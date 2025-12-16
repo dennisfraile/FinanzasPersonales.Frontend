@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User } from 'lucide-react';
+import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { NotificationBell } from './NotificationBell';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -56,6 +57,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: '/metas', icon: Target, label: 'Metas' },
         { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
         { path: '/categorias', icon: Tag, label: 'Categorías' },
+        { path: '/reportes', icon: BarChart3, label: 'Reportes' },
         { path: '/perfil', icon: User, label: 'Mi Perfil' },
     ];
 
@@ -85,6 +87,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </div>
 
                         <div className="flex items-center space-x-2 sm:space-x-4">
+                            <NotificationBell />
                             <button
                                 onClick={toggleTheme}
                                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

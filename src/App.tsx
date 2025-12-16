@@ -11,6 +11,8 @@ import { MetasPage } from './pages/MetasPage';
 import { PresupuestosPage } from './pages/PresupuestosPage';
 import { CategoriasPage } from './pages/CategoriasPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ReportesPage } from './pages/ReportesPage';
+import { NotificacionesPage } from './pages/NotificacionesPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -83,6 +85,24 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout><ProfilePage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reportes"
+              element={
+                <ProtectedRoute>
+                  <Layout><ReportesPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/notificaciones"
+              element={
+                <ProtectedRoute>
+                  <Layout><NotificacionesPage /></Layout>
                 </ProtectedRoute>
               }
             />
