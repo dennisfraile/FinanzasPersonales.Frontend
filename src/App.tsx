@@ -1,0 +1,110 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { GastosPage } from './pages/GastosPage';
+import { IngresosPage } from './pages/IngresosPage';
+import { MetasPage } from './pages/MetasPage';
+import { PresupuestosPage } from './pages/PresupuestosPage';
+import { CategoriasPage } from './pages/CategoriasPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { Layout } from './components/Layout';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function App() {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Layout><DashboardPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/gastos"
+              element={
+                <ProtectedRoute>
+                  <Layout><GastosPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/ingresos"
+              element={
+                <ProtectedRoute>
+                  <Layout><IngresosPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/metas"
+              element={
+                <ProtectedRoute>
+                  <Layout><MetasPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/presupuestos"
+              element={
+                <ProtectedRoute>
+                  <Layout><PresupuestosPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/categorias"
+              element={
+                <ProtectedRoute>
+                  <Layout><CategoriasPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/perfil"
+              element={
+                <ProtectedRoute>
+                  <Layout><ProfilePage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            limit={3}
+          />
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+}
+
+export default App;
