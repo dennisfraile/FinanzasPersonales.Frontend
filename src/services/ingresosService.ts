@@ -14,6 +14,7 @@ export interface CreateIngresoDto {
     categoriaId: number;
     descripcion?: string;
     monto: number;
+    cuentaId?: number | null; // NUEVO
 }
 
 export const ingresosService = {

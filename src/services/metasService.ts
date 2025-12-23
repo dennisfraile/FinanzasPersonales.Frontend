@@ -13,6 +13,7 @@ export interface CreateMetaDto {
     montoTotal: number;
     ahorroActual: number;
     montoRestante: number;
+    cuentaId?: number | null;
 }
 
 export const metasService = {

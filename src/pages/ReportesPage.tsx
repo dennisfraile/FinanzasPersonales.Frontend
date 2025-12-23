@@ -14,11 +14,13 @@ import {
 import { TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, AlertCircle, TrendingUp as TrendIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 
+
 // const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
 export const ReportesPage = () => {
     const [mesesAnalisis, setMesesAnalisis] = useState(6);
     const [isLoading, setIsLoading] = useState(true);
+
 
     const [tendencias, setTendencias] = useState<TendenciasMensualesDto | null>(null);
     const [comparativa, setComparativa] = useState<ComparativaMesDto | null>(null);

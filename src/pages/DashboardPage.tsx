@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { dashboardService, type DashboardData, type GraficaData } from '../services/dashboardService';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Target, Wallet } from 'lucide-react';
+import { useCuentas } from '../hooks/useCuentas';
 
 export const DashboardPage = () => {
     const [resumen, setResumen] = useState<DashboardData | null>(null);
@@ -10,6 +11,7 @@ export const DashboardPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth() + 1); // 1-12
     const [anoSeleccionado, setAnoSeleccionado] = useState(new Date().getFullYear());
+    const { cuentas } = useCuentas(); // NUEVO: Para distribución
 
     useEffect(() => {
         loadDashboardData();
@@ -190,6 +192,43 @@ export const DashboardPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* NUEVO: Distribución de Fondos por Cuenta */}
+            {cuentas && cuentas.length > 0 && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mt-6">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-4">
+                        💰 Distribución de Fondos por Cuenta
+                    </h2>
+                    <div className="h-64 sm:h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={cuentas.map(c => ({ name: c.nombre, value: c.balanceActual }))}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={80}
+                                    label={(entry) => `${entry.name}: $${entry.value.toFixed(2)}`}
+                                >
+                                    {cuentas.map((_, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: '#1f2937',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        color: 'white'
+                                    }}
+                                />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -16,6 +16,7 @@ export interface CreateGastoDto {
     tipo: string;
     descripcion: string;
     monto: number;
+    cuentaId?: number | null; // NUEVO
 }
 
 export const gastosService = {

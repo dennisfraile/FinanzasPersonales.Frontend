@@ -4,6 +4,7 @@ import { categoriasService, type Categoria } from '../services/categoriasService
 import { Trash2, Plus, Edit2, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
+import { CuentaSelector } from '../components/CuentaSelector';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -21,6 +22,7 @@ export const IngresosPage = () => {
         categoriaId: 0,
         descripcion: '',
         monto: 0,
+        cuentaId: null,
     });
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: '', tipo: 'Ingreso' });
 
@@ -283,6 +285,14 @@ export const IngresosPage = () => {
                                         required
                                     />
                                 </div>
+
+                                <CuentaSelector
+                                    value={formData.cuentaId}
+                                    onChange={(id) => setFormData({ ...formData, cuentaId: id })}
+                                    label="Cuenta (Opcional)"
+                                    required={false}
+                                />
+
                                 <div className="flex gap-2">
                                     <button type="submit" className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
                                         Guardar

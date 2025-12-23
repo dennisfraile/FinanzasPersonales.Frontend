@@ -14,6 +14,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { ReportesPage } from './pages/ReportesPage';
 import { NotificacionesPage } from './pages/NotificacionesPage';
 import { CuentasPage } from './pages/CuentasPage';
+import { TransferirPage } from './pages/TransferirPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -113,6 +114,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout><CuentasPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transferir"
+              element={
+                <ProtectedRoute>
+                  <Layout><TransferirPage /></Layout>
                 </ProtectedRoute>
               }
             />

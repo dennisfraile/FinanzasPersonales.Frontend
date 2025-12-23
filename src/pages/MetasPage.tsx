@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { metasService, type Meta, type CreateMetaDto } from '../services/metasService';
 import { Trash2, Plus, Edit2, DollarSign, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { CuentaSelector } from '../components/CuentaSelector';
 
 export const MetasPage = () => {
     const [metas, setMetas] = useState<Meta[]>([]);
@@ -16,6 +17,7 @@ export const MetasPage = () => {
         montoTotal: 0,
         ahorroActual: 0,
         montoRestante: 0,
+        cuentaId: null,
     });
 
     useEffect(() => {
@@ -254,6 +256,14 @@ export const MetasPage = () => {
                                         required
                                     />
                                 </div>
+
+                                <CuentaSelector
+                                    value={formData.cuentaId}
+                                    onChange={(id) => setFormData({ ...formData, cuentaId: id })}
+                                    label="Cuenta para el Ahorro (Opcional)"
+                                    required={false}
+                                />
+
                                 <div className="flex gap-2">
                                     <button type="submit" className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
                                         Guardar
