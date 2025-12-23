@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3, Wallet, ArrowLeftRight, Repeat } from 'lucide-react';
+import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
 
@@ -60,6 +60,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: '/cuentas', icon: Wallet, label: 'Cuentas' },
         { path: '/transferir', icon: ArrowLeftRight, label: 'Transferir' },
         { path: '/gastos-recurrentes', icon: Repeat, label: 'Recurrentes' },
+        { path: '/calendario', icon: Calendar, label: 'Calendario' },
         { path: '/reportes', icon: BarChart3, label: 'Reportes' },
         { path: '/perfil', icon: User, label: 'Mi Perfil' },
     ];
