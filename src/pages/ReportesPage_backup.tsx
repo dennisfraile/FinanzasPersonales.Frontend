@@ -11,7 +11,7 @@ import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
-import { TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, AlertCircle, TrendingUp as TrendIcon, FileDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, AlertCircle, TrendingUp as TrendIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 
@@ -67,82 +67,6 @@ export const ReportesPage = () => {
         return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
     };
 
-    const handleExportExcel = async () => {
-        try {
-            const desde = new Date();
-            desde.setMonth(desde.getMonth() - mesesAnalisis);
-            const hasta = new Date();
-
-            const response = await fetch('/api/Export/excel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    desde: desde.toISOString(),
-                    hasta: hasta.toISOString(),
-                    incluir: ['gastos', 'ingresos', 'metas', 'presupuestos']
-                })
-            });
-
-            if (!response.ok) throw new Error('Error al exportar');
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Finanzas_${new Date().toISOString().split('T')[0]}.xlsx`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-
-            toast.success('¡Reporte Excel descargado!');
-        } catch (error) {
-            console.error('Error:', error);
-            toast.error('Error al exportar a Excel');
-        }
-    };
-
-    const handleExportPdf = async () => {
-        try {
-            const desde = new Date();
-            desde.setMonth(desde.getMonth() - mesesAnalisis);
-            const hasta = new Date();
-
-            const response = await fetch('/api/Export/pdf', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    desde: desde.toISOString(),
-                    hasta: hasta.toISOString(),
-                    incluir: ['gastos', 'ingresos']
-                })
-            });
-
-            if (!response.ok) throw new Error('Error al exportar');
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Reporte_${new Date().toISOString().split('T')[0]}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-
-            toast.success('¡Reporte PDF descargado!');
-        } catch (error) {
-            console.error('Error:', error);
-            toast.error('Error al exportar a PDF');
-        }
-    };
-
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -154,36 +78,21 @@ export const ReportesPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
             <div className="max-w-7xl mx-auto space-y-6">
+                {/* Header */}
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">📊 Reportes Avanzados</h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Análisis profundo de tus finanzas</p>
                     </div>
-                    <div className="flex gap-3 items-center">
-                        <select
-                            value={mesesAnalisis}
-                            onChange={(e) => setMesesAnalisis(Number(e.target.value))}
-                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                        >
-                            <option value={3}>Últimos 3 meses</option>
-                            <option value={6}>Últimos 6 meses</option>
-                            <option value={12}>Últimos 12 meses</option>
-                        </select>
-                        <button
-                            onClick={handleExportExcel}
-                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                        >
-                            <FileDown size={20} />
-                            Excel
-                        </button>
-                        <button
-                            onClick={handleExportPdf}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                        >
-                            <FileDown size={20} />
-                            PDF
-                        </button>
-                    </div>
+                    <select
+                        value={mesesAnalisis}
+                        onChange={(e) => setMesesAnalisis(Number(e.target.value))}
+                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    >
+                        <option value={3}>Últimos 3 meses</option>
+                        <option value={6}>Últimos 6 meses</option>
+                        <option value={12}>Últimos 12 meses</option>
+                    </select>
                 </div>
 
                 {/* Tarjetas de Resumen */}
