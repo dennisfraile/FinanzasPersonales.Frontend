@@ -1,5 +1,5 @@
 import { useNotificaciones } from '../hooks/useNotificaciones';
-import { Bell, Check, Trash2 } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
 
 export const NotificacionesPage = () => {
     const { notificaciones, marcarLeida, isLoading } = useNotificaciones();
@@ -73,8 +73,8 @@ export const NotificacionesPage = () => {
                         <div
                             key={notif.id}
                             className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border-l-4 transition-all ${notif.leida
-                                    ? 'border-gray-300 dark:border-gray-600'
-                                    : 'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                                ? 'border-gray-300 dark:border-gray-600'
+                                : 'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
                                 }`}
                         >
                             <div className="flex items-start gap-3">

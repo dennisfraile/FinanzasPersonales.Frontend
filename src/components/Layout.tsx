@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3, Wallet } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
 
@@ -57,6 +57,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: '/metas', icon: Target, label: 'Metas' },
         { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
         { path: '/categorias', icon: Tag, label: 'Categorías' },
+        { path: '/cuentas', icon: Wallet, label: 'Cuentas' },
         { path: '/reportes', icon: BarChart3, label: 'Reportes' },
         { path: '/perfil', icon: User, label: 'Mi Perfil' },
     ];

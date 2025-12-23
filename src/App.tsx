@@ -13,6 +13,7 @@ import { CategoriasPage } from './pages/CategoriasPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { ReportesPage } from './pages/ReportesPage';
 import { NotificacionesPage } from './pages/NotificacionesPage';
+import { CuentasPage } from './pages/CuentasPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -103,6 +104,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout><NotificacionesPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/cuentas"
+              element={
+                <ProtectedRoute>
+                  <Layout><CuentasPage /></Layout>
                 </ProtectedRoute>
               }
             />
