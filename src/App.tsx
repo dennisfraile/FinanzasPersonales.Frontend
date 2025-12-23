@@ -15,6 +15,7 @@ import { ReportesPage } from './pages/ReportesPage';
 import { NotificacionesPage } from './pages/NotificacionesPage';
 import { CuentasPage } from './pages/CuentasPage';
 import { TransferirPage } from './pages/TransferirPage';
+import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -122,6 +123,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout><TransferirPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/gastos-recurrentes"
+              element={
+                <ProtectedRoute>
+                  <Layout><GastosRecurrentesPage /></Layout>
                 </ProtectedRoute>
               }
             />
