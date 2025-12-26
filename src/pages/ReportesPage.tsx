@@ -286,7 +286,7 @@ export const ReportesPage = () => {
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="periodo" />
                                 <YAxis />
-                                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                                <Tooltip formatter={(value: number | undefined) => value ? formatCurrency(value) : '$0.00'} />
                                 <Legend />
                                 <Line type="monotone" dataKey="totalIngresos" stroke="#10b981" name="Ingresos" strokeWidth={2} />
                                 <Line type="monotone" dataKey="totalGastos" stroke="#ef4444" name="Gastos" strokeWidth={2} />
@@ -338,7 +338,7 @@ export const ReportesPage = () => {
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis type="number" />
                                     <YAxis dataKey="nombre" type="category" width={100} />
-                                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                                    <Tooltip formatter={(value: number | undefined) => value ? formatCurrency(value) : '$0.00'} />
                                     <Bar dataKey="total" fill="#8b5cf6" />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -372,7 +372,7 @@ export const ReportesPage = () => {
                                         <Cell fill="#3b82f6" />
                                         <Cell fill="#ef4444" />
                                     </Pie>
-                                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                                    <Tooltip formatter={(value: number | undefined) => value ? formatCurrency(value) : '$0.00'} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="flex flex-col justify-center space-y-4">
