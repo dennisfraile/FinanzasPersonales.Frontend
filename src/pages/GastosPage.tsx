@@ -65,7 +65,24 @@ export const GastosPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validaciones
+        if (formData.monto <= 0) {
+            toast.error('El monto debe ser mayor a cero');
+            return;
+        }
+
+        const fechaGasto = new Date(formData.fecha);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        if (fechaGasto > hoy) {
+            toast.error('No puedes registrar gastos con fecha futura');
+            return;
+        }
+
         try {
+            setIsLoading(true); // Prevenir double-submit
             if (editingId) {
                 await gastosService.update(editingId, formData);
                 toast.success('Gasto actualizado');
@@ -78,6 +95,8 @@ export const GastosPage = () => {
         } catch (error) {
             console.error('Error saving gasto:', error);
             toast.error('Error al guardar gasto');
+        } finally {
+            setIsLoading(false);
         }
     };
 
