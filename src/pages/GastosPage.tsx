@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { AdjuntosList } from '../components/AdjuntosList';
+import { TableSkeleton } from '../components/Skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,6 +14,7 @@ export const GastosPage = () => {
     const [gastos, setGastos] = useState<Gasto[]>([]);
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -41,11 +43,14 @@ export const GastosPage = () => {
 
     const loadGastos = async () => {
         try {
+            setIsLoading(true);
             const data = await gastosService.getAll();
             setGastos(data);
         } catch (error) {
             console.error('Error loading gastos:', error);
             toast.error('Error al cargar gastos');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -292,54 +297,60 @@ export const GastosPage = () => {
                     </div>
                 )}
 
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Monto</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {paginatedGastos.map((gasto) => (
-                                <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td className="px-6 py-4 dark:text-gray-300">{gasto.descripcion}</td>
-                                    <td className="px-6 py-4 dark:text-gray-300">{gasto.categoriaNombre || '-'}</td>
-                                    <td className="px-6 py-4 dark:text-gray-300">
-                                        <span className={`px-2 py-1 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                                            }`}>
-                                            {gasto.tipo || 'Variable'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4 font-semibold text-red-600">${gasto.monto.toFixed(2)}</td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex gap-2">
-                                            <button onClick={() => handleEdit(gasto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
-                                                <Edit2 size={18} />
-                                            </button>
-                                            <button onClick={() => handleDelete(gasto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
+                {isLoading ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                        <TableSkeleton rows={10} columns={6} />
+                    </div>
+                ) : (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                        <table className="w-full">
+                            <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Monto</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                {paginatedGastos.map((gasto) => (
+                                    <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="px-6 py-4 dark:text-gray-300">{gasto.descripcion}</td>
+                                        <td className="px-6 py-4 dark:text-gray-300">{gasto.categoriaNombre || '-'}</td>
+                                        <td className="px-6 py-4 dark:text-gray-300">
+                                            <span className={`px-2 py-1 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                                                }`}>
+                                                {gasto.tipo || 'Variable'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4 font-semibold text-red-600">${gasto.monto.toFixed(2)}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex gap-2">
+                                                <button onClick={() => handleEdit(gasto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                                    <Edit2 size={18} />
+                                                </button>
+                                                <button onClick={() => handleDelete(gasto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
 
-                    {totalPages > 1 && (
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
-                    )}
-                </div>
+                        {totalPages > 1 && (
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        )}
+                    </div>
+                )}
 
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
