@@ -18,6 +18,12 @@ export const GastosPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategoria, setFilterCategoria] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [showFilters, setShowFilters] = useState(false);
+    // Advanced filters
+    const [fechaDesde, setFechaDesde] = useState('');
+    const [fechaHasta, setFechaHasta] = useState('');
+    const [montoMin, setMontoMin] = useState('');
+    const [montoMax, setMontoMax] = useState('');
     const [formData, setFormData] = useState<CreateGastoDto>({
         fecha: new Date().toISOString().split('T')[0],
         categoriaId: 0,
@@ -125,15 +131,33 @@ export const GastosPage = () => {
         }
     };
 
-    // Filtrado y búsqueda
+    const clearFilters = () => {
+        setSearchTerm('');
+        setFilterCategoria('');
+        setFechaDesde('');
+        setFechaHasta('');
+        setMontoMin('');
+        setMontoMax('');
+        setCurrentPage(1);
+    };
+
+    // Filtrado y búsqueda con filtros avanzados
     const filteredGastos = useMemo(() => {
         if (!Array.isArray(gastos)) return [];
         return gastos.filter(gasto => {
             const matchesSearch = (gasto.descripcion ?? '').toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategoria = !filterCategoria || gasto.categoriaId.toString() === filterCategoria;
-            return matchesSearch && matchesCategoria;
+
+            // Filtros avanzados
+            const matchesFechaDesde = !fechaDesde || gasto.fecha >= fechaDesde;
+            const matchesFechaHasta = !fechaHasta || gasto.fecha <= fechaHasta;
+            const matchesMontoMin = !montoMin || gasto.monto >= parseFloat(montoMin);
+            const matchesMontoMax = !montoMax || gasto.monto <= parseFloat(montoMax);
+
+            return matchesSearch && matchesCategoria && matchesFechaDesde && matchesFechaHasta &&
+                matchesMontoMin && matchesMontoMax;
         });
-    }, [gastos, searchTerm, filterCategoria]);
+    }, [gastos, searchTerm, filterCategoria, fechaDesde, fechaHasta, montoMin, montoMax]);
 
     // Paginación
     const totalPages = Math.ceil(filteredGastos.length / ITEMS_PER_PAGE);
@@ -185,7 +209,88 @@ export const GastosPage = () => {
                             ))}
                         </select>
                     </div>
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                    >
+                        {showFilters ? 'Ocultar' : 'Mostrar'} Filtros Avanzados
+                    </button>
                 </div>
+
+                {/* Advanced Filters Panel */}
+                {showFilters && (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold dark:text-white">Filtros Avanzados</h3>
+                            <button
+                                onClick={clearFilters}
+                                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                            >
+                                Limpiar Filtros
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Desde</label>
+                                <input
+                                    type="date"
+                                    value={fechaDesde}
+                                    onChange={(e) => setFechaDesde(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Hasta</label>
+                                <input
+                                    type="date"
+                                    value={fechaHasta}
+                                    onChange={(e) => setFechaHasta(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
+                                <select
+                                    value={filterCategoria}
+                                    onChange={(e) => setFilterCategoria(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="">Todas</option>
+                                    {categorias.map(c => (
+                                        <option key={c.id} value={c.id}>{c.nombre}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Mínimo</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={montoMin}
+                                    onChange={(e) => setMontoMin(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Máximo</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={montoMax}
+                                    onChange={(e) => setMontoMax(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div className="flex items-end">
+                                <div className="text-sm dark:text-gray-300">
+                                    <strong>{filteredGastos.length}</strong> resultados
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <table className="w-full">
