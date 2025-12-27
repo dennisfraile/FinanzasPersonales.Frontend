@@ -7,6 +7,7 @@ import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { AdjuntosList } from '../components/AdjuntosList';
 import { TableSkeleton } from '../components/Skeleton';
+import { TagSelector } from '../components/TagSelector';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -32,6 +33,7 @@ export const IngresosPage = () => {
         descripcion: '',
         monto: 0,
         cuentaId: null,
+        tagIds: [],
     });
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: '', tipo: 'Ingreso' });
 
@@ -427,6 +429,18 @@ export const IngresosPage = () => {
                                     label="Cuenta (Opcional)"
                                     required={false}
                                 />
+
+                                {/* Tags */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Tags
+                                    </label>
+                                    <TagSelector
+                                        selectedTagIds={formData.tagIds || []}
+                                        onChange={(tagIds) => setFormData({ ...formData, tagIds })}
+                                    />
+                                </div>
+
 
                                 {/* Adjuntos - solo mostrar cuando editando un ingreso existente */}
                                 {editingId && (

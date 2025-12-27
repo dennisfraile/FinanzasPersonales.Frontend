@@ -7,6 +7,7 @@ export interface Ingreso {
     categoriaNombre?: string;
     descripcion?: string;
     monto: number;
+    tagIds?: number[];
 }
 
 export interface CreateIngresoDto {
@@ -15,6 +16,7 @@ export interface CreateIngresoDto {
     descripcion?: string;
     monto: number;
     cuentaId?: number | null; // NUEVO
+    tagIds?: number[];
 }
 
 export const ingresosService = {
