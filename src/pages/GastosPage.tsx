@@ -328,6 +328,7 @@ export const GastosPage = () => {
                             <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tags</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
@@ -339,6 +340,15 @@ export const GastosPage = () => {
                                 {paginatedGastos.map((gasto) => (
                                     <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 dark:text-gray-300">{gasto.descripcion}</td>
+                                        <td className="px-6 py-4">
+                                            {gasto.tagIds && gasto.tagIds.length > 0 ? (
+                                                <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                                                    {gasto.tagIds.length} tag{gasto.tagIds.length !== 1 ? 's' : ''}
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400">-</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 dark:text-gray-300">{gasto.categoriaNombre || '-'}</td>
                                         <td className="px-6 py-4 dark:text-gray-300">
                                             <span className={`px-2 py-1 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
