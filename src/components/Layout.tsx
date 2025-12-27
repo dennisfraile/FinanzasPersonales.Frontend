@@ -62,6 +62,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: '/gastos-recurrentes', icon: Repeat, label: 'Recurrentes' },
         { path: '/calendario', icon: Calendar, label: 'Calendario' },
         { path: '/tags', icon: Tag, label: 'Tags' },
+        { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
         { path: '/reportes', icon: BarChart3, label: 'Reportes' },
         { path: '/perfil', icon: User, label: 'Mi Perfil' },
     ];

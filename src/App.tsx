@@ -18,6 +18,7 @@ import { TransferirPage } from './pages/TransferirPage';
 import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
 import { CalendarioPage } from './pages/CalendarioPage';
 import { TagsPage } from './pages/TagsPage';
+import { ComparacionPage } from './pages/ComparacionPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -149,6 +150,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout><TagsPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/comparacion"
+              element={
+                <ProtectedRoute>
+                  <Layout><ComparacionPage /></Layout>
                 </ProtectedRoute>
               }
             />
