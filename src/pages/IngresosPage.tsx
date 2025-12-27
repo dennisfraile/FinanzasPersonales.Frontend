@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { AdjuntosList } from '../components/AdjuntosList';
+import { TableSkeleton } from '../components/Skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,11 +14,18 @@ export const IngresosPage = () => {
     const [ingresos, setIngresos] = useState<Ingreso[]>([]);
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategoria, setFilterCategoria] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [showFilters, setShowFilters] = useState(false);
+    // Advanced filters
+    const [fechaDesde, setFechaDesde] = useState('');
+    const [fechaHasta, setFechaHasta] = useState('');
+    const [montoMin, setMontoMin] = useState('');
+    const [montoMax, setMontoMax] = useState('');
     const [formData, setFormData] = useState<CreateIngresoDto>({
         fecha: new Date().toISOString().split('T')[0],
         categoriaId: 0,
@@ -34,11 +42,14 @@ export const IngresosPage = () => {
 
     const loadIngresos = async () => {
         try {
+            setIsLoading(true);
             const data = await ingresosService.getAll();
             setIngresos(data);
         } catch (error) {
             console.error('Error loading ingresos:', error);
             toast.error('Error al cargar ingresos');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -53,7 +64,24 @@ export const IngresosPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validaciones
+        if (formData.monto <= 0) {
+            toast.error('El monto debe ser mayor a cero');
+            return;
+        }
+
+        const fechaIngreso = new Date(formData.fecha);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        if (fechaIngreso > hoy) {
+            toast.error('No puedes registrar ingresos con fecha futura');
+            return;
+        }
+
         try {
+            setIsLoading(true);
             if (editingId) {
                 await ingresosService.update(editingId, formData);
                 toast.success('Ingreso actualizado');
@@ -66,6 +94,8 @@ export const IngresosPage = () => {
         } catch (error) {
             console.error('Error saving ingreso:', error);
             toast.error('Error al guardar ingreso');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -122,6 +152,16 @@ export const IngresosPage = () => {
         }
     };
 
+    const clearFilters = () => {
+        setSearchTerm('');
+        setFilterCategoria('');
+        setFechaDesde('');
+        setFechaHasta('');
+        setMontoMin('');
+        setMontoMax('');
+        setCurrentPage(1);
+    };
+
     const filteredIngresos = useMemo(() => {
         if (!Array.isArray(ingresos)) return [];
         return ingresos.filter(ingreso => {
@@ -129,9 +169,17 @@ export const IngresosPage = () => {
                 ingreso.monto.toString().includes(searchTerm) ||
                 (ingreso.categoriaNombre ?? '').toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategoria = !filterCategoria || ingreso.categoriaId.toString() === filterCategoria;
-            return matchesSearch && matchesCategoria;
+
+            // Filtros avanzados
+            const matchesFechaDesde = !fechaDesde || ingreso.fecha >= fechaDesde;
+            const matchesFechaHasta = !fechaHasta || ingreso.fecha <= fechaHasta;
+            const matchesMontoMin = !montoMin || ingreso.monto >= parseFloat(montoMin);
+            const matchesMontoMax = !montoMax || ingreso.monto <= parseFloat(montoMax);
+
+            return matchesSearch && matchesCategoria && matchesFechaDesde && matchesFechaHasta &&
+                matchesMontoMin && matchesMontoMax;
         });
-    }, [ingresos, searchTerm, filterCategoria]);
+    }, [ingresos, searchTerm, filterCategoria, fechaDesde, fechaHasta, montoMin, montoMax]);
 
     const totalPages = Math.ceil(filteredIngresos.length / ITEMS_PER_PAGE);
     const paginatedIngresos = useMemo(() => {
@@ -182,9 +230,94 @@ export const IngresosPage = () => {
                             ))}
                         </select>
                     </div>
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                    >
+                        {showFilters ? 'Ocultar' : 'Mostrar'} Filtros Avanzados
+                    </button>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                {/* Advanced Filters Panel */}
+                {showFilters && (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold dark:text-white">Filtros Avanzados</h3>
+                            <button
+                                onClick={clearFilters}
+                                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                            >
+                                Limpiar Filtros
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Desde</label>
+                                <input
+                                    type="date"
+                                    value={fechaDesde}
+                                    onChange={(e) => setFechaDesde(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Hasta</label>
+                                <input
+                                    type="date"
+                                    value={fechaHasta}
+                                    onChange={(e) => setFechaHasta(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
+                                <select
+                                    value={filterCategoria}
+                                    onChange={(e) => setFilterCategoria(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="">Todas</option>
+                                    {categorias.map(c => (
+                                        <option key={c.id} value={c.id}>{c.nombre}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Mínimo</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={montoMin}
+                                    onChange={(e) => setMontoMin(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Máximo</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={montoMax}
+                                    onChange={(e) => setMontoMax(e.target.value)}
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div className="flex items-end">
+                                <div className="text-sm dark:text-gray-300">
+                                    <strong>{filteredIngresos.length}</strong> resultados
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {isLoading ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                        <TableSkeleton rows={10} columns={6} />
+                    </div>
+                ) : (<div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <table className="w-full">
                         <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                             <tr>
@@ -225,6 +358,7 @@ export const IngresosPage = () => {
                         />
                     )}
                 </div>
+                )}
 
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
