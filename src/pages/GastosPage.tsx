@@ -27,6 +27,7 @@ export const GastosPage = () => {
     const [fechaHasta, setFechaHasta] = useState('');
     const [montoMin, setMontoMin] = useState('');
     const [montoMax, setMontoMax] = useState('');
+    const [filterTagIds, setFilterTagIds] = useState<number[]>([]);
     const [formData, setFormData] = useState<CreateGastoDto>({
         fecha: new Date().toISOString().split('T')[0],
         categoriaId: 0,
@@ -164,6 +165,7 @@ export const GastosPage = () => {
         setFechaHasta('');
         setMontoMin('');
         setMontoMax('');
+        setFilterTagIds([]);
         setCurrentPage(1);
     };
 
@@ -309,6 +311,16 @@ export const GastosPage = () => {
                                     placeholder="0.00"
                                 />
                             </div>
+
+                            {/* Tags Filter */}
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Filtrar por Tags</label>
+                                <TagSelector
+                                    selectedTagIds={filterTagIds}
+                                    onChange={setFilterTagIds}
+                                />
+                            </div>
+
                             <div className="flex items-end">
                                 <div className="text-sm dark:text-gray-300">
                                     <strong>{filteredGastos.length}</strong> resultados
