@@ -17,6 +17,7 @@ import { CuentasPage } from './pages/CuentasPage';
 import { TransferirPage } from './pages/TransferirPage';
 import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
 import { CalendarioPage } from './pages/CalendarioPage';
+import { TagsPage } from './pages/TagsPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -140,6 +141,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout><CalendarioPage /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tags"
+              element={
+                <ProtectedRoute>
+                  <Layout><TagsPage /></Layout>
                 </ProtectedRoute>
               }
             />
