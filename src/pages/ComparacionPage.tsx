@@ -48,8 +48,9 @@ export const ComparacionPage = () => {
                         <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">Período 1</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Desde</label>
+                                <label htmlFor="periodo1-desde" className="block text-sm font-medium mb-1 dark:text-gray-300">Desde</label>
                                 <input
+                                    id="periodo1-desde"
                                     type="date"
                                     value={fecha1Inicio}
                                     onChange={(e) => setFecha1Inicio(e.target.value)}
@@ -57,8 +58,9 @@ export const ComparacionPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Hasta</label>
+                                <label htmlFor="periodo1-hasta" className="block text-sm font-medium mb-1 dark:text-gray-300">Hasta</label>
                                 <input
+                                    id="periodo1-hasta"
                                     type="date"
                                     value={fecha1Fin}
                                     onChange={(e) => setFecha1Fin(e.target.value)}
@@ -72,8 +74,9 @@ export const ComparacionPage = () => {
                         <h2 className="text-xl font-semibold mb-4 text-green-600 dark:text-green-400">Período 2</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Desde</label>
+                                <label htmlFor="periodo2-desde" className="block text-sm font-medium mb-1 dark:text-gray-300">Desde</label>
                                 <input
+                                    id="periodo2-desde"
                                     type="date"
                                     value={fecha2Inicio}
                                     onChange={(e) => setFecha2Inicio(e.target.value)}
@@ -81,8 +84,9 @@ export const ComparacionPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Hasta</label>
+                                <label htmlFor="periodo2-hasta" className="block text-sm font-medium mb-1 dark:text-gray-300">Hasta</label>
                                 <input
+                                    id="periodo2-hasta"
                                     type="date"
                                     value={fecha2Fin}
                                     onChange={(e) => setFecha2Fin(e.target.value)}
@@ -104,8 +108,8 @@ export const ComparacionPage = () => {
                 {/* Resultados */}
                 {comparacion && (
                     <div className="mt-8 space-y-6">
-                        {/* Comparación de totales */}
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                        {/* Comparación de totales - Desktop */}
+                        <div className="hidden md:block bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                             <table className="w-full">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
@@ -152,6 +156,69 @@ export const ComparacionPage = () => {
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        {/* Comparación de totales - Mobile */}
+                        <div className="md:hidden space-y-4">
+                            {[
+                                {
+                                    label: 'Ingresos',
+                                    p1: comparacion.periodo1.totalIngresos,
+                                    p2: comparacion.periodo2.totalIngresos,
+                                    diff: comparacion.diferenciaIngresos,
+                                    pct: comparacion.porcentajeCambioIngresos,
+                                    diffPositive: comparacion.diferenciaIngresos >= 0,
+                                    pctPositive: comparacion.porcentajeCambioIngresos >= 0,
+                                },
+                                {
+                                    label: 'Gastos',
+                                    p1: comparacion.periodo1.totalGastos,
+                                    p2: comparacion.periodo2.totalGastos,
+                                    diff: comparacion.diferenciaGastos,
+                                    pct: comparacion.porcentajeCambioGastos,
+                                    diffPositive: comparacion.diferenciaGastos <= 0,
+                                    pctPositive: comparacion.porcentajeCambioGastos <= 0,
+                                },
+                                {
+                                    label: 'Balance',
+                                    p1: comparacion.periodo1.balance,
+                                    p2: comparacion.periodo2.balance,
+                                    diff: comparacion.diferenciaBalance,
+                                    pct: null,
+                                    diffPositive: comparacion.diferenciaBalance >= 0,
+                                    pctPositive: false,
+                                },
+                            ].map((row) => (
+                                <div key={row.label} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="font-bold text-lg dark:text-white">{row.label}</h3>
+                                        {row.pct !== null && (
+                                            <span className={`flex items-center gap-1 text-sm font-semibold ${row.pctPositive ? 'text-green-600' : 'text-red-600'}`}>
+                                                {row.pct >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                                                {row.pct.toFixed(2)}%
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                        <div>
+                                            <p className="text-blue-600 dark:text-blue-400 font-medium">Período 1</p>
+                                            <p className="dark:text-gray-300">{formatCurrency(row.p1)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-green-600 dark:text-green-400 font-medium">Período 2</p>
+                                            <p className="dark:text-gray-300">{formatCurrency(row.p2)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="pt-2 border-t dark:border-gray-700">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500 dark:text-gray-400">Diferencia:</span>
+                                            <span className={`font-semibold ${row.diffPositive ? 'text-green-600' : 'text-red-600'}`}>
+                                                {row.diff >= 0 ? '+' : ''}{formatCurrency(row.diff)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}

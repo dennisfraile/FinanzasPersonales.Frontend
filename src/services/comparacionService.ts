@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5050/api';
+import apiClient from './api';
 
 export interface PeriodoFinanciero {
     fechaInicio: string;
@@ -22,15 +20,6 @@ export interface ComparacionPeriodos {
     porcentajeCambioGastos: number;
 }
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-};
-
 export const comparacionService = {
     compararPeriodos: async (
         fecha1Inicio: string,
@@ -38,13 +27,9 @@ export const comparacionService = {
         fecha2Inicio: string,
         fecha2Fin: string
     ): Promise<ComparacionPeriodos> => {
-        const response = await axios.get<ComparacionPeriodos>(
-            `${API_URL}/Reportes/comparar-periodos`,
-            {
-                ...getAuthHeaders(),
-                params: { fecha1Inicio, fecha1Fin, fecha2Inicio, fecha2Fin },
-            }
-        );
+        const response = await apiClient.get<ComparacionPeriodos>('/Reportes/comparar-periodos', {
+            params: { fecha1Inicio, fecha1Fin, fecha2Inicio, fecha2Fin },
+        });
         return response.data;
     },
 };

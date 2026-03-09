@@ -200,12 +200,14 @@ export const GastosPage = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                aria-label="Buscar gastos"
                             />
                         </div>
                         <select
                             value={filterCategoria}
                             onChange={(e) => setFilterCategoria(e.target.value)}
                             className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            aria-label="Filtrar por categoría"
                         >
                             <option value="">Todas las categorías</option>
                             {categorias.map(c => (
@@ -235,8 +237,9 @@ export const GastosPage = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Desde</label>
+                                <label htmlFor="fecha-desde" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Desde</label>
                                 <input
+                                    id="fecha-desde"
                                     type="date"
                                     value={fechaDesde}
                                     onChange={(e) => setFechaDesde(e.target.value)}
@@ -244,8 +247,9 @@ export const GastosPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Hasta</label>
+                                <label htmlFor="fecha-hasta" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Hasta</label>
                                 <input
+                                    id="fecha-hasta"
                                     type="date"
                                     value={fechaHasta}
                                     onChange={(e) => setFechaHasta(e.target.value)}
@@ -253,8 +257,9 @@ export const GastosPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
+                                <label htmlFor="filter-categoria" className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
                                 <select
+                                    id="filter-categoria"
                                     value={filterCategoria}
                                     onChange={(e) => setFilterCategoria(e.target.value)}
                                     className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -266,8 +271,9 @@ export const GastosPage = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Mínimo</label>
+                                <label htmlFor="monto-minimo" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Mínimo</label>
                                 <input
+                                    id="monto-minimo"
                                     type="number"
                                     step="0.01"
                                     value={montoMin}
@@ -277,8 +283,9 @@ export const GastosPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Máximo</label>
+                                <label htmlFor="monto-maximo" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Máximo</label>
                                 <input
+                                    id="monto-maximo"
                                     type="number"
                                     step="0.01"
                                     value={montoMax}
@@ -312,54 +319,92 @@ export const GastosPage = () => {
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tags</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Monto</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {paginatedGastos.map((gasto) => (
-                                    <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4 dark:text-gray-300">{gasto.descripcion}</td>
-                                        <td className="px-6 py-4">
-                                            {gasto.tagIds && gasto.tagIds.length > 0 ? (
-                                                <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
-                                                    {gasto.tagIds.length} tag{gasto.tagIds.length !== 1 ? 's' : ''}
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-400">-</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 dark:text-gray-300">{gasto.categoriaNombre || '-'}</td>
-                                        <td className="px-6 py-4 dark:text-gray-300">
-                                            <span className={`px-2 py-1 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                                                }`}>
-                                                {gasto.tipo || 'Variable'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 font-semibold text-red-600">${gasto.monto.toFixed(2)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button onClick={() => handleEdit(gasto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button onClick={() => handleDelete(gasto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                        {/* Desktop table */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tags</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Monto</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                    {paginatedGastos.map((gasto) => (
+                                        <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td className="px-6 py-4 dark:text-gray-300">{gasto.descripcion}</td>
+                                            <td className="px-6 py-4">
+                                                {gasto.tagIds && gasto.tagIds.length > 0 ? (
+                                                    <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                                                        {gasto.tagIds.length} tag{gasto.tagIds.length !== 1 ? 's' : ''}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400">-</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 dark:text-gray-300">{gasto.categoriaNombre || '-'}</td>
+                                            <td className="px-6 py-4 dark:text-gray-300">
+                                                <span className={`px-2 py-1 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                                                    }`}>
+                                                    {gasto.tipo || 'Variable'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 font-semibold text-red-600">${gasto.monto.toFixed(2)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => handleEdit(gasto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(gasto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {/* Mobile cards */}
+                        <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+                            {paginatedGastos.map((gasto) => (
+                                <div key={gasto.id} className="p-4 space-y-2">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium dark:text-white truncate">{gasto.descripcion}</p>
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                                <span className="text-sm text-gray-500 dark:text-gray-400">{gasto.categoriaNombre || '-'}</span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'}`}>
+                                                    {gasto.tipo || 'Variable'}
+                                                </span>
+                                                {gasto.tagIds && gasto.tagIds.length > 0 && (
+                                                    <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">
+                                                        {gasto.tagIds.length} tag{gasto.tagIds.length !== 1 ? 's' : ''}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <p className="font-bold text-red-600 text-lg ml-4">${gasto.monto.toFixed(2)}</p>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(gasto.fecha).toLocaleDateString()}</span>
+                                        <div className="flex gap-3">
+                                            <button onClick={() => handleEdit(gasto)} className="text-blue-600 dark:text-blue-400 p-1" aria-label="Editar">
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button onClick={() => handleDelete(gasto.id)} className="text-red-600 dark:text-red-400 p-1" aria-label="Eliminar">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
 
                         {totalPages > 1 && (
                             <Pagination
@@ -372,13 +417,14 @@ export const GastosPage = () => {
                 )}
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} Gasto</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Descripción</label>
+                                    <label htmlFor="gasto-descripcion" className="block text-sm font-medium mb-1 dark:text-gray-300">Descripción</label>
                                     <input
+                                        id="gasto-descripcion"
                                         type="text"
                                         value={formData.descripcion}
                                         onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
@@ -387,9 +433,10 @@ export const GastosPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
+                                    <label htmlFor="gasto-categoria" className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
                                     <div className="flex gap-2">
                                         <select
+                                            id="gasto-categoria"
                                             value={formData.categoriaId}
                                             onChange={(e) => setFormData({ ...formData, categoriaId: Number(e.target.value) })}
                                             className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -411,8 +458,9 @@ export const GastosPage = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Tipo</label>
+                                    <label htmlFor="gasto-tipo" className="block text-sm font-medium mb-1 dark:text-gray-300">Tipo</label>
                                     <select
+                                        id="gasto-tipo"
                                         value={formData.tipo || 'Fijo'}
                                         onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -423,8 +471,9 @@ export const GastosPage = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha</label>
+                                    <label htmlFor="gasto-fecha" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha</label>
                                     <input
+                                        id="gasto-fecha"
                                         type="date"
                                         value={formData.fecha}
                                         onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
@@ -433,8 +482,9 @@ export const GastosPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto</label>
+                                    <label htmlFor="gasto-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto</label>
                                     <input
+                                        id="gasto-monto"
                                         type="number"
                                         step="0.01"
                                         value={formData.monto}
@@ -486,8 +536,8 @@ export const GastosPage = () => {
 
                 {/* Quick Create Categoria Modal */}
                 {isQuickCatModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
                             <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva Categoría Rápida</h3>
                             <div className="space-y-4">
                                 <div>

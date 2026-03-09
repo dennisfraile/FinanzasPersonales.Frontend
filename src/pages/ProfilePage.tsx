@@ -69,16 +69,18 @@ export const ProfilePage = () => {
                                 type="email"
                                 value={user?.email || ''}
                                 disabled
+                                aria-label="Email"
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                             />
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Vinculado a tu cuenta de Google</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label htmlFor="userName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Nombre de Usuario
                             </label>
                             <input
+                                id="userName"
                                 type="text"
                                 value={profileData.userName || ''}
                                 onChange={(e) => setProfileData({ userName: e.target.value })}

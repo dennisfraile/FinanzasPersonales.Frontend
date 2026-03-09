@@ -144,31 +144,37 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <aside
                     className={`
                         fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)]
-                        bg-white dark:bg-gray-800 shadow-sm
+                        bg-gradient-to-b from-slate-900 to-slate-800
+                        border-r border-slate-700/50
                         transition-all duration-300 ease-in-out
                         z-10 lg:z-auto
                         ${isMobile
                             ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64')
-                            : (sidebarOpen ? 'w-64' : 'w-20')
+                            : (sidebarOpen ? 'w-64' : 'w-[4.5rem]')
                         }
                     `}
                 >
-                    <nav className="p-4 space-y-2 overflow-y-auto h-full">
+                    <nav className="px-3 py-4 space-y-1 overflow-y-auto h-full sidebar-scroll">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
+                            const active = isActive(item.path);
                             return (
                                 <Link
                                     key={item.path}
                                     to={item.path}
                                     onClick={handleLinkClick}
-                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path)
-                                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-semibold'
-                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                                        }`}
+                                    className={`
+                                        flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                        ${!sidebarOpen && !isMobile ? 'justify-center' : ''}
+                                        ${active
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold'
+                                            : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                                        }
+                                    `}
                                     title={!sidebarOpen && !isMobile ? item.label : undefined}
                                 >
-                                    <Icon size={20} className="shrink-0" />
-                                    <span className={`${!sidebarOpen && !isMobile ? 'hidden' : 'whitespace-nowrap'}`}>
+                                    <Icon size={20} className={`shrink-0 ${active ? 'text-white' : ''}`} />
+                                    <span className={`${!sidebarOpen && !isMobile ? 'hidden' : 'whitespace-nowrap text-sm'}`}>
                                         {item.label}
                                     </span>
                                 </Link>

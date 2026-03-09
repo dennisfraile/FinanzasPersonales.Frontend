@@ -140,6 +140,7 @@ export const MetasPage = () => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            aria-label="Buscar metas"
                         />
                     </div>
                 </div>
@@ -154,10 +155,10 @@ export const MetasPage = () => {
                                 <div className="flex justify-between items-start mb-4">
                                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{meta.metas}</h3>
                                     <div className="flex gap-2">
-                                        <button onClick={() => handleEdit(meta)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                        <button onClick={() => handleEdit(meta)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                             <Edit2 size={18} />
                                         </button>
-                                        <button onClick={() => handleDelete(meta.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
+                                        <button onClick={() => handleDelete(meta.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
                                             <Trash2 size={18} />
                                         </button>
                                     </div>
@@ -208,13 +209,14 @@ export const MetasPage = () => {
 
                 {/* Modales */}
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} Meta</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre de la Meta</label>
+                                    <label htmlFor="meta-nombre" className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre de la Meta</label>
                                     <input
+                                        id="meta-nombre"
                                         type="text"
                                         value={formData.metas}
                                         onChange={(e) => setFormData({ ...formData, metas: e.target.value })}
@@ -224,8 +226,9 @@ export const MetasPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Total</label>
+                                    <label htmlFor="meta-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Total</label>
                                     <input
+                                        id="meta-monto"
                                         type="number"
                                         step="0.01"
                                         value={formData.montoTotal}
@@ -235,8 +238,9 @@ export const MetasPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Ahorro Actual</label>
+                                    <label htmlFor="meta-ahorro" className="block text-sm font-medium mb-1 dark:text-gray-300">Ahorro Actual</label>
                                     <input
+                                        id="meta-ahorro"
                                         type="number"
                                         step="0.01"
                                         value={formData.ahorroActual}
@@ -267,13 +271,14 @@ export const MetasPage = () => {
                 )}
 
                 {isAbonoModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">💰 Abonar a Meta</h2>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto a abonar</label>
+                                    <label htmlFor="meta-abono" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto a abonar</label>
                                     <input
+                                        id="meta-abono"
                                         type="number"
                                         step="0.01"
                                         value={montoAbono}

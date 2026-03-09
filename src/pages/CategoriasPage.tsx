@@ -106,12 +106,14 @@ export const CategoriasPage = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                aria-label="Buscar categorías"
                             />
                         </div>
                         <select
                             value={filterTipo}
                             onChange={(e) => setFilterTipo(e.target.value)}
                             className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            aria-label="Filtrar por tipo"
                         >
                             <option value="">Todos los tipos</option>
                             <option value="Gasto">Gastos</option>
@@ -134,10 +136,10 @@ export const CategoriasPage = () => {
                                     <span className="font-medium dark:text-white">{cat.nombre}</span>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => handleEdit(cat)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                    <button onClick={() => handleEdit(cat)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                         <Edit2 size={18} />
                                     </button>
-                                    <button onClick={() => handleDelete(cat.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
+                                    <button onClick={() => handleDelete(cat.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
                                         <Trash2 size={18} />
                                     </button>
                                 </div>
@@ -163,10 +165,10 @@ export const CategoriasPage = () => {
                                     <span className="font-medium dark:text-white">{cat.nombre}</span>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => handleEdit(cat)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                    <button onClick={() => handleEdit(cat)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                         <Edit2 size={18} />
                                     </button>
-                                    <button onClick={() => handleDelete(cat.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
+                                    <button onClick={() => handleDelete(cat.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
                                         <Trash2 size={18} />
                                     </button>
                                 </div>
@@ -180,13 +182,14 @@ export const CategoriasPage = () => {
 
                 {/* Modal */}
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} Categoría</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre</label>
+                                    <label htmlFor="categoria-nombre" className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre</label>
                                     <input
+                                        id="categoria-nombre"
                                         type="text"
                                         value={formData.nombre}
                                         onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
@@ -196,8 +199,9 @@ export const CategoriasPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Tipo</label>
+                                    <label htmlFor="categoria-tipo" className="block text-sm font-medium mb-1 dark:text-gray-300">Tipo</label>
                                     <select
+                                        id="categoria-tipo"
                                         value={formData.tipo}
                                         onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"

@@ -71,7 +71,7 @@ export const GastosRecurrentesPage = () => {
         try {
             await deleteMutation.mutateAsync(id);
             toast.success('Gasto recurrente eliminado');
-        } catch (error) {
+        } catch {
             toast.error('Error al eliminar');
         }
     };
@@ -80,7 +80,7 @@ export const GastosRecurrentesPage = () => {
         try {
             await generarMutation.mutateAsync(id);
             toast.success('¡Gasto generado!');
-        } catch (error) {
+        } catch {
             toast.error('Error al generar gasto');
         }
     };
@@ -89,7 +89,7 @@ export const GastosRecurrentesPage = () => {
         try {
             const result = await generarPendientesMutation.mutateAsync();
             toast.success(result.mensaje);
-        } catch (error) {
+        } catch {
             toast.error('Error al generar pendientes');
         }
     };
@@ -218,12 +218,14 @@ export const GastosRecurrentesPage = () => {
                                         <button
                                             onClick={() => handleEdit(rec)}
                                             className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            aria-label="Editar"
                                         >
                                             <Edit2 size={20} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(rec.id)}
                                             className="p-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                            aria-label="Eliminar"
                                         >
                                             <Trash2 size={20} />
                                         </button>
@@ -236,17 +238,18 @@ export const GastosRecurrentesPage = () => {
 
                 {/* Modal */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
                             <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {editingId ? 'Editar' : 'Nuevo'} Gasto Recurrente
                             </h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <label htmlFor="recurrente-descripcion" className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Descripción
                                     </label>
                                     <input
+                                        id="recurrente-descripcion"
                                         type="text"
                                         value={formData.descripcion}
                                         onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
@@ -255,10 +258,11 @@ export const GastosRecurrentesPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <label htmlFor="recurrente-categoria" className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Categoría
                                     </label>
                                     <select
+                                        id="recurrente-categoria"
                                         value={formData.categoriaId}
                                         onChange={(e) => setFormData({ ...formData, categoriaId: Number(e.target.value) })}
                                         className={`w-full px-3 py-2 border rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
@@ -271,10 +275,11 @@ export const GastosRecurrentesPage = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <label htmlFor="recurrente-monto" className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Monto
                                     </label>
                                     <input
+                                        id="recurrente-monto"
                                         type="number"
                                         step="0.01"
                                         value={formData.monto}
@@ -284,10 +289,11 @@ export const GastosRecurrentesPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <label htmlFor="recurrente-cuenta" className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Cuenta (Opcional)
                                     </label>
                                     <select
+                                        id="recurrente-cuenta"
                                         value={formData.cuentaId || ''}
                                         onChange={(e) => setFormData({ ...formData, cuentaId: e.target.value ? Number(e.target.value) : null })}
                                         className={`w-full px-3 py-2 border rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
@@ -300,10 +306,11 @@ export const GastosRecurrentesPage = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <label htmlFor="recurrente-frecuencia" className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Frecuencia
                                         </label>
                                         <select
+                                            id="recurrente-frecuencia"
                                             value={formData.frecuencia}
                                             onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value })}
                                             className={`w-full px-3 py-2 border rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
@@ -315,10 +322,11 @@ export const GastosRecurrentesPage = () => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <label htmlFor="recurrente-dia" className={`block mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Día de Pago
                                         </label>
                                         <input
+                                            id="recurrente-dia"
                                             type="number"
                                             min="1"
                                             max="31"
@@ -332,12 +340,13 @@ export const GastosRecurrentesPage = () => {
                                 {editingId && (
                                     <div className="flex items-center gap-2">
                                         <input
+                                            id="recurrente-activo"
                                             type="checkbox"
                                             checked={formData.activo}
                                             onChange={(e) => setFormData({ ...formData, activo: e.target.checked })}
                                             className="w-4 h-4"
                                         />
-                                        <label className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                                        <label htmlFor="recurrente-activo" className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
                                             Activo
                                         </label>
                                     </div>

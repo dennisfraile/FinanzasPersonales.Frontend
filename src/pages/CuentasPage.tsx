@@ -183,17 +183,18 @@ export const CuentasPage = () => {
             {/* Modal Crear/Editar */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-md w-full p-6`}>
+                    <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto`}>
                         <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             {editingCuenta ? 'Editar Cuenta' : 'Nueva Cuenta'}
                         </h2>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <label htmlFor="cuenta-nombre" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                     Nombre
                                 </label>
                                 <input
+                                    id="cuenta-nombre"
                                     type="text"
                                     required
                                     value={formData.nombre}
@@ -209,10 +210,11 @@ export const CuentasPage = () => {
                             {!editingCuenta && (
                                 <>
                                     <div>
-                                        <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <label htmlFor="cuenta-tipo" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Tipo de Cuenta
                                         </label>
                                         <select
+                                            id="cuenta-tipo"
                                             value={formData.tipo}
                                             onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
                                             className={`w-full px-3 py-2 border rounded-lg ${theme === 'dark'
@@ -229,10 +231,11 @@ export const CuentasPage = () => {
                                     </div>
 
                                     <div>
-                                        <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <label htmlFor="cuenta-balance" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Balance Inicial
                                         </label>
                                         <input
+                                            id="cuenta-balance"
                                             type="number"
                                             step="0.01"
                                             required

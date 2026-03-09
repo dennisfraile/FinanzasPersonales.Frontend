@@ -39,6 +39,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
                                 type="button"
                                 onClick={() => toggleTag(tag.id)}
                                 className="hover:bg-black/10 rounded-full p-0.5"
+                                aria-label={`Quitar tag ${tag.nombre}`}
                             >
                                 <X size={12} />
                             </button>

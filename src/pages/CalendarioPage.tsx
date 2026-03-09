@@ -144,6 +144,7 @@ export const CalendarioPage = () => {
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="text-gray-400 hover:text-gray-600"
+                                aria-label="Cerrar"
                             >
                                 <X size={24} />
                             </button>

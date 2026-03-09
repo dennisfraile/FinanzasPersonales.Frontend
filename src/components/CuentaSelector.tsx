@@ -28,12 +28,13 @@ export const CuentaSelector: React.FC<CuentaSelectorProps> = ({
 
     return (
         <div>
-            <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label htmlFor="cuenta-selector" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                 {label}
                 {!required && <span className="text-gray-500 ml-1">(Opcional)</span>}
             </label>
 
             <select
+                id="cuenta-selector"
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : null)}
                 required={required}

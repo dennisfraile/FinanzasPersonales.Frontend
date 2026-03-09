@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5050/api';
+import apiClient from './api';
 
 export interface TransaccionSummary {
     id: number;
@@ -25,24 +23,11 @@ export interface CalendarioData {
     dias: DiaCalendario[];
 }
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-};
-
 export const calendarioService = {
     getCalendario: async (mes: number, ano: number): Promise<CalendarioData> => {
-        const response = await axios.get<CalendarioData>(
-            `${API_URL}/Reportes/calendario`,
-            {
-                ...getAuthHeaders(),
-                params: { mes, ano },
-            }
-        );
+        const response = await apiClient.get<CalendarioData>('/Reportes/calendario', {
+            params: { mes, ano },
+        });
         return response.data;
     },
 };

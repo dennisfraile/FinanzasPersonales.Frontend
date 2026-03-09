@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5050/api';
+import apiClient from './api';
 
 export interface MesFinanciero {
     mes: string;
@@ -23,21 +21,9 @@ export interface DashboardMetrics {
     top5Categorias: CategoriaTop[];
 }
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-};
-
 export const dashboardService = {
     getMetrics: async (): Promise<DashboardMetrics> => {
-        const response = await axios.get<DashboardMetrics>(
-            `${API_URL}/Dashboard/metrics`,
-            getAuthHeaders()
-        );
+        const response = await apiClient.get<DashboardMetrics>('/Dashboard/metrics');
         return response.data;
     },
 };

@@ -123,6 +123,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     <button
                         onClick={clearFile}
                         className="text-gray-500 hover:text-red-600"
+                        aria-label="Quitar archivo"
                     >
                         <X size={20} />
                     </button>

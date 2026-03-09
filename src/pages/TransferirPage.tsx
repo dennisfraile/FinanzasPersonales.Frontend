@@ -78,10 +78,11 @@ export const TransferirPage = () => {
                     />
 
                     <div>
-                        <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <label htmlFor="monto" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                             Monto a Transferir
                         </label>
                         <input
+                            id="monto"
                             type="number"
                             step="0.01"
                             value={formData.monto}
@@ -96,10 +97,11 @@ export const TransferirPage = () => {
                     </div>
 
                     <div>
-                        <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <label htmlFor="descripcion" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                             Descripción (Opcional)
                         </label>
                         <textarea
+                            id="descripcion"
                             value={formData.descripcion}
                             onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                             className={`w-full px-3 py-2 border rounded-lg transition-colors ${theme === 'dark'

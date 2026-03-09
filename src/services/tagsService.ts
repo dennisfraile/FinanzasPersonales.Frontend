@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5050/api';
+import apiClient from './api';
 
 export interface Tag {
     id: number;
@@ -14,31 +12,22 @@ export interface CreateTagDto {
     color: string;
 }
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-};
-
 export const tagsService = {
     getAll: async (): Promise<Tag[]> => {
-        const response = await axios.get<Tag[]>(`${API_URL}/Tags`, getAuthHeaders());
+        const response = await apiClient.get<Tag[]>('/Tags');
         return response.data;
     },
 
     create: async (dto: CreateTagDto): Promise<Tag> => {
-        const response = await axios.post<Tag>(`${API_URL}/Tags`, dto, getAuthHeaders());
+        const response = await apiClient.post<Tag>('/Tags', dto);
         return response.data;
     },
 
     update: async (id: number, dto: CreateTagDto): Promise<void> => {
-        await axios.put(`${API_URL}/Tags/${id}`, dto, getAuthHeaders());
+        await apiClient.put(`/Tags/${id}`, dto);
     },
 
     delete: async (id: number): Promise<void> => {
-        await axios.delete(`${API_URL}/Tags/${id}`, getAuthHeaders());
+        await apiClient.delete(`/Tags/${id}`);
     },
 };

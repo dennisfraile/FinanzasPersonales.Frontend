@@ -46,6 +46,7 @@ export const NotificationBell = () => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Notificaciones"
             >
                 <Bell size={20} className="text-gray-700 dark:text-gray-300" />
                 {noLeidas > 0 && (
@@ -72,6 +73,7 @@ export const NotificationBell = () => {
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                aria-label="Cerrar notificaciones"
                             >
                                 <X size={16} className="text-gray-500" />
                             </button>

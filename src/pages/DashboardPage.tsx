@@ -3,19 +3,37 @@ import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tool
 import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 
 export const DashboardPage = () => {
-    const { data: metrics, isLoading } = useDashboardMetrics();
+    const { data: metrics, isLoading, isError, refetch } = useDashboardMetrics();
 
     const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="text-xl text-gray-600 dark:text-gray-400">Cargando dashboard...</div>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <div className="text-xl text-gray-600 dark:text-gray-400">Cargando dashboard...</div>
+                </div>
             </div>
         );
     }
 
-    if (!metrics) return null;
+    if (isError || !metrics) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-xl text-red-500 mb-4">Error al cargar el dashboard</p>
+                    <p className="text-gray-500 dark:text-gray-400 mb-4">Verifica que el servidor esté funcionando</p>
+                    <button
+                        onClick={() => refetch()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const cambioColor = metrics.cambioMesAnterior > 0 ? 'text-red-600' : 'text-green-600';
     const cambioIcon = metrics.cambioMesAnterior > 0 ? <TrendingUp className="inline" size={20} /> : <TrendingDown className="inline" size={20} />;
