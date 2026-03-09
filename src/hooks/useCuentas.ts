@@ -1,37 +1,19 @@
-import { useState, useEffect } from 'react';
-import type { CuentaDto } from '../services/cuentasService';
-import cuentasService from '../services/cuentasService';
-import { toast } from 'react-toastify';
+import { useQueryCuentas, useBalanceTotal } from './useQueryHooks';
 
 export const useCuentas = () => {
-    const [cuentas, setCuentas] = useState<CuentaDto[]>([]);
-    const [balanceTotal, setBalanceTotal] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: cuentas = [], isLoading: isLoadingCuentas, refetch: refetchCuentas } = useQueryCuentas();
+    const { data: balanceTotal = 0, isLoading: isLoadingBalance, refetch: refetchBalance } = useBalanceTotal();
 
-    const fetchCuentas = async () => {
-        try {
-            setIsLoading(true);
-            const data = await cuentasService.getCuentas();
-            setCuentas(data);
+    const isLoading = isLoadingCuentas || isLoadingBalance;
 
-            const balance = await cuentasService.getBalanceTotal();
-            setBalanceTotal(balance);
-        } catch (error) {
-            console.error('Error fetching cuentas:', error);
-            toast.error('Error al cargar cuentas');
-        } finally {
-            setIsLoading(false);
-        }
+    const refetch = async () => {
+        await Promise.all([refetchCuentas(), refetchBalance()]);
     };
-
-    useEffect(() => {
-        fetchCuentas();
-    }, []);
 
     return {
         cuentas,
         balanceTotal,
         isLoading,
-        refetch: fetchCuentas
+        refetch
     };
 };

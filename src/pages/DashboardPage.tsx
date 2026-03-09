@@ -1,26 +1,9 @@
-import { useEffect, useState } from 'react';
-import { dashboardService, type DashboardMetrics } from '../services/dashboardService';
+import { useDashboardMetrics } from '../hooks/useQueryHooks';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 
 export const DashboardPage = () => {
-    const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        loadMetrics();
-    }, []);
-
-    const loadMetrics = async () => {
-        try {
-            const data = await dashboardService.getMetrics();
-            setMetrics(data);
-        } catch (error) {
-            console.error('Error loading metrics:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { data: metrics, isLoading } = useDashboardMetrics();
 
     const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 

@@ -1,39 +1,29 @@
-import { useState, useEffect } from 'react';
-import { tagsService, type Tag, type CreateTagDto } from '../services/tagsService';
+import { useState } from 'react';
+import { type Tag, type CreateTagDto } from '../services/tagsService';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from '../hooks/useQueryHooks';
 
 export const TagsPage = () => {
-    const [tags, setTags] = useState<Tag[]>([]);
+    const { data: tags = [] } = useTags();
+    const createTagMutation = useCreateTag();
+    const updateTagMutation = useUpdateTag();
+    const deleteTagMutation = useDeleteTag();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState<CreateTagDto>({ nombre: '', color: '#3b82f6' });
-
-    useEffect(() => {
-        loadTags();
-    }, []);
-
-    const loadTags = async () => {
-        try {
-            const data = await tagsService.getAll();
-            setTags(data);
-        } catch (error) {
-            console.error('Error loading tags:', error);
-            toast.error('Error al cargar tags');
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {
-                await tagsService.update(editingId, formData);
+                await updateTagMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Tag actualizado');
             } else {
-                await tagsService.create(formData);
+                await createTagMutation.mutateAsync(formData);
                 toast.success('Tag creado');
             }
-            loadTags();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving tag:', error);
@@ -44,9 +34,8 @@ export const TagsPage = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Eliminar este tag?')) {
             try {
-                await tagsService.delete(id);
+                await deleteTagMutation.mutateAsync(id);
                 toast.success('Tag eliminado');
-                loadTags();
             } catch (error) {
                 console.error('Error deleting tag:', error);
                 toast.error('Error al eliminar tag');

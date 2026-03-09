@@ -1,12 +1,19 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { presupuestosService, type Presupuesto, type CreatePresupuestoDto } from '../services/presupuestosService';
-import { categoriasService, type Categoria } from '../services/categoriasService';
+import { useState, useMemo } from 'react';
+import { type Presupuesto, type CreatePresupuestoDto } from '../services/presupuestosService';
+import { type Categoria } from '../services/categoriasService';
 import { Trash2, Plus, Edit2, AlertTriangle, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { usePresupuestos, useCreatePresupuesto, useUpdatePresupuesto, useDeletePresupuesto, useCategorias } from '../hooks/useQueryHooks';
 
 export const PresupuestosPage = () => {
-    const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const { data: presupuestos = [] } = usePresupuestos();
+    const { data: allCategorias = [] } = useCategorias();
+    const categorias = useMemo(() => allCategorias.filter((c: Categoria) => c.tipo === 'Gasto'), [allCategorias]);
+
+    const createPresupuestoMutation = useCreatePresupuesto();
+    const updatePresupuestoMutation = useUpdatePresupuesto();
+    const deletePresupuestoMutation = useDeletePresupuesto();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -17,46 +24,17 @@ export const PresupuestosPage = () => {
         mesAplicable: new Date().getMonth() + 1,
         anoAplicable: new Date().getFullYear(),
     });
-    const hasLoadedRef = useRef(false);
-
-    useEffect(() => {
-        if (!hasLoadedRef.current) {
-            hasLoadedRef.current = true;
-            loadPresupuestos();
-            loadCategorias();
-        }
-    }, []);
-
-    const loadPresupuestos = async () => {
-        try {
-            const data = await presupuestosService.getAll();
-            setPresupuestos(data);
-        } catch (error) {
-            console.error('Error loading presupuestos:', error);
-            toast.error('Error al cargar presupuestos');
-        }
-    };
-
-    const loadCategorias = async () => {
-        try {
-            const data = await categoriasService.getAll();
-            setCategorias(data.filter(c => c.tipo === 'Gasto'));
-        } catch (error) {
-            console.error('Error loading categorias:', error);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {
-                await presupuestosService.update(editingId, formData);
+                await updatePresupuestoMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Presupuesto actualizado');
             } else {
-                await presupuestosService.create(formData);
+                await createPresupuestoMutation.mutateAsync(formData);
                 toast.success('Presupuesto creado');
             }
-            loadPresupuestos();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving presupuesto:', error);
@@ -67,9 +45,8 @@ export const PresupuestosPage = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de eliminar este presupuesto?')) {
             try {
-                await presupuestosService.delete(id);
+                await deletePresupuestoMutation.mutateAsync(id);
                 toast.success('Presupuesto eliminado');
-                loadPresupuestos();
             } catch (error) {
                 console.error('Error deleting presupuesto:', error);
                 toast.error('Error al eliminar presupuesto');

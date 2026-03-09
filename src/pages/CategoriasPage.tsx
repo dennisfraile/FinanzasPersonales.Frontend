@@ -1,10 +1,15 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { categoriasService, type Categoria, type CreateCategoriaDto } from '../services/categoriasService';
+import { useState, useMemo } from 'react';
+import { type Categoria, type CreateCategoriaDto } from '../services/categoriasService';
 import { Trash2, Plus, Edit2, Search, Tag } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useCategorias, useCreateCategoria, useUpdateCategoria, useDeleteCategoria } from '../hooks/useQueryHooks';
 
 export const CategoriasPage = () => {
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const { data: categorias = [] } = useCategorias();
+    const createCategoriaMutation = useCreateCategoria();
+    const updateCategoriaMutation = useUpdateCategoria();
+    const deleteCategoriaMutation = useDeleteCategoria();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -13,36 +18,17 @@ export const CategoriasPage = () => {
         nombre: '',
         tipo: 'Gasto',
     });
-    const hasLoadedRef = useRef(false);
-
-    useEffect(() => {
-        if (!hasLoadedRef.current) {
-            hasLoadedRef.current = true;
-            loadCategorias();
-        }
-    }, []);
-
-    const loadCategorias = async () => {
-        try {
-            const data = await categoriasService.getAll();
-            setCategorias(data);
-        } catch (error) {
-            console.error('Error loading categorias:', error);
-            toast.error('Error al cargar categorías');
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {
-                await categoriasService.update(editingId, formData);
+                await updateCategoriaMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Categoría actualizada');
             } else {
-                await categoriasService.create(formData);
+                await createCategoriaMutation.mutateAsync(formData);
                 toast.success('Categoría creada');
             }
-            loadCategorias();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving categoria:', error);
@@ -53,9 +39,8 @@ export const CategoriasPage = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de eliminar esta categoría?')) {
             try {
-                await categoriasService.delete(id);
+                await deleteCategoriaMutation.mutateAsync(id);
                 toast.success('Categoría eliminada');
-                loadCategorias();
             } catch (error) {
                 console.error('Error deleting categoria:', error);
                 toast.error('Error al eliminar categoría');

@@ -1,60 +1,22 @@
-import { useState, useEffect } from 'react';
-import { reportesService } from '../services/reportesService';
-import type {
-    TendenciasMensualesDto,
-    ComparativaMesDto,
-    TopCategoriasDto,
-    GastosTipoDto,
-    ProyeccionGastosDto
-} from '../services/reportesService';
+import { useState } from 'react';
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, AlertCircle, TrendingUp as TrendIcon, FileDown } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-
-// const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+import { useTendencias, useComparativa, useTopCategorias, useGastosTipo, useProyeccion } from '../hooks/useQueryHooks';
 
 export const ReportesPage = () => {
     const [mesesAnalisis, setMesesAnalisis] = useState(6);
-    const [isLoading, setIsLoading] = useState(true);
 
+    const { data: tendencias, isLoading: isLoadingTendencias } = useTendencias(mesesAnalisis);
+    const { data: comparativa } = useComparativa();
+    const { data: topCategorias } = useTopCategorias();
+    const { data: gastosTipo } = useGastosTipo();
+    const { data: proyeccion } = useProyeccion();
 
-    const [tendencias, setTendencias] = useState<TendenciasMensualesDto | null>(null);
-    const [comparativa, setComparativa] = useState<ComparativaMesDto | null>(null);
-    const [topCategorias, setTopCategorias] = useState<TopCategoriasDto | null>(null);
-    const [gastosTipo, setGastosTipo] = useState<GastosTipoDto | null>(null);
-    const [proyeccion, setProyeccion] = useState<ProyeccionGastosDto | null>(null);
-
-    useEffect(() => {
-        cargarDatos();
-    }, [mesesAnalisis]);
-
-    const cargarDatos = async () => {
-        setIsLoading(true);
-        try {
-            const [tend, comp, top, tipo, proy] = await Promise.all([
-                reportesService.getTendencias(mesesAnalisis),
-                reportesService.getComparativa(),
-                reportesService.getTopCategorias(),
-                reportesService.getGastosTipo(),
-                reportesService.getProyeccion()
-            ]);
-
-            setTendencias(tend);
-            setComparativa(comp);
-            setTopCategorias(top);
-            setGastosTipo(tipo);
-            setProyeccion(proy);
-        } catch (error) {
-            console.error('Error cargando reportes:', error);
-            toast.error('Error al cargar los reportes');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const isLoading = isLoadingTendencias;
 
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('es-MX', {

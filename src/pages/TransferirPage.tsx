@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CuentaSelector } from '../components/CuentaSelector';
-import transferenciasService from '../services/transferenciasService';
 import { toast } from 'react-toastify';
 import { ArrowLeftRight } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useCreateTransferencia } from '../hooks/useQueryHooks';
 
 export const TransferirPage = () => {
     const { theme } = useTheme();
     const navigate = useNavigate();
+    const createTransferenciaMutation = useCreateTransferencia();
     const [formData, setFormData] = useState({
         cuentaOrigenId: null as number | null,
         cuentaDestinoId: null as number | null,
@@ -36,7 +37,7 @@ export const TransferirPage = () => {
         }
 
         try {
-            await transferenciasService.createTransferencia({
+            await createTransferenciaMutation.mutateAsync({
                 cuentaOrigenId: formData.cuentaOrigenId,
                 cuentaDestinoId: formData.cuentaDestinoId,
                 monto: formData.monto,
@@ -113,7 +114,8 @@ export const TransferirPage = () => {
                     <div className="flex gap-3">
                         <button
                             type="submit"
-                            className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            disabled={createTransferenciaMutation.isPending}
+                            className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
                         >
                             Realizar Transferencia
                         </button>

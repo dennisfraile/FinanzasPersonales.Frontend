@@ -4,12 +4,16 @@ import { useTheme } from '../context/ThemeContext';
 import { useCuentas } from '../hooks/useCuentas';
 import { CuentaCard } from '../components/CuentaCard';
 import type { CuentaDto, CuentaCreateDto } from '../services/cuentasService';
-import cuentasService from '../services/cuentasService';
 import { toast } from 'react-toastify';
+import { useCreateCuenta, useUpdateCuenta, useDeleteCuenta } from '../hooks/useQueryHooks';
 
 export const CuentasPage = () => {
     const { theme } = useTheme();
-    const { cuentas, balanceTotal, isLoading, refetch } = useCuentas();
+    const { cuentas, balanceTotal, isLoading } = useCuentas();
+    const createCuentaMutation = useCreateCuenta();
+    const updateCuentaMutation = useUpdateCuenta();
+    const deleteCuentaMutation = useDeleteCuenta();
+
     const [showModal, setShowModal] = useState(false);
     const [editingCuenta, setEditingCuenta] = useState<CuentaDto | null>(null);
     const [formData, setFormData] = useState<CuentaCreateDto>({
@@ -24,23 +28,25 @@ export const CuentasPage = () => {
 
         try {
             if (editingCuenta) {
-                await cuentasService.updateCuenta(editingCuenta.id, {
-                    nombre: formData.nombre,
-                    balanceActual: editingCuenta.balanceActual,
-                    color: formData.color,
-                    icono: formData.icono,
-                    activa: true
+                await updateCuentaMutation.mutateAsync({
+                    id: editingCuenta.id,
+                    data: {
+                        nombre: formData.nombre,
+                        balanceActual: editingCuenta.balanceActual,
+                        color: formData.color,
+                        icono: formData.icono,
+                        activa: true
+                    }
                 });
                 toast.success('Cuenta actualizada');
             } else {
-                await cuentasService.createCuenta(formData);
+                await createCuentaMutation.mutateAsync(formData);
                 toast.success('Cuenta creada exitosamente');
             }
 
             setShowModal(false);
             setEditingCuenta(null);
             resetForm();
-            refetch();
         } catch (error) {
             console.error('Error:', error);
             toast.error('Error al guardar la cuenta');
@@ -64,9 +70,8 @@ export const CuentasPage = () => {
         if (!confirm('¿Estás seguro de eliminar esta cuenta?')) return;
 
         try {
-            await cuentasService.deleteCuenta(id);
+            await deleteCuentaMutation.mutateAsync(id);
             toast.success('Cuenta eliminada');
-            refetch();
         } catch (error) {
             console.error('Error:', error);
             toast.error('Error al eliminar la cuenta');

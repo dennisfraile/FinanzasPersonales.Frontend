@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { CuentaDto } from '../services/cuentasService';
-import cuentasService from '../services/cuentasService';
+import { useQueryCuentas } from '../hooks/useQueryHooks';
 import { useTheme } from '../context/ThemeContext';
 
 interface CuentaSelectorProps {
@@ -17,23 +15,7 @@ export const CuentaSelector: React.FC<CuentaSelectorProps> = ({
     required = false
 }) => {
     const { theme } = useTheme();
-    const [cuentas, setCuentas] = useState<CuentaDto[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        loadCuentas();
-    }, []);
-
-    const loadCuentas = async () => {
-        try {
-            const data = await cuentasService.getCuentas();
-            setCuentas(data);
-        } catch (error) {
-            console.error('Error loading cuentas:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { data: cuentas = [], isLoading } = useQueryCuentas();
 
     const formatCurrency = (amount: number, moneda: string) => {
         return new Intl.NumberFormat('es-MX', {

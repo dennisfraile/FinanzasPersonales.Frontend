@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { tagsService, type Tag } from '../services/tagsService';
+import { useTags } from '../hooks/useQueryHooks';
 import { X } from 'lucide-react';
 
 interface TagSelectorProps {
@@ -8,23 +7,7 @@ interface TagSelectorProps {
 }
 
 export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
-    const [allTags, setAllTags] = useState<Tag[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        loadTags();
-    }, []);
-
-    const loadTags = async () => {
-        try {
-            const tags = await tagsService.getAll();
-            setAllTags(tags);
-        } catch (error) {
-            console.error('Error loading tags:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { data: allTags = [], isLoading } = useTags();
 
     const toggleTag = (tagId: number) => {
         if (selectedTagIds.includes(tagId)) {

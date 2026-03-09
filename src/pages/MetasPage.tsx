@@ -1,11 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
-import { metasService, type Meta, type CreateMetaDto } from '../services/metasService';
+import { useState, useMemo } from 'react';
+import { type Meta, type CreateMetaDto } from '../services/metasService';
 import { Trash2, Plus, Edit2, DollarSign, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { CuentaSelector } from '../components/CuentaSelector';
+import { useMetas, useCreateMeta, useUpdateMeta, useDeleteMeta, useAbonarMeta } from '../hooks/useQueryHooks';
 
 export const MetasPage = () => {
-    const [metas, setMetas] = useState<Meta[]>([]);
+    const { data: metas = [] } = useMetas();
+    const createMetaMutation = useCreateMeta();
+    const updateMetaMutation = useUpdateMeta();
+    const deleteMetaMutation = useDeleteMeta();
+    const abonarMetaMutation = useAbonarMeta();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAbonoModalOpen, setIsAbonoModalOpen] = useState(false);
     const [selectedMetaId, setSelectedMetaId] = useState<number | null>(null);
@@ -20,20 +26,6 @@ export const MetasPage = () => {
         cuentaId: null,
     });
 
-    useEffect(() => {
-        loadMetas();
-    }, []);
-
-    const loadMetas = async () => {
-        try {
-            const data = await metasService.getAll();
-            setMetas(data);
-        } catch (error) {
-            console.error('Error loading metas:', error);
-            toast.error('Error al cargar metas');
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -43,13 +35,12 @@ export const MetasPage = () => {
             };
 
             if (editingId) {
-                await metasService.update(editingId, dataToSend);
+                await updateMetaMutation.mutateAsync({ id: editingId, data: dataToSend });
                 toast.success('Meta actualizada');
             } else {
-                await metasService.create(dataToSend);
+                await createMetaMutation.mutateAsync(dataToSend);
                 toast.success('Meta creada');
             }
-            loadMetas();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving meta:', error);
@@ -60,9 +51,8 @@ export const MetasPage = () => {
     const handleAbonar = async () => {
         if (selectedMetaId && montoAbono > 0) {
             try {
-                await metasService.abonar(selectedMetaId, montoAbono);
+                await abonarMetaMutation.mutateAsync({ id: selectedMetaId, monto: montoAbono });
                 toast.success(`Abono de $${montoAbono.toFixed(2)} realizado`);
-                loadMetas();
                 setIsAbonoModalOpen(false);
                 setMontoAbono(0);
                 setSelectedMetaId(null);
@@ -76,9 +66,8 @@ export const MetasPage = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de eliminar esta meta?')) {
             try {
-                await metasService.delete(id);
+                await deleteMetaMutation.mutateAsync(id);
                 toast.success('Meta eliminada');
-                loadMetas();
             } catch (error) {
                 console.error('Error deleting meta:', error);
                 toast.error('Error al eliminar meta');

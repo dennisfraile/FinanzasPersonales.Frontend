@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ingresosService, type Ingreso, type CreateIngresoDto } from '../services/ingresosService';
-import { categoriasService, type Categoria } from '../services/categoriasService';
+import { useState, useMemo } from 'react';
+import { type Ingreso, type CreateIngresoDto } from '../services/ingresosService';
+import { type Categoria } from '../services/categoriasService';
 import { Trash2, Plus, Edit2, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
@@ -8,14 +8,21 @@ import { CuentaSelector } from '../components/CuentaSelector';
 import { AdjuntosList } from '../components/AdjuntosList';
 import { TableSkeleton } from '../components/Skeleton';
 import { TagSelector } from '../components/TagSelector';
+import { useIngresos, useCreateIngreso, useUpdateIngreso, useDeleteIngreso, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
 
 const ITEMS_PER_PAGE = 10;
 
 export const IngresosPage = () => {
-    const [ingresos, setIngresos] = useState<Ingreso[]>([]);
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const { data: ingresos = [], isLoading } = useIngresos();
+    const { data: allCategorias = [] } = useCategorias();
+    const categorias = useMemo(() => allCategorias.filter((c: Categoria) => c.tipo === 'Ingreso'), [allCategorias]);
+
+    const createIngresoMutation = useCreateIngreso();
+    const updateIngresoMutation = useUpdateIngreso();
+    const deleteIngresoMutation = useDeleteIngreso();
+    const createCategoriaMutation = useCreateCategoria();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -38,33 +45,6 @@ export const IngresosPage = () => {
     });
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: '', tipo: 'Ingreso' });
 
-    useEffect(() => {
-        loadIngresos();
-        loadCategorias();
-    }, []);
-
-    const loadIngresos = async () => {
-        try {
-            setIsLoading(true);
-            const data = await ingresosService.getAll();
-            setIngresos(data);
-        } catch (error) {
-            console.error('Error loading ingresos:', error);
-            toast.error('Error al cargar ingresos');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const loadCategorias = async () => {
-        try {
-            const data = await categoriasService.getAll();
-            setCategorias(data.filter(c => c.tipo === 'Ingreso'));
-        } catch (error) {
-            console.error('Error loading categorias:', error);
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -84,30 +64,25 @@ export const IngresosPage = () => {
         }
 
         try {
-            setIsLoading(true);
             if (editingId) {
-                await ingresosService.update(editingId, formData);
+                await updateIngresoMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Ingreso actualizado');
             } else {
-                await ingresosService.create(formData);
+                await createIngresoMutation.mutateAsync(formData);
                 toast.success('Ingreso creado');
             }
-            loadIngresos();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving ingreso:', error);
             toast.error('Error al guardar ingreso');
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de eliminar este ingreso?')) {
             try {
-                await ingresosService.delete(id);
+                await deleteIngresoMutation.mutateAsync(id);
                 toast.success('Ingreso eliminado');
-                loadIngresos();
             } catch (error) {
                 console.error('Error deleting ingreso:', error);
                 toast.error('Error al eliminar ingreso');
@@ -143,9 +118,8 @@ export const IngresosPage = () => {
             return;
         }
         try {
-            const newCat = await categoriasService.create(nuevaCategoria);
+            const newCat = await createCategoriaMutation.mutateAsync(nuevaCategoria);
             toast.success('Categoría creada');
-            await loadCategorias();
             setFormData({ ...formData, categoriaId: newCat.id });
             setIsQuickCatModalOpen(false);
             setNuevaCategoria({ nombre: '', tipo: 'Ingreso' });
@@ -192,6 +166,8 @@ export const IngresosPage = () => {
     }, [filteredIngresos, currentPage]);
 
     const total = filteredIngresos.reduce((sum, i) => sum + i.monto, 0);
+
+    const isMutating = createIngresoMutation.isPending || updateIngresoMutation.isPending;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -462,7 +438,7 @@ export const IngresosPage = () => {
                                 )}
 
                                 <div className="flex gap-2">
-                                    <button type="submit" className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                                    <button type="submit" disabled={isMutating} className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50">
                                         Guardar
                                     </button>
                                     <button type="button" onClick={handleCloseModal} className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">

@@ -1,45 +1,47 @@
-import { useState, useEffect } from 'react';
-import { notificacionesService, type NotificacionDto } from '../services/notificacionesService';
+import { useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useQueryNotificaciones, useNotificacionesNoLeidas, useMarcarNotificacionLeida } from './useQueryHooks';
+import { useSignalR } from './useSignalR';
 
 export const useNotificaciones = () => {
-    const [notificaciones, setNotificaciones] = useState<NotificacionDto[]>([]);
-    const [noLeidas, setNoLeidas] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
+    const queryClient = useQueryClient();
+    const { data: notificaciones = [], isLoading: isLoadingNotif, refetch: refetchNotif } = useQueryNotificaciones(false);
+    const { data: noLeidas = 0, refetch: refetchNoLeidas } = useNotificacionesNoLeidas();
+    const marcarLeidaMutation = useMarcarNotificacionLeida();
+    const { startConnection, onNotificacion } = useSignalR();
 
-    const cargar = async () => {
-        try {
-            const [todasNotif, countNoLeidas] = await Promise.all([
-                notificacionesService.getNotificaciones(false),
-                notificacionesService.getNoLeidas()
-            ]);
-            setNotificaciones(todasNotif);
-            setNoLeidas(countNoLeidas);
-        } catch (error) {
-            console.error('Error cargando notificaciones:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const isLoading = isLoadingNotif;
 
     const marcarLeida = async (id: number) => {
         try {
-            await notificacionesService.marcarLeida(id);
-            setNotificaciones(prev =>
-                prev.map(n => n.id === id ? { ...n, leida: true } : n)
-            );
-            setNoLeidas(prev => Math.max(0, prev - 1));
+            await marcarLeidaMutation.mutateAsync(id);
         } catch (error) {
-            console.error('Error marcando como leída:', error);
+            console.error('Error marcando como leida:', error);
         }
     };
 
+    const refrescar = async () => {
+        await Promise.all([refetchNotif(), refetchNoLeidas()]);
+    };
+
+    // Handle incoming SignalR notification by invalidating queries
+    const handleNuevaNotificacion = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['notificaciones'] });
+    }, [queryClient]);
+
     useEffect(() => {
-        cargar();
+        // Start SignalR connection
+        startConnection().catch((err) => {
+            console.error('SignalR connection failed, relying on polling fallback:', err);
+        });
 
-        // Polling cada 30 segundos
-        const interval = setInterval(cargar, 30000);
-        return () => clearInterval(interval);
-    }, []);
+        // Listen for real-time notifications
+        const cleanup = onNotificacion(handleNuevaNotificacion);
 
-    return { notificaciones, noLeidas, isLoading, marcarLeida, refrescar: cargar };
+        return () => {
+            if (cleanup) cleanup();
+        };
+    }, [startConnection, onNotificacion, handleNuevaNotificacion]);
+
+    return { notificaciones, noLeidas, isLoading, marcarLeida, refrescar };
 };

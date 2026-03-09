@@ -1,20 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import gastosRecurrentesService from '../services/gastosRecurrentesService';
 import type { GastoRecurrente, CreateGastoRecurrenteDto } from '../services/gastosRecurrentesService';
 import { useCuentas } from '../hooks/useCuentas';
 import { Repeat, Plus, Edit2, Trash2, Play } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import apiClient from '../services/api';
+import {
+    useGastosRecurrentes, useCreateGastoRecurrente, useUpdateGastoRecurrente,
+    useDeleteGastoRecurrente, useGenerarGastoRecurrente, useGenerarPendientes,
+    useCategorias
+} from '../hooks/useQueryHooks';
 
 export const GastosRecurrentesPage = () => {
     const { theme } = useTheme();
-    const [recurrentes, setRecurrentes] = useState<GastoRecurrente[]>([]);
-    const [categories, setCategories] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: recurrentes = [], isLoading } = useGastosRecurrentes();
+    const { data: categories = [] } = useCategorias();
+    const { cuentas } = useCuentas();
+
+    const createMutation = useCreateGastoRecurrente();
+    const updateMutation = useUpdateGastoRecurrente();
+    const deleteMutation = useDeleteGastoRecurrente();
+    const generarMutation = useGenerarGastoRecurrente();
+    const generarPendientesMutation = useGenerarPendientes();
+
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const { cuentas } = useCuentas();
 
     const [formData, setFormData] = useState<CreateGastoRecurrenteDto & { activo: boolean }>({
         descripcion: '',
@@ -26,43 +35,16 @@ export const GastosRecurrentesPage = () => {
         activo: true
     });
 
-    useEffect(() => {
-        loadRecurrentes();
-        loadCategories();
-    }, []);
-
-    const loadCategories = async () => {
-        try {
-            const response = await apiClient.get('/Categorias');
-            setCategories(response.data);
-        } catch (error) {
-            console.error('Error loading categories:', error);
-        }
-    };
-
-    const loadRecurrentes = async () => {
-        try {
-            const data = await gastosRecurrentesService.getAll();
-            setRecurrentes(data);
-        } catch (error) {
-            console.error('Error:', error);
-            toast.error('Error al cargar gastos recurrentes');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {
-                await gastosRecurrentesService.update(editingId, formData);
+                await updateMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Gasto recurrente actualizado');
             } else {
-                await gastosRecurrentesService.create(formData);
+                await createMutation.mutateAsync(formData);
                 toast.success('Gasto recurrente creado');
             }
-            loadRecurrentes();
             handleCloseModal();
         } catch (error) {
             console.error('Error:', error);
@@ -87,9 +69,8 @@ export const GastosRecurrentesPage = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('¿Eliminar este gasto recurrente?')) return;
         try {
-            await gastosRecurrentesService.delete(id);
+            await deleteMutation.mutateAsync(id);
             toast.success('Gasto recurrente eliminado');
-            loadRecurrentes();
         } catch (error) {
             toast.error('Error al eliminar');
         }
@@ -97,9 +78,8 @@ export const GastosRecurrentesPage = () => {
 
     const handleGenerar = async (id: number) => {
         try {
-            await gastosRecurrentesService.generar(id);
+            await generarMutation.mutateAsync(id);
             toast.success('¡Gasto generado!');
-            loadRecurrentes();
         } catch (error) {
             toast.error('Error al generar gasto');
         }
@@ -107,9 +87,8 @@ export const GastosRecurrentesPage = () => {
 
     const handleGenerarPendientes = async () => {
         try {
-            const result = await gastosRecurrentesService.generarPendientes();
+            const result = await generarPendientesMutation.mutateAsync();
             toast.success(result.mensaje);
-            loadRecurrentes();
         } catch (error) {
             toast.error('Error al generar pendientes');
         }

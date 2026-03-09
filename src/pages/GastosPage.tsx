@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
-import { gastosService, type Gasto, type CreateGastoDto } from '../services/gastosService';
-import { categoriasService, type Categoria } from '../services/categoriasService';
+import { useState, useMemo } from 'react';
+import { type Gasto, type CreateGastoDto } from '../services/gastosService';
+import { type Categoria } from '../services/categoriasService';
 import { Trash2, Plus, Edit2, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
@@ -8,14 +8,21 @@ import { CuentaSelector } from '../components/CuentaSelector';
 import { AdjuntosList } from '../components/AdjuntosList';
 import { TableSkeleton } from '../components/Skeleton';
 import { TagSelector } from '../components/TagSelector';
+import { useGastos, useCreateGasto, useUpdateGasto, useDeleteGasto, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
 
 const ITEMS_PER_PAGE = 10;
 
 export const GastosPage = () => {
-    const [gastos, setGastos] = useState<Gasto[]>([]);
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const { data: gastos = [], isLoading } = useGastos();
+    const { data: allCategorias = [] } = useCategorias();
+    const categorias = useMemo(() => allCategorias.filter((c: Categoria) => c.tipo === 'Gasto'), [allCategorias]);
+
+    const createGastoMutation = useCreateGasto();
+    const updateGastoMutation = useUpdateGasto();
+    const deleteGastoMutation = useDeleteGasto();
+    const createCategoriaMutation = useCreateCategoria();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -34,37 +41,10 @@ export const GastosPage = () => {
         tipo: 'Fijo',
         descripcion: '',
         monto: 0,
-        cuentaId: null, // NUEVO
+        cuentaId: null,
         tagIds: [],
     });
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: '', tipo: 'Gasto' });
-
-    useEffect(() => {
-        loadGastos();
-        loadCategorias();
-    }, []);
-
-    const loadGastos = async () => {
-        try {
-            setIsLoading(true);
-            const data = await gastosService.getAll();
-            setGastos(data);
-        } catch (error) {
-            console.error('Error loading gastos:', error);
-            toast.error('Error al cargar gastos');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const loadCategorias = async () => {
-        try {
-            const data = await categoriasService.getAll();
-            setCategorias(data.filter(c => c.tipo === 'Gasto'));
-        } catch (error) {
-            console.error('Error loading categorias:', error);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,30 +65,25 @@ export const GastosPage = () => {
         }
 
         try {
-            setIsLoading(true); // Prevenir double-submit
             if (editingId) {
-                await gastosService.update(editingId, formData);
+                await updateGastoMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Gasto actualizado');
             } else {
-                await gastosService.create(formData);
+                await createGastoMutation.mutateAsync(formData);
                 toast.success('Gasto creado');
             }
-            loadGastos();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving gasto:', error);
             toast.error('Error al guardar gasto');
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de eliminar este gasto?')) {
             try {
-                await gastosService.delete(id);
+                await deleteGastoMutation.mutateAsync(id);
                 toast.success('Gasto eliminado');
-                loadGastos();
             } catch (error) {
                 console.error('Error deleting gasto:', error);
                 toast.error('Error al eliminar gasto');
@@ -146,9 +121,8 @@ export const GastosPage = () => {
             return;
         }
         try {
-            const newCat = await categoriasService.create(nuevaCategoria);
+            const newCat = await createCategoriaMutation.mutateAsync(nuevaCategoria);
             toast.success('Categoría creada');
-            await loadCategorias();
             setFormData({ ...formData, categoriaId: newCat.id });
             setIsQuickCatModalOpen(false);
             setNuevaCategoria({ nombre: '', tipo: 'Gasto' });
@@ -195,6 +169,8 @@ export const GastosPage = () => {
     }, [filteredGastos, currentPage]);
 
     const total = filteredGastos.reduce((sum, g) => sum + g.monto, 0);
+
+    const isMutating = createGastoMutation.isPending || updateGastoMutation.isPending;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -496,7 +472,7 @@ export const GastosPage = () => {
                                 )}
 
                                 <div className="flex gap-2">
-                                    <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                                    <button type="submit" disabled={isMutating} className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50">
                                         Guardar
                                     </button>
                                     <button type="button" onClick={handleCloseModal} className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
