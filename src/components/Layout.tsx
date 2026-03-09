@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
+import { useSignalR } from '../hooks/useSignalR';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -13,6 +14,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
+    const { startConnection } = useSignalR();
 
     // Estado del sidebar: desktop siempre abierto, móvil cerrado por defecto
     const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -31,6 +33,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Iniciar conexión SignalR cuando el usuario está autenticado
+    useEffect(() => {
+        if (user) {
+            startConnection().catch((err) => {
+                console.error('SignalR connection failed:', err);
+            });
+        }
+    }, [user, startConnection]);
 
     // Guardar preferencia en localStorage
     useEffect(() => {
