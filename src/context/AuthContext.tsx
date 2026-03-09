@@ -1,11 +1,10 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { authService, type AuthResponse } from '../services/authService';
+import { authService } from '../services/authService';
 import { userService, type UserProfile } from '../services/userService';
 
 interface AuthContextType {
-    user: { id: string; email: string; userName?: string } | null;
-    login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string) => Promise<void>;
+    user: { id: string; email: string; userName?: string; fotoUrl?: string } | null;
+    loginWithGoogle: (idToken: string) => Promise<void>;
     logout: () => void;
     isLoading: boolean;
     refreshUserProfile: () => Promise<void>;
@@ -14,7 +13,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<{ id: string; email: string; userName?: string } | null>(null);
+    const [user, setUser] = useState<{ id: string; email: string; userName?: string; fotoUrl?: string } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const loadUserProfile = async () => {
@@ -23,7 +22,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser({
                 id: profile.id,
                 email: profile.email,
-                userName: profile.userName
+                userName: profile.userName,
+                fotoUrl: profile.fotoUrl
             });
         } catch (error) {
             console.error('Error loading profile:', error);
@@ -32,22 +32,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
-        // Verificar si hay token al cargar
         const token = authService.getToken();
         if (token) {
-            loadUserProfile();
+            loadUserProfile().finally(() => setIsLoading(false));
+        } else {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, []);
 
-    const login = async (email: string, password: string) => {
-        const response: AuthResponse = await authService.login({ email, password });
-        localStorage.setItem('token', response.token);
-        await loadUserProfile();
-    };
-
-    const register = async (email: string, password: string) => {
-        const response: AuthResponse = await authService.register({ email, password });
+    const loginWithGoogle = async (idToken: string) => {
+        const response = await authService.loginWithGoogle(idToken);
         localStorage.setItem('token', response.token);
         await loadUserProfile();
     };
@@ -62,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, isLoading, refreshUserProfile }}>
+        <AuthContext.Provider value={{ user, loginWithGoogle, logout, isLoading, refreshUserProfile }}>
             {children}
         </AuthContext.Provider>
     );
