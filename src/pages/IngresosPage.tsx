@@ -332,7 +332,7 @@ export const IngresosPage = () => {
                                     <tr key={ingreso.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 dark:text-gray-300">{ingreso.descripcion || '-'}</td>
                                         <td className="px-6 py-4 dark:text-gray-300">{ingreso.categoriaNombre || '-'}</td>
-                                        <td className="px-6 py-4 dark:text-gray-300">{new Date(ingreso.fecha).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4 dark:text-gray-300">{new Date(ingreso.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</td>
                                         <td className="px-6 py-4 font-semibold text-green-600">${ingreso.monto.toFixed(2)}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
@@ -361,7 +361,7 @@ export const IngresosPage = () => {
                                     <p className="font-bold text-green-600 text-lg ml-4">${ingreso.monto.toFixed(2)}</p>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(ingreso.fecha).toLocaleDateString()}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(ingreso.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</span>
                                     <div className="flex gap-3">
                                         <button onClick={() => handleEdit(ingreso)} className="text-blue-600 dark:text-blue-400 p-1" aria-label="Editar">
                                             <Edit2 size={18} />
