@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, AlertCircle, TrendingUp as TrendIcon, FileDown } from 'lucide-react';
 import { toast } from 'react-toastify';
+import apiClient from '../services/api';
 import { useTendencias, useComparativa, useTopCategorias, useGastosTipo, useProyeccion } from '../hooks/useQueryHooks';
 
 export const ReportesPage = () => {
@@ -35,22 +36,13 @@ export const ReportesPage = () => {
             desde.setMonth(desde.getMonth() - mesesAnalisis);
             const hasta = new Date();
 
-            const response = await fetch('/api/Export/excel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    desde: desde.toISOString(),
-                    hasta: hasta.toISOString(),
-                    incluir: ['gastos', 'ingresos', 'metas', 'presupuestos']
-                })
-            });
+            const response = await apiClient.post('/Export/excel', {
+                desde: desde.toISOString(),
+                hasta: hasta.toISOString(),
+                incluir: ['gastos', 'ingresos', 'metas', 'presupuestos']
+            }, { responseType: 'blob' });
 
-            if (!response.ok) throw new Error('Error al exportar');
-
-            const blob = await response.blob();
+            const blob = new Blob([response.data]);
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -73,22 +65,13 @@ export const ReportesPage = () => {
             desde.setMonth(desde.getMonth() - mesesAnalisis);
             const hasta = new Date();
 
-            const response = await fetch('/api/Export/pdf', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    desde: desde.toISOString(),
-                    hasta: hasta.toISOString(),
-                    incluir: ['gastos', 'ingresos']
-                })
-            });
+            const response = await apiClient.post('/Export/pdf', {
+                desde: desde.toISOString(),
+                hasta: hasta.toISOString(),
+                incluir: ['gastos', 'ingresos']
+            }, { responseType: 'blob' });
 
-            if (!response.ok) throw new Error('Error al exportar');
-
-            const blob = await response.blob();
+            const blob = new Blob([response.data]);
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;

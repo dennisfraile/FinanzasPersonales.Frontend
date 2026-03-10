@@ -485,7 +485,8 @@ export function useQueryNotificaciones(soloNoLeidas: boolean = false) {
     return useQuery({
         queryKey: [...queryKeys.notificaciones, soloNoLeidas],
         queryFn: () => notificacionesService.getNotificaciones(soloNoLeidas),
-        refetchInterval: 30000, // Polling every 30 seconds
+        refetchInterval: 30000,
+        refetchIntervalInBackground: false, // No polling cuando la pestaña está inactiva
     });
 }
 
@@ -494,6 +495,7 @@ export function useNotificacionesNoLeidas() {
         queryKey: queryKeys.notificacionesNoLeidas,
         queryFn: () => notificacionesService.getNoLeidas(),
         refetchInterval: 30000,
+        refetchIntervalInBackground: false, // No polling cuando la pestaña está inactiva
     });
 }
 

@@ -24,9 +24,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             return false;
         }
 
-        // Validar tipo (solo PDF)
+        // Validar tipo (solo PDF) - extensión y MIME type
         if (!file.name.toLowerCase().endsWith('.pdf')) {
             toast.error('Solo se permiten archivos PDF. Por favor, escanea tus comprobantes como PDF.');
+            return false;
+        }
+
+        if (file.type && file.type !== 'application/pdf') {
+            toast.error('El tipo de archivo no es válido. Solo se permiten archivos PDF.');
             return false;
         }
 
