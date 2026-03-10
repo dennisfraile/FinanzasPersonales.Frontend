@@ -97,9 +97,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     <Menu size={24} className="text-gray-600 dark:text-gray-300" />
                                 )}
                             </button>
-                            <span className="text-2xl">💰</span>
+                            <img src="/logo.png" alt="Mis finanzas" className="h-8 w-8 rounded-full object-cover" />
                             <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
-                                Finanzas Personales
+                                Mis finanzas
                             </h1>
                         </div>
 

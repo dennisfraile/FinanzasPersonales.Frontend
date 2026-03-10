@@ -36,7 +36,8 @@ export const LoginPage = () => {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
             <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Finanzas Personales</h1>
+                    <img src="/logo.png" alt="Mis finanzas" className="h-20 w-20 mx-auto mb-4 rounded-full object-cover" />
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Mis finanzas</h1>
                     <p className="text-gray-600">Inicia sesion con tu cuenta de Google</p>
                 </div>
 
