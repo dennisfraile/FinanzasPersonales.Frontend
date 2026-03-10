@@ -8,6 +8,7 @@ export interface Gasto {
     tipo?: string;
     descripcion?: string;
     monto: number;
+    tagIds?: number[];
 }
 
 export interface CreateGastoDto {
@@ -16,6 +17,8 @@ export interface CreateGastoDto {
     tipo: string;
     descripcion: string;
     monto: number;
+    cuentaId?: number | null; // NUEVO
+    tagIds?: number[];
 }
 
 export const gastosService = {

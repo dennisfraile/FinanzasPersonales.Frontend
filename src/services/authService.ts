@@ -1,28 +1,14 @@
 import apiClient from './api';
 
-export interface LoginCredentials {
-    email: string;
-    password: string;
-}
-
-export interface RegisterData {
-    email: string;
-    password: string;
-}
-
 export interface AuthResponse {
     token: string;
-    email: string;
+    isSuccess: boolean;
+    message: string;
 }
 
 export const authService = {
-    async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        const response = await apiClient.post('/Auth/login', credentials);
-        return response.data;
-    },
-
-    async register(data: RegisterData): Promise<AuthResponse> {
-        const response = await apiClient.post('/Auth/register', data);
+    async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+        const response = await apiClient.post('/Auth/google', { idToken });
         return response.data;
     },
 

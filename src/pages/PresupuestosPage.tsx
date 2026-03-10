@@ -1,12 +1,19 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { presupuestosService, type Presupuesto, type CreatePresupuestoDto } from '../services/presupuestosService';
-import { categoriasService, type Categoria } from '../services/categoriasService';
+import { useState, useMemo } from 'react';
+import { type Presupuesto, type CreatePresupuestoDto } from '../services/presupuestosService';
+import { type Categoria } from '../services/categoriasService';
 import { Trash2, Plus, Edit2, AlertTriangle, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { usePresupuestos, useCreatePresupuesto, useUpdatePresupuesto, useDeletePresupuesto, useCategorias } from '../hooks/useQueryHooks';
 
 export const PresupuestosPage = () => {
-    const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const { data: presupuestos = [] } = usePresupuestos();
+    const { data: allCategorias = [] } = useCategorias();
+    const categorias = useMemo(() => allCategorias.filter((c: Categoria) => c.tipo === 'Gasto'), [allCategorias]);
+
+    const createPresupuestoMutation = useCreatePresupuesto();
+    const updatePresupuestoMutation = useUpdatePresupuesto();
+    const deletePresupuestoMutation = useDeletePresupuesto();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -17,46 +24,17 @@ export const PresupuestosPage = () => {
         mesAplicable: new Date().getMonth() + 1,
         anoAplicable: new Date().getFullYear(),
     });
-    const hasLoadedRef = useRef(false);
-
-    useEffect(() => {
-        if (!hasLoadedRef.current) {
-            hasLoadedRef.current = true;
-            loadPresupuestos();
-            loadCategorias();
-        }
-    }, []);
-
-    const loadPresupuestos = async () => {
-        try {
-            const data = await presupuestosService.getAll();
-            setPresupuestos(data);
-        } catch (error) {
-            console.error('Error loading presupuestos:', error);
-            toast.error('Error al cargar presupuestos');
-        }
-    };
-
-    const loadCategorias = async () => {
-        try {
-            const data = await categoriasService.getAll();
-            setCategorias(data.filter(c => c.tipo === 'Gasto'));
-        } catch (error) {
-            console.error('Error loading categorias:', error);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {
-                await presupuestosService.update(editingId, formData);
+                await updatePresupuestoMutation.mutateAsync({ id: editingId, data: formData });
                 toast.success('Presupuesto actualizado');
             } else {
-                await presupuestosService.create(formData);
+                await createPresupuestoMutation.mutateAsync(formData);
                 toast.success('Presupuesto creado');
             }
-            loadPresupuestos();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving presupuesto:', error);
@@ -67,9 +45,8 @@ export const PresupuestosPage = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de eliminar este presupuesto?')) {
             try {
-                await presupuestosService.delete(id);
+                await deletePresupuestoMutation.mutateAsync(id);
                 toast.success('Presupuesto eliminado');
-                loadPresupuestos();
             } catch (error) {
                 console.error('Error deleting presupuesto:', error);
                 toast.error('Error al eliminar presupuesto');
@@ -151,6 +128,7 @@ export const PresupuestosPage = () => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            aria-label="Buscar presupuestos"
                         />
                     </div>
                 </div>
@@ -179,10 +157,10 @@ export const PresupuestosPage = () => {
                                         )}
                                     </div>
                                     <div className="flex gap-2">
-                                        <button onClick={() => handleEdit(presupuesto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                        <button onClick={() => handleEdit(presupuesto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                             <Edit2 size={18} />
                                         </button>
-                                        <button onClick={() => handleDelete(presupuesto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400">
+                                        <button onClick={() => handleDelete(presupuesto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
                                             <Trash2 size={18} />
                                         </button>
                                     </div>
@@ -222,13 +200,14 @@ export const PresupuestosPage = () => {
 
                 {/* Modal crear/editar */}
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} Presupuesto</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
+                                    <label htmlFor="presupuesto-categoria" className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
                                     <select
+                                        id="presupuesto-categoria"
                                         value={formData.categoriaId}
                                         onChange={(e) => setFormData({ ...formData, categoriaId: Number(e.target.value) })}
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -241,8 +220,9 @@ export const PresupuestosPage = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Límite de Gasto</label>
+                                    <label htmlFor="presupuesto-limite" className="block text-sm font-medium mb-1 dark:text-gray-300">Límite de Gasto</label>
                                     <input
+                                        id="presupuesto-limite"
                                         type="number"
                                         step="0.01"
                                         value={formData.montoLimite}
@@ -252,8 +232,9 @@ export const PresupuestosPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Período</label>
+                                    <label htmlFor="presupuesto-periodo" className="block text-sm font-medium mb-1 dark:text-gray-300">Período</label>
                                     <select
+                                        id="presupuesto-periodo"
                                         value={formData.periodo}
                                         onChange={(e) => setFormData({ ...formData, periodo: e.target.value })}
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -265,8 +246,9 @@ export const PresupuestosPage = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1 dark:text-gray-300">Mes</label>
+                                        <label htmlFor="presupuesto-mes" className="block text-sm font-medium mb-1 dark:text-gray-300">Mes</label>
                                         <input
+                                            id="presupuesto-mes"
                                             type="number"
                                             min="1"
                                             max="12"
@@ -277,8 +259,9 @@ export const PresupuestosPage = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1 dark:text-gray-300">Año</label>
+                                        <label htmlFor="presupuesto-ano" className="block text-sm font-medium mb-1 dark:text-gray-300">Año</label>
                                         <input
+                                            id="presupuesto-ano"
                                             type="number"
                                             value={formData.anoAplicable}
                                             onChange={(e) => setFormData({ ...formData, anoAplicable: Number(e.target.value) })}

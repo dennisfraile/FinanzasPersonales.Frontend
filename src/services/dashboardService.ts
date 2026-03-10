@@ -1,47 +1,29 @@
 import apiClient from './api';
 
-export interface DashboardData {
-    mesActual: {
-        totalIngresos: number;
-        totalGastos: number;
-        balance: number;
-        metasActivas: number;
-        presupuestosActivos: number;
-    };
+export interface MesFinanciero {
+    mes: string;
+    ingresos: number;
+    gastos: number;
 }
 
-export interface GraficaData {
-    titulo: string;
-    datos: Array<{
-        etiqueta: string;
-        valor: number;
-    }>;
+export interface CategoriaTop {
+    nombre: string;
+    total: number;
+    color: string;
+}
+
+export interface DashboardMetrics {
+    totalIngresosDelMes: number;
+    totalGastosDelMes: number;
+    balanceDelMes: number;
+    cambioMesAnterior: number;
+    tendencia6Meses: MesFinanciero[];
+    top5Categorias: CategoriaTop[];
 }
 
 export const dashboardService = {
-    async getResumen(mes?: number, ano?: number): Promise<DashboardData> {
-        const params = new URLSearchParams();
-        if (mes) params.append('mes', mes.toString());
-        if (ano) params.append('ano', ano.toString());
-        const response = await apiClient.get(`/Dashboard?${params.toString()}`);
-        return response.data;
-    },
-
-    async getIngresosVsGastos(): Promise<GraficaData> {
-        const response = await apiClient.get('/Dashboard/grafica/ingresos-vs-gastos');
-        return response.data;
-    },
-
-    async getGastosPorCategoria(mes?: number, ano?: number): Promise<GraficaData> {
-        const params = new URLSearchParams();
-        if (mes) params.append('mes', mes.toString());
-        if (ano) params.append('ano', ano.toString());
-        const response = await apiClient.get(`/Dashboard/grafica/gastos-por-categoria?${params.toString()}`);
-        return response.data;
-    },
-
-    async getProgresoMetas(): Promise<GraficaData> {
-        const response = await apiClient.get('/Dashboard/grafica/progreso-metas');
+    getMetrics: async (): Promise<DashboardMetrics> => {
+        const response = await apiClient.get<DashboardMetrics>('/Dashboard/metrics');
         return response.data;
     },
 };
