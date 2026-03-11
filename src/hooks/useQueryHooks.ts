@@ -9,6 +9,8 @@ import { dashboardService } from '../services/dashboardService';
 import { reportesService } from '../services/reportesService';
 import gastosRecurrentesService from '../services/gastosRecurrentesService';
 import type { CreateGastoRecurrenteDto, UpdateGastoRecurrenteDto } from '../services/gastosRecurrentesService';
+import ingresosRecurrentesService from '../services/ingresosRecurrentesService';
+import type { CreateIngresoRecurrenteDto, UpdateIngresoRecurrenteDto } from '../services/ingresosRecurrentesService';
 import cuentasService from '../services/cuentasService';
 import type { CuentaCreateDto, CuentaUpdateDto } from '../services/cuentasService';
 import transferenciasService from '../services/transferenciasService';
@@ -32,6 +34,7 @@ export const queryKeys = {
         proyeccion: ['reportes', 'proyeccion'] as const,
     },
     gastosRecurrentes: ['gastosRecurrentes'] as const,
+    ingresosRecurrentes: ['ingresosRecurrentes'] as const,
     cuentas: ['cuentas'] as const,
     balanceTotal: ['balanceTotal'] as const,
     transferencias: ['transferencias'] as const,
@@ -404,6 +407,72 @@ export function useGenerarPendientes() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.gastosRecurrentes });
             queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+        },
+    });
+}
+
+// ============ INGRESOS RECURRENTES ============
+export function useIngresosRecurrentes() {
+    return useQuery({
+        queryKey: queryKeys.ingresosRecurrentes,
+        queryFn: () => ingresosRecurrentesService.getAll(),
+    });
+}
+
+export function useCreateIngresoRecurrente() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreateIngresoRecurrenteDto) => ingresosRecurrentesService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresosRecurrentes });
+        },
+    });
+}
+
+export function useUpdateIngresoRecurrente() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UpdateIngresoRecurrenteDto }) => ingresosRecurrentesService.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresosRecurrentes });
+        },
+    });
+}
+
+export function useDeleteIngresoRecurrente() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => ingresosRecurrentesService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresosRecurrentes });
+        },
+    });
+}
+
+export function useGenerarIngresoRecurrente() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => ingresosRecurrentesService.generar(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresosRecurrentes });
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+        },
+    });
+}
+
+export function useGenerarPendientesIngresos() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: () => ingresosRecurrentesService.generarPendientes(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresosRecurrentes });
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresos });
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });

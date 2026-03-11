@@ -16,6 +16,7 @@ import { NotificacionesPage } from './pages/NotificacionesPage';
 import { CuentasPage } from './pages/CuentasPage';
 import { TransferirPage } from './pages/TransferirPage';
 import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
+import { IngresosRecurrentesPage } from './pages/IngresosRecurrentesPage';
 import { TagsPage } from './pages/TagsPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
@@ -147,6 +148,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><GastosRecurrentesPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ingresos-recurrentes"
+                element={
+                  <ProtectedRoute>
+                    <Layout><IngresosRecurrentesPage /></Layout>
                   </ProtectedRoute>
                 }
               />
