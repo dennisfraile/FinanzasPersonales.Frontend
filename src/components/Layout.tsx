@@ -16,23 +16,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation();
     const { startConnection } = useSignalR();
 
-    // Estado del sidebar: desktop siempre abierto, móvil cerrado por defecto
-    const [sidebarOpen, setSidebarOpen] = useState(() => {
-        const saved = localStorage.getItem('sidebarOpen');
-        return saved !== null ? JSON.parse(saved) : window.innerWidth >= 1024;
-    });
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-
-    // Detectar cambios de tamaño de pantalla
-    useEffect(() => {
-        const handleResize = () => {
-            const mobile = window.innerWidth < 1024;
-            setIsMobile(mobile);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Iniciar conexión SignalR cuando el usuario está autenticado
     useEffect(() => {
@@ -43,20 +27,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         }
     }, [user, startConnection]);
 
-    // Guardar preferencia en localStorage
+    // Cerrar sidebar al cambiar de ruta
     useEffect(() => {
-        localStorage.setItem('sidebarOpen', JSON.stringify(sidebarOpen));
-    }, [sidebarOpen]);
+        setSidebarOpen(false);
+    }, [location.pathname]);
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
-    };
-
-    // Cerrar sidebar en móvil al navegar
-    const handleLinkClick = () => {
-        if (isMobile) {
-            setSidebarOpen(false);
-        }
     };
 
     const isActive = (path: string) => location.pathname === path;
@@ -133,10 +110,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </nav>
 
             <div className="flex relative">
-                {/* Overlay para móvil */}
-                {isMobile && sidebarOpen && (
+                {/* Overlay */}
+                {sidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
+                        className="fixed inset-0 bg-black/40 z-10"
                         onClick={() => setSidebarOpen(false)}
                     />
                 )}
@@ -144,15 +121,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {/* Sidebar */}
                 <aside
                     className={`
-                        fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)]
-                        bg-gradient-to-b from-slate-900 to-slate-800
-                        border-r border-slate-700/50
-                        transition-all duration-300 ease-in-out
-                        z-10 lg:z-auto
-                        ${isMobile
-                            ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64')
-                            : (sidebarOpen ? 'w-64' : 'w-[4.5rem]')
-                        }
+                        fixed top-16 left-0 h-[calc(100vh-4rem)] w-64
+                        bg-white dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-800
+                        border-r border-gray-200 dark:border-slate-700/50
+                        shadow-lg dark:shadow-none
+                        transition-transform duration-300 ease-in-out
+                        z-10
+                        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     `}
                 >
                     <nav className="px-3 py-4 space-y-1 overflow-y-auto h-full sidebar-scroll">
@@ -163,19 +138,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    onClick={handleLinkClick}
                                     className={`
                                         flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                        ${!sidebarOpen && !isMobile ? 'justify-center' : ''}
                                         ${active
                                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold'
-                                            : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                                            : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white'
                                         }
                                     `}
-                                    title={!sidebarOpen && !isMobile ? item.label : undefined}
                                 >
                                     <Icon size={20} className={`shrink-0 ${active ? 'text-white' : ''}`} />
-                                    <span className={`${!sidebarOpen && !isMobile ? 'hidden' : 'whitespace-nowrap text-sm'}`}>
+                                    <span className="whitespace-nowrap text-sm">
                                         {item.label}
                                     </span>
                                 </Link>
@@ -185,17 +157,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </aside>
 
                 {/* Main content */}
-                <main
-                    className={`
-                        flex-1 transition-all duration-300 
-                        ${sidebarOpen && !isMobile ? 'lg:ml-0' : ''}
-                    `}
-                    onClick={() => {
-                        if (sidebarOpen && !isMobile) {
-                            setSidebarOpen(false);
-                        }
-                    }}
-                >
+                <main className="flex-1 transition-all duration-300">
                     {children}
                 </main>
             </div>
