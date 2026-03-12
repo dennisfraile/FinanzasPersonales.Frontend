@@ -64,7 +64,7 @@ export const toastHelper = {
         } else {
             toastHelper.error(
                 `Error al ${context}`,
-                error.response?.data?.message || error.message || 'Intenta nuevamente'
+                'Intenta nuevamente'
             );
         }
     },

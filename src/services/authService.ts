@@ -14,6 +14,14 @@ export const authService = {
 
     logout() {
         localStorage.removeItem('token');
+        localStorage.removeItem('offline_queue');
+        localStorage.removeItem('onboarding_dismissed');
+
+        // Clear PWA API cache
+        if ('caches' in window) {
+            caches.delete('api-cache').catch(() => {});
+        }
+
         window.location.href = '/login';
     },
 
