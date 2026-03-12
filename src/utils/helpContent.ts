@@ -237,7 +237,7 @@ export function getNaturalLanguageSummary(metrics: {
     totalGastosDelMes: number;
     balanceDelMes: number;
     cambioMesAnterior: number;
-    top5Categorias: { categoria: string; total: number }[];
+    top5Categorias: { nombre: string; total: number }[];
 }): string {
     const parts: string[] = [];
 
@@ -265,7 +265,7 @@ export function getNaturalLanguageSummary(metrics: {
 
     if (metrics.top5Categorias.length > 0) {
         const topCat = metrics.top5Categorias[0];
-        parts.push(`Tu mayor gasto fue en ${topCat.categoria} ($${topCat.total.toFixed(2)}).`);
+        parts.push(`Tu mayor gasto fue en ${topCat.nombre} ($${topCat.total.toFixed(2)}).`);
     }
 
     return parts.join(' ');
