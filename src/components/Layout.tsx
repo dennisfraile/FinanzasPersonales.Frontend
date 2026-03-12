@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
+import OfflineIndicator from './OfflineIndicator';
 import { useSignalR } from '../hooks/useSignalR';
 
 interface LayoutProps {
@@ -161,6 +162,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     {children}
                 </main>
             </div>
+
+            <OfflineIndicator />
         </div>
     );
 };
