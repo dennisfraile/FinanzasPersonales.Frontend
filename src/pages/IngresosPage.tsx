@@ -9,6 +9,9 @@ import { AdjuntosList } from '../components/AdjuntosList';
 import { TableSkeleton } from '../components/Skeleton';
 import { TagSelector } from '../components/TagSelector';
 import { useIngresos, useCreateIngreso, useUpdateIngreso, useDeleteIngreso, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import EmptyState from '../components/EmptyState';
+import { sectionHelp, emptyStates } from '../utils/helpContent';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -174,7 +177,10 @@ export const IngresosPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">💰 Ingresos</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Ingresos</h1>
+                            <HelpTooltip content={sectionHelp.ingresos} />
+                        </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Total: ${total.toFixed(2)}</p>
                     </div>
                     <button
@@ -314,6 +320,10 @@ export const IngresosPage = () => {
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                         <TableSkeleton rows={10} columns={6} />
                     </div>
+                ) : filteredIngresos.length === 0 && !searchTerm && !filterCategoria ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                        <EmptyState content={emptyStates.ingresos} onAction={() => setIsModalOpen(true)} />
+                    </div>
                 ) : (<div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     {/* Desktop table */}
                     <div className="hidden md:block overflow-x-auto">
@@ -416,13 +426,14 @@ export const IngresosPage = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="ingreso-descripcion" className="block text-sm font-medium mb-1 dark:text-gray-300">Descripción</label>
+                                    <label htmlFor="ingreso-descripcion" className="block text-sm font-medium mb-1 dark:text-gray-300">Descripcion (de donde proviene)</label>
                                     <input
                                         id="ingreso-descripcion"
                                         type="text"
                                         value={formData.descripcion || ''}
                                         onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        placeholder="Ej: Salario quincenal, Pago freelance, Venta..."
                                         required
                                     />
                                 </div>
@@ -438,7 +449,7 @@ export const IngresosPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="ingreso-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto</label>
+                                    <label htmlFor="ingreso-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto (cuanto recibiste)</label>
                                     <input
                                         id="ingreso-monto"
                                         type="number"

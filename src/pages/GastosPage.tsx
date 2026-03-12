@@ -9,6 +9,9 @@ import { AdjuntosList } from '../components/AdjuntosList';
 import { TableSkeleton } from '../components/Skeleton';
 import { TagSelector } from '../components/TagSelector';
 import { useGastos, useCreateGasto, useUpdateGasto, useDeleteGasto, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import EmptyState from '../components/EmptyState';
+import { sectionHelp, emptyStates } from '../utils/helpContent';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -177,7 +180,10 @@ export const GastosPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">💸 Gastos</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Gastos</h1>
+                            <HelpTooltip content={sectionHelp.gastos} />
+                        </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Total: ${total.toFixed(2)}</p>
                     </div>
                     <button
@@ -317,6 +323,10 @@ export const GastosPage = () => {
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                         <TableSkeleton rows={10} columns={6} />
                     </div>
+                ) : filteredGastos.length === 0 && !searchTerm && !filterCategoria ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                        <EmptyState content={emptyStates.gastos} onAction={() => setIsModalOpen(true)} />
+                    </div>
                 ) : (
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                         {/* Desktop table */}
@@ -422,13 +432,14 @@ export const GastosPage = () => {
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} Gasto</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label htmlFor="gasto-descripcion" className="block text-sm font-medium mb-1 dark:text-gray-300">Descripción</label>
+                                    <label htmlFor="gasto-descripcion" className="block text-sm font-medium mb-1 dark:text-gray-300">Descripcion (que compraste o pagaste)</label>
                                     <input
                                         id="gasto-descripcion"
                                         type="text"
                                         value={formData.descripcion}
                                         onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        placeholder="Ej: Almuerzo en restaurante, Gasolina, Netflix..."
                                         required
                                     />
                                 </div>
@@ -482,7 +493,7 @@ export const GastosPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="gasto-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto</label>
+                                    <label htmlFor="gasto-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto (cuanto pagaste)</label>
                                     <input
                                         id="gasto-monto"
                                         type="number"

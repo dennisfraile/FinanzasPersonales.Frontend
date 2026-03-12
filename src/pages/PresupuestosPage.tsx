@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react';
 import { type Presupuesto, type CreatePresupuestoDto } from '../services/presupuestosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, AlertTriangle, Search } from 'lucide-react';
+import { Trash2, Plus, Edit2, AlertTriangle, CheckCircle2, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { usePresupuestos, useCreatePresupuesto, useUpdatePresupuesto, useDeletePresupuesto, useCategorias } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import EmptyState from '../components/EmptyState';
+import { sectionHelp, emptyStates } from '../utils/helpContent';
 
 export const PresupuestosPage = () => {
     const { data: presupuestos = [] } = usePresupuestos();
@@ -104,7 +107,10 @@ export const PresupuestosPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">💼 Presupuestos</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Presupuestos</h1>
+                            <HelpTooltip content={sectionHelp.presupuestos} />
+                        </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">
                             {new Date().toLocaleString('es', { month: 'long', year: 'numeric' })}
                         </p>
@@ -133,6 +139,12 @@ export const PresupuestosPage = () => {
                     </div>
                 </div>
 
+                {filteredPresupuestos.length === 0 && !searchTerm ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                        <EmptyState content={emptyStates.presupuestos} onAction={() => setIsModalOpen(true)} />
+                    </div>
+                ) : null}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredPresupuestos.map((presupuesto) => {
                         const alertLevel = getAlertLevel(presupuesto.porcentajeUtilizado);
@@ -146,13 +158,19 @@ export const PresupuestosPage = () => {
                                         {alertLevel === 'danger' && (
                                             <div className="flex items-center gap-1 text-red-600 text-sm mt-1">
                                                 <AlertTriangle size={16} />
-                                                <span>¡Límite excedido!</span>
+                                                <span>Excediste el limite. Revisa tus gastos en esta categoria.</span>
                                             </div>
                                         )}
                                         {alertLevel === 'warning' && (
                                             <div className="flex items-center gap-1 text-orange-600 text-sm mt-1">
                                                 <AlertTriangle size={16} />
-                                                <span>Cerca del límite</span>
+                                                <span>Cuidado, te acercas al limite ({presupuesto.porcentajeUtilizado.toFixed(0)}%)</span>
+                                            </div>
+                                        )}
+                                        {alertLevel === 'normal' && (
+                                            <div className="flex items-center gap-1 text-green-600 text-sm mt-1">
+                                                <CheckCircle2 size={16} />
+                                                <span>Vas bien, tienes margen</span>
                                             </div>
                                         )}
                                     </div>
@@ -220,7 +238,7 @@ export const PresupuestosPage = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label htmlFor="presupuesto-limite" className="block text-sm font-medium mb-1 dark:text-gray-300">Límite de Gasto</label>
+                                    <label htmlFor="presupuesto-limite" className="block text-sm font-medium mb-1 dark:text-gray-300">Limite de Gasto (maximo que quieres gastar)</label>
                                     <input
                                         id="presupuesto-limite"
                                         type="number"

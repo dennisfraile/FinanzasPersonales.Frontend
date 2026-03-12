@@ -4,6 +4,9 @@ import { Trash2, Plus, Edit2, DollarSign, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { useMetas, useCreateMeta, useUpdateMeta, useDeleteMeta, useAbonarMeta } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import EmptyState from '../components/EmptyState';
+import { sectionHelp, emptyStates } from '../utils/helpContent';
 
 export const MetasPage = () => {
     const { data: metas = [] } = useMetas();
@@ -118,7 +121,10 @@ export const MetasPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">🎯 Metas Financieras</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Metas Financieras</h1>
+                            <HelpTooltip content={sectionHelp.metas} />
+                        </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">{filteredMetas.length} metas</p>
                     </div>
                     <button
@@ -145,6 +151,12 @@ export const MetasPage = () => {
                     </div>
                 </div>
 
+                {filteredMetas.length === 0 && !searchTerm && (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                        <EmptyState content={emptyStates.metas} onAction={() => setIsModalOpen(true)} />
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredMetas.map((meta) => {
                         const progreso = getProgreso(meta);
@@ -165,9 +177,13 @@ export const MetasPage = () => {
                                 </div>
 
                                 <div className="mb-4">
-                                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                        <span>{progreso.toFixed(1)}%</span>
-                                        <span>{completada ? '¡Completada!' : 'En progreso'}</span>
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className={`font-medium ${completada ? 'text-green-600' : progreso >= 50 ? 'text-blue-600' : 'text-orange-600'}`}>
+                                            {progreso.toFixed(1)}%
+                                        </span>
+                                        <span className={`${completada ? 'text-green-600 font-semibold' : progreso >= 50 ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}>
+                                            {completada ? 'Completada! Felicidades!' : progreso >= 75 ? 'Ya casi lo logras!' : progreso >= 50 ? 'Vas por buen camino' : progreso > 0 ? 'Sigue aportando' : 'Haz tu primer abono'}
+                                        </span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         <div
@@ -226,7 +242,7 @@ export const MetasPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="meta-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Total</label>
+                                    <label htmlFor="meta-monto" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Total (cuanto necesitas ahorrar)</label>
                                     <input
                                         id="meta-monto"
                                         type="number"
@@ -238,7 +254,7 @@ export const MetasPage = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="meta-ahorro" className="block text-sm font-medium mb-1 dark:text-gray-300">Ahorro Actual</label>
+                                    <label htmlFor="meta-ahorro" className="block text-sm font-medium mb-1 dark:text-gray-300">Ahorro Actual (cuanto llevas ahorrado)</label>
                                     <input
                                         id="meta-ahorro"
                                         type="number"
