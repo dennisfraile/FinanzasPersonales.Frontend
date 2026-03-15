@@ -1,6 +1,7 @@
 import type { CuentaDto } from '../services/cuentasService';
-import { Wallet, Building2, CreditCard, PiggyBank, TrendingUp, Edit, Trash2 } from 'lucide-react';
+import { Wallet, Building2, CreditCard, PiggyBank, TrendingUp, Edit, Trash2, BarChart3 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 interface CuentaCardProps {
     cuenta: CuentaDto;
@@ -26,6 +27,7 @@ const coloresPorTipo: Record<string, string> = {
 
 export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete }) => {
     const { theme } = useTheme();
+    const navigate = useNavigate();
     const Icono = iconosPorTipo[cuenta.tipo] || Wallet;
     const color = cuenta.color || coloresPorTipo[cuenta.tipo] || '#6B7280';
 
@@ -55,6 +57,16 @@ export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete
                 </div>
 
                 <div className="flex gap-2">
+                    <button
+                        onClick={() => navigate(`/cuentas/${cuenta.id}/dashboard`)}
+                        className={`p-2 rounded-lg transition-colors ${theme === 'dark'
+                            ? 'hover:bg-gray-700 text-gray-400 hover:text-blue-400'
+                            : 'hover:bg-gray-100 text-gray-600 hover:text-blue-600'
+                            }`}
+                        title="Ver dashboard"
+                    >
+                        <BarChart3 size={18} />
+                    </button>
                     {onEdit && (
                         <button
                             onClick={() => onEdit(cuenta)}

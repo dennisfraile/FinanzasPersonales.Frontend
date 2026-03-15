@@ -14,6 +14,7 @@ import { CategoriasPage } from './pages/CategoriasPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { NotificacionesPage } from './pages/NotificacionesPage';
 import { CuentasPage } from './pages/CuentasPage';
+import { CuentaDashboardPage } from './pages/CuentaDashboardPage';
 import { TransferirPage } from './pages/TransferirPage';
 import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
 import { IngresosRecurrentesPage } from './pages/IngresosRecurrentesPage';
@@ -132,6 +133,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><CuentasPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cuentas/:cuentaId/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Layout><CuentaDashboardPage /></Layout>
                   </ProtectedRoute>
                 }
               />

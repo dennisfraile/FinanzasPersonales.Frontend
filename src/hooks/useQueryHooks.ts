@@ -16,6 +16,7 @@ import type { CuentaCreateDto, CuentaUpdateDto } from '../services/cuentasServic
 import transferenciasService from '../services/transferenciasService';
 import type { TransferenciaCreateDto } from '../services/transferenciasService';
 import { notificacionesService } from '../services/notificacionesService';
+import { cuentaDashboardService, type AsignarSurplusDto } from '../services/cuentaDashboardService';
 
 // ============ QUERY KEYS ============
 export const queryKeys = {
@@ -40,6 +41,7 @@ export const queryKeys = {
     transferencias: ['transferencias'] as const,
     notificaciones: ['notificaciones'] as const,
     notificacionesNoLeidas: ['notificaciones', 'noLeidas'] as const,
+    cuentaDashboard: (cuentaId: number) => ['cuentaDashboard', cuentaId] as const,
 };
 
 // ============ DASHBOARD ============
@@ -575,6 +577,28 @@ export function useMarcarNotificacionLeida() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.notificaciones });
             queryClient.invalidateQueries({ queryKey: queryKeys.notificacionesNoLeidas });
+        },
+    });
+}
+
+// ============ CUENTA DASHBOARD ============
+export function useCuentaDashboard(cuentaId: number | null, page = 1, pageSize = 50) {
+    return useQuery({
+        queryKey: [...queryKeys.cuentaDashboard(cuentaId!), page, pageSize],
+        queryFn: () => cuentaDashboardService.getDashboard(cuentaId!, page, pageSize),
+        enabled: !!cuentaId,
+    });
+}
+
+export function useAsignarSurplus() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: AsignarSurplusDto) => cuentaDashboardService.asignarSurplus(data),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentaDashboard(variables.cuentaId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: queryKeys.metas });
         },
     });
 }
