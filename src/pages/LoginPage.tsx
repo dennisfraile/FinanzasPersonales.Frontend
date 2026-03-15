@@ -57,7 +57,7 @@ export const LoginPage = () => {
                             onSuccess={handleGoogleSuccess}
                             onError={handleGoogleError}
                             size="large"
-                            width="350"
+                            width="300"
                             text="signin_with"
                             shape="rectangular"
                             theme="outline"

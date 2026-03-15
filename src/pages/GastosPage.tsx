@@ -181,7 +181,7 @@ export const GastosPage = () => {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Gastos</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Gastos</h1>
                             <HelpTooltip content={sectionHelp.gastos} />
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Total: ${total.toFixed(2)}</p>

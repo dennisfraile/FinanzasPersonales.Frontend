@@ -97,14 +97,14 @@ export const ReportesPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">📊 Reportes Avanzados</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">📊 Reportes Avanzados</h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Análisis profundo de tus finanzas</p>
                     </div>
-                    <div className="flex gap-3 items-center">
+                    <div className="flex flex-wrap gap-3 items-center">
                         <select
                             value={mesesAnalisis}
                             onChange={(e) => setMesesAnalisis(Number(e.target.value))}

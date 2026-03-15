@@ -113,8 +113,8 @@ export const CuentasPage = () => {
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6`}>
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            💰 Mis Cuentas
+                        <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            Mis Cuentas
                         </h1>
                         <p className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Gestiona tus cuentas financieras

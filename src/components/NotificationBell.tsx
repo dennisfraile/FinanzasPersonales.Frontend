@@ -65,7 +65,7 @@ export const NotificationBell = () => {
                     />
 
                     {/* Dropdown */}
-                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-20 max-h-96 overflow-y-auto">
+                    <div className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-20 max-h-[60vh] overflow-y-auto">
                         <div className="p-3 border-b dark:border-gray-700 flex justify-between items-center">
                             <h3 className="font-semibold text-gray-900 dark:text-white">
                                 Notificaciones {noLeidas > 0 && `(${noLeidas})`}

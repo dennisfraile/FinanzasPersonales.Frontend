@@ -122,7 +122,7 @@ export const MetasPage = () => {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Metas Financieras</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Metas Financieras</h1>
                             <HelpTooltip content={sectionHelp.metas} />
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">{filteredMetas.length} metas</p>

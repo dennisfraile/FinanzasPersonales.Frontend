@@ -120,14 +120,14 @@ export const PresupuestosPage = () => {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Presupuestos</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Presupuestos</h1>
                             <HelpTooltip content={sectionHelp.presupuestos} />
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">
                             {new Date().toLocaleString('es', { month: 'long', year: 'numeric' })}
                         </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <button
                             type="button"
                             onClick={() => navigate('/presupuestos/dashboard')}

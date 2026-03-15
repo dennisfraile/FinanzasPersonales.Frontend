@@ -42,7 +42,7 @@ export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete
         <div
             className={`
         ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} 
-        rounded-lg shadow-md p-6 
+        rounded-lg shadow-md p-4 sm:p-6
         hover:shadow-lg transition-shadow
         border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}
       `}
