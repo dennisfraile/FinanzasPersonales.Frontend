@@ -133,7 +133,7 @@ export const PresupuestoDashboardPage = () => {
                                             <YAxis type="category" dataKey="categoria" stroke="#9ca3af" width={110} />
                                             <Tooltip
                                                 contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
-                                                formatter={(value: number) => formatCurrency(value)}
+                                                formatter={(value: number | string) => formatCurrency(Number(value))}
                                                 labelFormatter={(label: string) => {
                                                     const item = chartData.find(c => c.categoria === label);
                                                     return item?.categoriaFull ?? label;
