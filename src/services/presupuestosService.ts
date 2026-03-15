@@ -8,9 +8,12 @@ export interface Presupuesto {
     periodo: string;
     mesAplicable: number;
     anoAplicable: number;
+    semanaAplicable?: number;
     gastadoActual: number;
     disponible: number;
     porcentajeUtilizado: number;
+    fechaInicio: string;
+    fechaFin: string;
 }
 
 export interface CreatePresupuestoDto {
@@ -19,6 +22,28 @@ export interface CreatePresupuestoDto {
     periodo: string;
     mesAplicable: number;
     anoAplicable: number;
+    semanaAplicable?: number;
+}
+
+export interface PresupuestoComparacion {
+    presupuestoId: number;
+    categoriaId: number;
+    categoriaNombre: string;
+    montoLimite: number;
+    gastadoActual: number;
+    disponible: number;
+    porcentajeUtilizado: number;
+}
+
+export interface PresupuestoDashboard {
+    periodo: string;
+    periodoLabel: string;
+    fechaInicio: string;
+    fechaFin: string;
+    totalPresupuestado: number;
+    totalGastado: number;
+    totalDisponible: number;
+    comparaciones: PresupuestoComparacion[];
 }
 
 export const presupuestosService = {
@@ -38,5 +63,10 @@ export const presupuestosService = {
 
     async delete(id: number): Promise<void> {
         await apiClient.delete(`/Presupuestos/${id}`);
+    },
+
+    async getDashboard(periodo: string): Promise<PresupuestoDashboard> {
+        const response = await apiClient.get('/Presupuestos/dashboard', { params: { periodo } });
+        return response.data;
     },
 };

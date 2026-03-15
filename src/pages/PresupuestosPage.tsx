@@ -1,14 +1,24 @@
 import { useState, useMemo } from 'react';
 import { type Presupuesto, type CreatePresupuestoDto } from '../services/presupuestosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, AlertTriangle, CheckCircle2, Search } from 'lucide-react';
+import { Trash2, Plus, Edit2, AlertTriangle, CheckCircle2, Search, BarChart3 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import { usePresupuestos, useCreatePresupuesto, useUpdatePresupuesto, useDeletePresupuesto, useCategorias } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
 
+// Helper para obtener número de semana ISO
+const getISOWeek = (date: Date): number => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+};
+
 export const PresupuestosPage = () => {
+    const navigate = useNavigate();
     const { data: presupuestos = [] } = usePresupuestos();
     const { data: allCategorias = [] } = useCategorias();
     const categorias = useMemo(() => allCategorias.filter((c: Categoria) => c.tipo === 'Gasto'), [allCategorias]);
@@ -23,9 +33,10 @@ export const PresupuestosPage = () => {
     const [formData, setFormData] = useState<CreatePresupuestoDto>({
         categoriaId: 0,
         montoLimite: 0,
-        periodo: 'Mensual',
+        periodo: 'Semanal',
         mesAplicable: new Date().getMonth() + 1,
         anoAplicable: new Date().getFullYear(),
+        semanaAplicable: getISOWeek(new Date()),
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -65,6 +76,7 @@ export const PresupuestosPage = () => {
             periodo: presupuesto.periodo,
             mesAplicable: presupuesto.mesAplicable,
             anoAplicable: presupuesto.anoAplicable,
+            semanaAplicable: presupuesto.semanaAplicable,
         });
         setIsModalOpen(true);
     };
@@ -115,13 +127,24 @@ export const PresupuestosPage = () => {
                             {new Date().toLocaleString('es', { month: 'long', year: 'numeric' })}
                         </p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
-                    >
-                        <Plus size={20} />
-                        Nuevo Presupuesto
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/presupuestos/dashboard')}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                        >
+                            <BarChart3 size={20} />
+                            <span className="hidden sm:inline">Dashboard</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            <span className="hidden sm:inline">Nuevo Presupuesto</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Búsqueda */}
@@ -258,10 +281,30 @@ export const PresupuestosPage = () => {
                                         className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         required
                                     >
+                                        <option value="Semanal">Semanal</option>
+                                        <option value="Quincenal">Quincenal</option>
                                         <option value="Mensual">Mensual</option>
+                                        <option value="Trimestral">Trimestral</option>
+                                        <option value="Semestral">Semestral</option>
                                         <option value="Anual">Anual</option>
                                     </select>
                                 </div>
+                                {formData.periodo === 'Semanal' && (
+                                    <div>
+                                        <label htmlFor="presupuesto-semana" className="block text-sm font-medium mb-1 dark:text-gray-300">Semana del año</label>
+                                        <input
+                                            id="presupuesto-semana"
+                                            type="number"
+                                            min="1"
+                                            max="53"
+                                            value={formData.semanaAplicable ?? getISOWeek(new Date())}
+                                            onChange={(e) => setFormData({ ...formData, semanaAplicable: Number(e.target.value) })}
+                                            className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            required
+                                        />
+                                        <p className="text-xs text-gray-400 mt-1">Semana actual: {getISOWeek(new Date())}</p>
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="presupuesto-mes" className="block text-sm font-medium mb-1 dark:text-gray-300">Mes</label>

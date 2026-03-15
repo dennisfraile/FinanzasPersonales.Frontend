@@ -42,6 +42,7 @@ export const queryKeys = {
     notificaciones: ['notificaciones'] as const,
     notificacionesNoLeidas: ['notificaciones', 'noLeidas'] as const,
     cuentaDashboard: (cuentaId: number) => ['cuentaDashboard', cuentaId] as const,
+    presupuestoDashboard: (periodo: string) => ['presupuestoDashboard', periodo] as const,
 };
 
 // ============ DASHBOARD ============
@@ -600,5 +601,13 @@ export function useAsignarSurplus() {
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
             queryClient.invalidateQueries({ queryKey: queryKeys.metas });
         },
+    });
+}
+
+// ============ PRESUPUESTO DASHBOARD ============
+export function usePresupuestoDashboard(periodo: string) {
+    return useQuery({
+        queryKey: queryKeys.presupuestoDashboard(periodo),
+        queryFn: () => presupuestosService.getDashboard(periodo),
     });
 }

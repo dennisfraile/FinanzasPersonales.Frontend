@@ -10,6 +10,7 @@ import { GastosPage } from './pages/GastosPage';
 import { IngresosPage } from './pages/IngresosPage';
 import { MetasPage } from './pages/MetasPage';
 import { PresupuestosPage } from './pages/PresupuestosPage';
+import { PresupuestoDashboardPage } from './pages/PresupuestoDashboardPage';
 import { CategoriasPage } from './pages/CategoriasPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { NotificacionesPage } from './pages/NotificacionesPage';
@@ -84,6 +85,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><PresupuestosPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/presupuestos/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Layout><PresupuestoDashboardPage /></Layout>
                   </ProtectedRoute>
                 }
               />
