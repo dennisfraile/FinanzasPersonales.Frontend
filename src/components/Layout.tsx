@@ -111,10 +111,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </nav>
 
             <div className="flex relative">
-                {/* Overlay */}
+                {/* Overlay - cubre contenido detrás del sidebar */}
                 {sidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-black/40 z-10"
+                        className="fixed inset-0 top-16 bg-black/50 z-30 backdrop-blur-sm"
                         onClick={() => setSidebarOpen(false)}
                     />
                 )}
@@ -127,7 +127,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         border-r border-gray-200 dark:border-slate-700/50
                         shadow-lg dark:shadow-none
                         transition-transform duration-300 ease-in-out
-                        z-10
+                        z-40
                         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     `}
                 >
