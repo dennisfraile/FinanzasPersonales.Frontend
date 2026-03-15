@@ -1,7 +1,7 @@
 import { useDashboardMetrics, useGastos, usePresupuestos, useMetas, useCategorias } from '../hooks/useQueryHooks';
 import { useCuentas } from '../hooks/useCuentas';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, Landmark } from 'lucide-react';
 import HelpTooltip from '../components/HelpTooltip';
 import GlossaryModal from '../components/GlossaryModal';
 import OnboardingWizard from '../components/OnboardingWizard';
@@ -96,7 +96,7 @@ export const DashboardPage = () => {
                 </div>
 
                 {/* Metric Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                         <div className="flex items-center justify-between">
                             <div>
@@ -105,7 +105,7 @@ export const DashboardPage = () => {
                             </div>
                             <ArrowUpCircle className="text-green-600" size={40} />
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">Total de dinero recibido este mes</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">Total de dinero recibido este mes (incluye recurrentes)</p>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
@@ -116,13 +116,13 @@ export const DashboardPage = () => {
                             </div>
                             <ArrowDownCircle className="text-red-600" size={40} />
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">Total de dinero gastado este mes</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">Total de dinero gastado este mes (incluye recurrentes)</p>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Balance</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Balance del Mes</p>
                                 <h3 className={`text-2xl font-bold ${metrics.balanceDelMes >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     ${metrics.balanceDelMes.toFixed(2)}
                                 </h3>
@@ -132,6 +132,19 @@ export const DashboardPage = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                             {metrics.balanceDelMes >= 0 ? 'Estas ahorrando dinero' : 'Gastas mas de lo que ganas'}
                         </p>
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Balance en Cuentas</p>
+                                <h3 className={`text-2xl font-bold ${metrics.balanceCuentas >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                                    ${metrics.balanceCuentas.toFixed(2)}
+                                </h3>
+                            </div>
+                            <Landmark className={metrics.balanceCuentas >= 0 ? 'text-blue-600' : 'text-red-600'} size={40} />
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">Saldo total en todas tus cuentas activas</p>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">

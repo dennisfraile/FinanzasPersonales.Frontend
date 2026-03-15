@@ -16,6 +16,7 @@ export interface DashboardMetrics {
     totalIngresosDelMes: number;
     totalGastosDelMes: number;
     balanceDelMes: number;
+    balanceCuentas: number;
     cambioMesAnterior: number;
     tendencia6Meses: MesFinanciero[];
     top5Categorias: CategoriaTop[];
