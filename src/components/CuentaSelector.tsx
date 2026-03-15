@@ -20,7 +20,7 @@ export const CuentaSelector: React.FC<CuentaSelectorProps> = ({
     const formatCurrency = (amount: number, moneda: string) => {
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
-            currency: moneda || 'MXN',
+            currency: moneda || 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);

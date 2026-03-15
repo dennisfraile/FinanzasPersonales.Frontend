@@ -20,7 +20,7 @@ export const CuentasPage = () => {
         nombre: '',
         tipo: 'Efectivo',
         balanceInicial: 0,
-        moneda: 'MXN'
+        moneda: 'USD'
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -83,14 +83,14 @@ export const CuentasPage = () => {
             nombre: '',
             tipo: 'Efectivo',
             balanceInicial: 0,
-            moneda: 'MXN'
+            moneda: 'USD'
         });
     };
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
-            currency: 'MXN'
+            currency: 'USD'
         }).format(amount);
     };
 

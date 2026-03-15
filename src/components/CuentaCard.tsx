@@ -32,7 +32,7 @@ export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
-            currency: cuenta.moneda || 'MXN'
+            currency: cuenta.moneda || 'USD'
         }).format(amount);
     };
 

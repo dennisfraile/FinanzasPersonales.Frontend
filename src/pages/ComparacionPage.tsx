@@ -12,7 +12,7 @@ export const ComparacionPage = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const formatCurrency = (value: number) =>
-        new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value);
+        new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(value);
 
     const handleComparar = async () => {
         if (!fecha1Inicio || !fecha1Fin || !fecha2Inicio || !fecha2Fin) {
