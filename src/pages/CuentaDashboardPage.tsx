@@ -35,7 +35,6 @@ const tipoConfig: Record<string, { color: string; label: string; signo: string }
 export const CuentaDashboardPage = () => {
     const { cuentaId } = useParams<{ cuentaId: string }>();
     const navigate = useNavigate();
-    const { theme } = useTheme();
     const [page, setPage] = useState(1);
     const [showSurplusModal, setShowSurplusModal] = useState(false);
     const pageSize = 20;
@@ -161,7 +160,7 @@ export const CuentaDashboardPage = () => {
                                                         <div className="flex items-center gap-2">
                                                             {t.descripcion}
                                                             {t.esRecurrente && (
-                                                                <Repeat size={14} className="text-purple-500" title="Recurrente" />
+                                                                <span title="Recurrente"><Repeat size={14} className="text-purple-500" /></span>
                                                             )}
                                                         </div>
                                                         {t.categoria && (
