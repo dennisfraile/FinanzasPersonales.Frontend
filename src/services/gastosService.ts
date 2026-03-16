@@ -9,6 +9,8 @@ export interface Gasto {
     descripcion?: string;
     monto: number;
     tagIds?: number[];
+    cantidadDetalles?: number;
+    montoDisponible?: number | null;
 }
 
 export interface CreateGastoDto {

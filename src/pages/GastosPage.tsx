@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { type Gasto, type CreateGastoDto } from '../services/gastosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, Search } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
@@ -11,6 +11,7 @@ import { TagSelector } from '../components/TagSelector';
 import { useGastos, useCreateGasto, useUpdateGasto, useDeleteGasto, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
+import DetallesGastoPanel from '../components/DetallesGastoPanel';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
 
 const ITEMS_PER_PAGE = 10;
@@ -32,6 +33,7 @@ export const GastosPage = () => {
     const [filterCategoria, setFilterCategoria] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
+    const [detallesGastoId, setDetallesGastoId] = useState<number | null>(null);
     // Advanced filters
     const [fechaDesde, setFechaDesde] = useState('');
     const [fechaHasta, setFechaHasta] = useState('');
@@ -364,9 +366,21 @@ export const GastosPage = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</td>
-                                            <td className="px-6 py-4 font-semibold text-red-600">${gasto.monto.toFixed(2)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="font-semibold text-red-600">${gasto.monto.toFixed(2)}</span>
+                                                    {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && (
+                                                        <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
+                                                            {gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible?.toFixed(2)}`}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex gap-2">
+                                                    <button onClick={() => setDetallesGastoId(gasto.id)} className="text-green-600 hover:text-green-800 dark:text-green-400" aria-label="Ver compras" title="Registrar compras">
+                                                        <ShoppingCart size={18} />
+                                                    </button>
                                                     <button onClick={() => handleEdit(gasto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                                         <Edit2 size={18} />
                                                     </button>
@@ -399,11 +413,21 @@ export const GastosPage = () => {
                                                 )}
                                             </div>
                                         </div>
-                                        <p className="font-bold text-red-600 text-lg ml-4">${gasto.monto.toFixed(2)}</p>
+                                        <div className="text-right ml-4">
+                                            <p className="font-bold text-red-600 text-lg">${gasto.monto.toFixed(2)}</p>
+                                            {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && (
+                                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
+                                                    {gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible?.toFixed(2)} disp.`}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(gasto.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</span>
                                         <div className="flex gap-3">
+                                            <button onClick={() => setDetallesGastoId(gasto.id)} className="text-green-600 dark:text-green-400 p-1" aria-label="Ver compras">
+                                                <ShoppingCart size={18} />
+                                            </button>
                                             <button onClick={() => handleEdit(gasto)} className="text-blue-600 dark:text-blue-400 p-1" aria-label="Editar">
                                                 <Edit2 size={18} />
                                             </button>
@@ -543,6 +567,14 @@ export const GastosPage = () => {
                             </form>
                         </div>
                     </div>
+                )}
+
+                {/* Detalles de Gasto (Sub-compras) */}
+                {detallesGastoId && (
+                    <DetallesGastoPanel
+                        gastoId={detallesGastoId}
+                        onClose={() => setDetallesGastoId(null)}
+                    />
                 )}
 
                 {/* Quick Create Categoria Modal */}

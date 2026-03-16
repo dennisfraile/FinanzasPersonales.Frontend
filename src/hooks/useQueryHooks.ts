@@ -17,6 +17,7 @@ import transferenciasService from '../services/transferenciasService';
 import type { TransferenciaCreateDto } from '../services/transferenciasService';
 import { notificacionesService } from '../services/notificacionesService';
 import { cuentaDashboardService, type AsignarSurplusDto } from '../services/cuentaDashboardService';
+import { detallesGastoService, type CreateDetalleGastoDto } from '../services/detallesGastoService';
 
 // ============ QUERY KEYS ============
 export const queryKeys = {
@@ -43,6 +44,7 @@ export const queryKeys = {
     notificacionesNoLeidas: ['notificaciones', 'noLeidas'] as const,
     cuentaDashboard: (cuentaId: number) => ['cuentaDashboard', cuentaId] as const,
     presupuestoDashboard: (periodo: string) => ['presupuestoDashboard', periodo] as const,
+    gastoConDetalles: (gastoId: number) => ['gastoConDetalles', gastoId] as const,
 };
 
 // ============ DASHBOARD ============
@@ -609,5 +611,50 @@ export function usePresupuestoDashboard(periodo: string) {
     return useQuery({
         queryKey: queryKeys.presupuestoDashboard(periodo),
         queryFn: () => presupuestosService.getDashboard(periodo),
+    });
+}
+
+// ============ DETALLES DE GASTO (SUB-COMPRAS) ============
+export function useGastoConDetalles(gastoId: number | null) {
+    return useQuery({
+        queryKey: queryKeys.gastoConDetalles(gastoId!),
+        queryFn: () => detallesGastoService.getGastoConDetalles(gastoId!),
+        enabled: !!gastoId,
+    });
+}
+
+export function useCreateDetalleGasto() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ gastoId, data }: { gastoId: number; data: CreateDetalleGastoDto }) =>
+            detallesGastoService.create(gastoId, data),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastoConDetalles(variables.gastoId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+        },
+    });
+}
+
+export function useUpdateDetalleGasto() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ gastoId, detalleId, data }: { gastoId: number; detalleId: number; data: CreateDetalleGastoDto }) =>
+            detallesGastoService.update(gastoId, detalleId, data),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastoConDetalles(variables.gastoId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+        },
+    });
+}
+
+export function useDeleteDetalleGasto() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ gastoId, detalleId }: { gastoId: number; detalleId: number }) =>
+            detallesGastoService.delete(gastoId, detalleId),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastoConDetalles(variables.gastoId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+        },
     });
 }
