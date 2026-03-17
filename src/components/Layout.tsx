@@ -1,7 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, Moon, Sun, Menu, X, User, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar } from 'lucide-react';
+import {
+    LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut,
+    Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
+    ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
 import OfflineIndicator from './OfflineIndicator';
@@ -18,7 +22,10 @@ interface MenuItem {
 }
 
 interface MenuGroup {
+    key: string;
     label: string;
+    groupIcon: React.ElementType;
+    defaultOpen: boolean;
     items: MenuItem[];
 }
 
@@ -29,6 +36,91 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { startConnection } = useSignalR();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const menuGroups: MenuGroup[] = [
+        {
+            key: 'general',
+            label: 'General',
+            groupIcon: LayoutDashboard,
+            defaultOpen: true,
+            items: [
+                { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            ],
+        },
+        {
+            key: 'movimientos',
+            label: 'Movimientos',
+            groupIcon: TrendingUp,
+            defaultOpen: false,
+            items: [
+                { path: '/gastos', icon: TrendingDown, label: 'Gastos' },
+                { path: '/ingresos', icon: DollarSign, label: 'Ingresos' },
+            ],
+        },
+        {
+            key: 'cuentas',
+            label: 'Cuentas',
+            groupIcon: CreditCard,
+            defaultOpen: false,
+            items: [
+                { path: '/cuentas', icon: Wallet, label: 'Cuentas' },
+                { path: '/transferir', icon: ArrowLeftRight, label: 'Transferir' },
+            ],
+        },
+        {
+            key: 'planificacion',
+            label: 'Planificación',
+            groupIcon: Lightbulb,
+            defaultOpen: false,
+            items: [
+                { path: '/metas', icon: Target, label: 'Metas' },
+                { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
+            ],
+        },
+        {
+            key: 'recurrentes',
+            label: 'Recurrentes',
+            groupIcon: RefreshCw,
+            defaultOpen: false,
+            items: [
+                { path: '/gastos-recurrentes', icon: Repeat, label: 'Gastos Recurrentes' },
+                { path: '/ingresos-recurrentes', icon: Repeat, label: 'Ingresos Recurrentes' },
+            ],
+        },
+        {
+            key: 'analisis',
+            label: 'Análisis',
+            groupIcon: LineChart,
+            defaultOpen: false,
+            items: [
+                { path: '/calendario', icon: Calendar, label: 'Calendario' },
+                { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
+                { path: '/reportes', icon: BarChart3, label: 'Reportes' },
+            ],
+        },
+        {
+            key: 'configuracion',
+            label: 'Configuración',
+            groupIcon: Settings,
+            defaultOpen: false,
+            items: [
+                { path: '/categorias', icon: Tag, label: 'Categorías' },
+                { path: '/tags', icon: Tag, label: 'Tags' },
+            ],
+        },
+    ];
+
+    // Inicializar grupos abiertos: General abierto + cualquier grupo que tenga la ruta activa
+    const getInitialOpenGroups = () => {
+        const open: Record<string, boolean> = {};
+        menuGroups.forEach((group) => {
+            const hasActive = group.items.some((item) => item.path === location.pathname);
+            open[group.key] = group.defaultOpen || hasActive;
+        });
+        return open;
+    };
+
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(getInitialOpenGroups);
 
     // Iniciar conexión SignalR cuando el usuario está autenticado
     useEffect(() => {
@@ -44,64 +136,22 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         setSidebarOpen(false);
     }, [location.pathname]);
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
+    // Abrir el grupo de la ruta activa al navegar
+    useEffect(() => {
+        menuGroups.forEach((group) => {
+            if (group.items.some((item) => item.path === location.pathname)) {
+                setOpenGroups((prev) => ({ ...prev, [group.key]: true }));
+            }
+        });
+    }, [location.pathname]);
+
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+    const toggleGroup = (key: string) => {
+        setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
     const isActive = (path: string) => location.pathname === path;
-
-    const menuGroups: MenuGroup[] = [
-        {
-            label: 'General',
-            items: [
-                { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-            ],
-        },
-        {
-            label: 'Movimientos',
-            items: [
-                { path: '/gastos', icon: TrendingDown, label: 'Gastos' },
-                { path: '/ingresos', icon: DollarSign, label: 'Ingresos' },
-            ],
-        },
-        {
-            label: 'Cuentas',
-            items: [
-                { path: '/cuentas', icon: Wallet, label: 'Cuentas' },
-                { path: '/transferir', icon: ArrowLeftRight, label: 'Transferir' },
-            ],
-        },
-        {
-            label: 'Planificación',
-            items: [
-                { path: '/metas', icon: Target, label: 'Metas' },
-                { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
-            ],
-        },
-        {
-            label: 'Recurrentes',
-            items: [
-                { path: '/gastos-recurrentes', icon: Repeat, label: 'Gastos Recurrentes' },
-                { path: '/ingresos-recurrentes', icon: Repeat, label: 'Ingresos Recurrentes' },
-            ],
-        },
-        {
-            label: 'Análisis',
-            items: [
-                { path: '/calendario', icon: Calendar, label: 'Calendario' },
-                { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
-                { path: '/reportes', icon: BarChart3, label: 'Reportes' },
-            ],
-        },
-        {
-            label: 'Configuración',
-            items: [
-                { path: '/categorias', icon: Tag, label: 'Categorías' },
-                { path: '/tags', icon: Tag, label: 'Tags' },
-                { path: '/perfil', icon: User, label: 'Mi Perfil' },
-            ],
-        },
-    ];
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
@@ -110,7 +160,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center space-x-2">
-                            {/* Botón hamburguesa */}
                             <button
                                 onClick={toggleSidebar}
                                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors lg:mr-2"
@@ -160,7 +209,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </nav>
 
             <div className="flex relative">
-                {/* Overlay - cubre contenido detrás del sidebar */}
+                {/* Overlay */}
                 {sidebarOpen && (
                     <div
                         className="fixed inset-0 top-16 bg-black/50 z-30 backdrop-blur-sm"
@@ -180,38 +229,64 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     `}
                 >
-                    <nav className="px-3 py-4 overflow-y-auto h-full sidebar-scroll space-y-4">
-                        {menuGroups.map((group) => (
-                            <div key={group.label}>
-                                <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
-                                    {group.label}
-                                </p>
-                                <div className="space-y-0.5">
-                                    {group.items.map((item) => {
-                                        const Icon = item.icon;
-                                        const active = isActive(item.path);
-                                        return (
-                                            <Link
-                                                key={item.path}
-                                                to={item.path}
-                                                className={`
-                                                    flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                                    ${active
-                                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold'
-                                                        : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white'
-                                                    }
-                                                `}
-                                            >
-                                                <Icon size={20} className={`shrink-0 ${active ? 'text-white' : ''}`} />
-                                                <span className="whitespace-nowrap text-sm">
-                                                    {item.label}
-                                                </span>
-                                            </Link>
-                                        );
-                                    })}
+                    <nav className="px-3 py-4 overflow-y-auto h-full sidebar-scroll space-y-1">
+                        {menuGroups.map((group) => {
+                            const GroupIcon = group.groupIcon;
+                            const isOpen = openGroups[group.key] ?? group.defaultOpen;
+                            const hasActive = group.items.some((item) => isActive(item.path));
+
+                            return (
+                                <div key={group.key}>
+                                    {/* Group header */}
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleGroup(group.key)}
+                                        className={`
+                                            w-full flex items-center gap-2 px-3 py-2 rounded-lg
+                                            text-xs font-semibold uppercase tracking-wider
+                                            transition-colors duration-150 select-none
+                                            ${hasActive
+                                                ? 'text-blue-600 dark:text-blue-400'
+                                                : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
+                                            }
+                                        `}
+                                    >
+                                        <GroupIcon size={14} className="shrink-0" />
+                                        <span className="flex-1 text-left">{group.label}</span>
+                                        <ChevronDown
+                                            size={14}
+                                            className={`shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                                        />
+                                    </button>
+
+                                    {/* Group items */}
+                                    {isOpen && (
+                                        <div className="mt-0.5 mb-1 space-y-0.5">
+                                            {group.items.map((item) => {
+                                                const Icon = item.icon;
+                                                const active = isActive(item.path);
+                                                return (
+                                                    <Link
+                                                        key={item.path}
+                                                        to={item.path}
+                                                        className={`
+                                                            flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                                            ${active
+                                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold'
+                                                                : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white'
+                                                            }
+                                                        `}
+                                                    >
+                                                        <Icon size={20} className="shrink-0" />
+                                                        <span className="whitespace-nowrap text-sm">{item.label}</span>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </nav>
                 </aside>
 
