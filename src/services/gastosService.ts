@@ -8,6 +8,8 @@ export interface Gasto {
     tipo?: string;
     descripcion?: string;
     monto: number;
+    cuentaId?: number | null;
+    notas?: string;
     tagIds?: number[];
     cantidadDetalles?: number;
     montoDisponible?: number | null;
