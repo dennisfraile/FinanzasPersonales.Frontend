@@ -11,6 +11,17 @@ interface LayoutProps {
     children: React.ReactNode;
 }
 
+interface MenuItem {
+    path: string;
+    icon: React.ElementType;
+    label: string;
+}
+
+interface MenuGroup {
+    label: string;
+    items: MenuItem[];
+}
+
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
@@ -39,22 +50,57 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const isActive = (path: string) => location.pathname === path;
 
-    const menuItems = [
-        { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/gastos', icon: TrendingDown, label: 'Gastos' },
-        { path: '/ingresos', icon: DollarSign, label: 'Ingresos' },
-        { path: '/metas', icon: Target, label: 'Metas' },
-        { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
-        { path: '/categorias', icon: Tag, label: 'Categorías' },
-        { path: '/cuentas', icon: Wallet, label: 'Cuentas' },
-        { path: '/transferir', icon: ArrowLeftRight, label: 'Transferir' },
-        { path: '/gastos-recurrentes', icon: Repeat, label: 'Gastos Recurrentes' },
-        { path: '/ingresos-recurrentes', icon: Repeat, label: 'Ingresos Recurrentes' },
-        { path: '/calendario', icon: Calendar, label: 'Calendario' },
-        { path: '/tags', icon: Tag, label: 'Tags' },
-        { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
-        { path: '/reportes', icon: BarChart3, label: 'Reportes' },
-        { path: '/perfil', icon: User, label: 'Mi Perfil' },
+    const menuGroups: MenuGroup[] = [
+        {
+            label: 'General',
+            items: [
+                { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            ],
+        },
+        {
+            label: 'Movimientos',
+            items: [
+                { path: '/gastos', icon: TrendingDown, label: 'Gastos' },
+                { path: '/ingresos', icon: DollarSign, label: 'Ingresos' },
+            ],
+        },
+        {
+            label: 'Cuentas',
+            items: [
+                { path: '/cuentas', icon: Wallet, label: 'Cuentas' },
+                { path: '/transferir', icon: ArrowLeftRight, label: 'Transferir' },
+            ],
+        },
+        {
+            label: 'Planificación',
+            items: [
+                { path: '/metas', icon: Target, label: 'Metas' },
+                { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
+            ],
+        },
+        {
+            label: 'Recurrentes',
+            items: [
+                { path: '/gastos-recurrentes', icon: Repeat, label: 'Gastos Recurrentes' },
+                { path: '/ingresos-recurrentes', icon: Repeat, label: 'Ingresos Recurrentes' },
+            ],
+        },
+        {
+            label: 'Análisis',
+            items: [
+                { path: '/calendario', icon: Calendar, label: 'Calendario' },
+                { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
+                { path: '/reportes', icon: BarChart3, label: 'Reportes' },
+            ],
+        },
+        {
+            label: 'Configuración',
+            items: [
+                { path: '/categorias', icon: Tag, label: 'Categorías' },
+                { path: '/tags', icon: Tag, label: 'Tags' },
+                { path: '/perfil', icon: User, label: 'Mi Perfil' },
+            ],
+        },
     ];
 
     return (
@@ -95,9 +141,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     <Sun size={20} className="text-gray-300" />
                                 )}
                             </button>
-                            <span className="text-gray-600 dark:text-gray-300 hidden sm:inline text-sm">
+                            <Link
+                                to="/perfil"
+                                className="text-gray-600 dark:text-gray-300 hidden sm:inline text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            >
                                 {user?.userName || user?.email}
-                            </span>
+                            </Link>
                             <button
                                 onClick={logout}
                                 className="bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
@@ -131,29 +180,38 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     `}
                 >
-                    <nav className="px-3 py-4 space-y-1 overflow-y-auto h-full sidebar-scroll">
-                        {menuItems.map((item) => {
-                            const Icon = item.icon;
-                            const active = isActive(item.path);
-                            return (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`
-                                        flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                        ${active
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold'
-                                            : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white'
-                                        }
-                                    `}
-                                >
-                                    <Icon size={20} className={`shrink-0 ${active ? 'text-white' : ''}`} />
-                                    <span className="whitespace-nowrap text-sm">
-                                        {item.label}
-                                    </span>
-                                </Link>
-                            );
-                        })}
+                    <nav className="px-3 py-4 overflow-y-auto h-full sidebar-scroll space-y-4">
+                        {menuGroups.map((group) => (
+                            <div key={group.label}>
+                                <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+                                    {group.label}
+                                </p>
+                                <div className="space-y-0.5">
+                                    {group.items.map((item) => {
+                                        const Icon = item.icon;
+                                        const active = isActive(item.path);
+                                        return (
+                                            <Link
+                                                key={item.path}
+                                                to={item.path}
+                                                className={`
+                                                    flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                                    ${active
+                                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold'
+                                                        : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white'
+                                                    }
+                                                `}
+                                            >
+                                                <Icon size={20} className={`shrink-0 ${active ? 'text-white' : ''}`} />
+                                                <span className="whitespace-nowrap text-sm">
+                                                    {item.label}
+                                                </span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
                     </nav>
                 </aside>
 
