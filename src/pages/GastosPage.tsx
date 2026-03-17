@@ -372,12 +372,29 @@ export const GastosPage = () => {
                                             </td>
                                             <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</td>
                                             <td className="px-6 py-4">
-                                                <div className="flex items-center gap-1">
-                                                    <span className="font-semibold text-red-600">${gasto.monto.toFixed(2)}</span>
-                                                    {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && (
-                                                        <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
-                                                            {gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible?.toFixed(2)}`}
-                                                        </span>
+                                                <div className="flex flex-col gap-1 min-w-[120px]">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-semibold text-red-600">${gasto.monto.toFixed(2)}</span>
+                                                        {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && gasto.montoDisponible != null && (
+                                                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
+                                                                {gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible.toFixed(2)} disp.`}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && gasto.montoDisponible != null && (
+                                                        (() => {
+                                                            const usado = gasto.monto - gasto.montoDisponible;
+                                                            const pct = Math.min(100, (usado / gasto.monto) * 100);
+                                                            const barColor = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-orange-400' : pct >= 50 ? 'bg-yellow-400' : 'bg-green-500';
+                                                            return (
+                                                                <div className="w-full">
+                                                                    <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                                                        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                                                                    </div>
+                                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{pct.toFixed(0)}% usado</p>
+                                                                </div>
+                                                            );
+                                                        })()
                                                     )}
                                                 </div>
                                             </td>
@@ -420,13 +437,28 @@ export const GastosPage = () => {
                                         </div>
                                         <div className="text-right ml-4">
                                             <p className="font-bold text-red-600 text-lg">${gasto.monto.toFixed(2)}</p>
-                                            {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && (
-                                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
-                                                    {gasto.montoDisponible != null && gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible?.toFixed(2)} disp.`}
+                                            {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && gasto.montoDisponible != null && (
+                                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
+                                                    {gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible.toFixed(2)} disp.`}
                                                 </span>
                                             )}
                                         </div>
                                     </div>
+                                    {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && gasto.montoDisponible != null && (
+                                        (() => {
+                                            const usado = gasto.monto - gasto.montoDisponible;
+                                            const pct = Math.min(100, (usado / gasto.monto) * 100);
+                                            const barColor = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-orange-400' : pct >= 50 ? 'bg-yellow-400' : 'bg-green-500';
+                                            return (
+                                                <div className="w-full">
+                                                    <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                                        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{pct.toFixed(0)}% usado · ${usado.toFixed(2)} de ${gasto.monto.toFixed(2)}</p>
+                                                </div>
+                                            );
+                                        })()
+                                    )}
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(gasto.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</span>
                                         <div className="flex gap-3">
