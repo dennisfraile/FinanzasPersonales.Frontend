@@ -17,7 +17,8 @@ export interface CreateIngresoDto {
     categoriaId: number;
     descripcion?: string;
     monto: number;
-    cuentaId?: number | null; // NUEVO
+    cuentaId?: number | null;
+    notas?: string;
     tagIds?: number[];
 }
 

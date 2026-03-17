@@ -21,7 +21,8 @@ export interface CreateGastoDto {
     tipo: string;
     descripcion: string;
     monto: number;
-    cuentaId?: number | null; // NUEVO
+    cuentaId?: number | null;
+    notas?: string;
     tagIds?: number[];
 }
 
