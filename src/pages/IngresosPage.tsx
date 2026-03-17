@@ -100,6 +100,9 @@ export const IngresosPage = () => {
             categoriaId: ingreso.categoriaId,
             descripcion: ingreso.descripcion ?? '',
             monto: ingreso.monto,
+            cuentaId: ingreso.cuentaId ?? null,
+            notas: ingreso.notas ?? '',
+            tagIds: ingreso.tagIds || [],
         });
         setIsModalOpen(true);
     };
@@ -112,6 +115,8 @@ export const IngresosPage = () => {
             categoriaId: 0,
             descripcion: '',
             monto: 0,
+            cuentaId: null,
+            tagIds: [],
         });
     };
 

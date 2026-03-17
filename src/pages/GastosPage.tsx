@@ -104,6 +104,9 @@ export const GastosPage = () => {
             tipo: gasto.tipo || 'Fijo',
             descripcion: gasto.descripcion ?? '',
             monto: gasto.monto,
+            cuentaId: gasto.cuentaId ?? null,
+            notas: gasto.notas ?? '',
+            tagIds: gasto.tagIds || [],
         });
         setIsModalOpen(true);
     };
@@ -117,6 +120,8 @@ export const GastosPage = () => {
             tipo: 'Fijo',
             descripcion: '',
             monto: 0,
+            cuentaId: null,
+            tagIds: [],
         });
     };
 

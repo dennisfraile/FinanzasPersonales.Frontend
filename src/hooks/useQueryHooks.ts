@@ -72,6 +72,7 @@ export function useCreateGasto() {
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
         },
     });
 }
@@ -85,6 +86,7 @@ export function useUpdateGasto() {
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
         },
     });
 }
@@ -98,6 +100,7 @@ export function useDeleteGasto() {
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
         },
     });
 }
@@ -119,6 +122,7 @@ export function useCreateIngreso() {
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
         },
     });
 }
@@ -132,6 +136,7 @@ export function useUpdateIngreso() {
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
         },
     });
 }
@@ -145,6 +150,7 @@ export function useDeleteIngreso() {
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
         },
     });
 }
