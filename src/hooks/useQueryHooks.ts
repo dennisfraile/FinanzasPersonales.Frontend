@@ -19,6 +19,7 @@ import { notificacionesService } from '../services/notificacionesService';
 import { cuentaDashboardService, type AsignarSurplusDto } from '../services/cuentaDashboardService';
 import { detallesGastoService, type CreateDetalleGastoDto } from '../services/detallesGastoService';
 import { deudasService, type CreateDeudaDto, type UpdateDeudaDto, type CreatePagoDeudaDto } from '../services/deudasService';
+import { gastosCompartidosService, type CreateGastoCompartidoDto } from '../services/gastosCompartidosService';
 
 // ============ QUERY KEYS ============
 export const queryKeys = {
@@ -49,6 +50,8 @@ export const queryKeys = {
     deudas: ['deudas'] as const,
     deudaPagos: (deudaId: number) => ['deudaPagos', deudaId] as const,
     deudaProyeccion: (deudaId: number, pagoMensual?: number) => ['deudaProyeccion', deudaId, pagoMensual] as const,
+    gastosCompartidos: ['gastosCompartidos'] as const,
+    resumenSplit: ['resumenSplit'] as const,
 };
 
 // ============ DASHBOARD ============
@@ -738,5 +741,54 @@ export function useDeudaProyeccion(deudaId: number | null, pagoMensual?: number)
         queryKey: queryKeys.deudaProyeccion(deudaId!, pagoMensual),
         queryFn: () => deudasService.getProyeccion(deudaId!, pagoMensual),
         enabled: !!deudaId,
+    });
+}
+
+// ============ GASTOS COMPARTIDOS ============
+export function useGastosCompartidos() {
+    return useQuery({
+        queryKey: queryKeys.gastosCompartidos,
+        queryFn: () => gastosCompartidosService.getAll(),
+    });
+}
+
+export function useResumenSplit() {
+    return useQuery({
+        queryKey: queryKeys.resumenSplit,
+        queryFn: () => gastosCompartidosService.getResumen(),
+    });
+}
+
+export function useCreateGastoCompartido() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreateGastoCompartidoDto) => gastosCompartidosService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosCompartidos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.resumenSplit });
+        },
+    });
+}
+
+export function useDeleteGastoCompartido() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => gastosCompartidosService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosCompartidos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.resumenSplit });
+        },
+    });
+}
+
+export function useLiquidarParticipante() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ gastoId, participanteId, monto }: { gastoId: number; participanteId: number; monto: number }) =>
+            gastosCompartidosService.liquidarParticipante(gastoId, participanteId, monto),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosCompartidos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.resumenSplit });
+        },
     });
 }

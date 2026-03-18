@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import {
     LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut,
     Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
-    ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings
+    ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
@@ -55,6 +55,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             items: [
                 { path: '/gastos', icon: TrendingDown, label: 'Gastos' },
                 { path: '/ingresos', icon: DollarSign, label: 'Ingresos' },
+                { path: '/gastos-compartidos', icon: Users, label: 'Compartidos' },
             ],
         },
         {

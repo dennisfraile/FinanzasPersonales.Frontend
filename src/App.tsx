@@ -21,6 +21,7 @@ import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
 import { IngresosRecurrentesPage } from './pages/IngresosRecurrentesPage';
 import { TagsPage } from './pages/TagsPage';
 import { DeudasPage } from './pages/DeudasPage';
+import { GastosCompartidosPage } from './pages/GastosCompartidosPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -195,6 +196,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><DeudasPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gastos-compartidos"
+                element={
+                  <ProtectedRoute>
+                    <Layout><GastosCompartidosPage /></Layout>
                   </ProtectedRoute>
                 }
               />
