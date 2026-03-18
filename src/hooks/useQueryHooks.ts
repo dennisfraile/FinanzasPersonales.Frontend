@@ -20,6 +20,8 @@ import { cuentaDashboardService, type AsignarSurplusDto } from '../services/cuen
 import { detallesGastoService, type CreateDetalleGastoDto } from '../services/detallesGastoService';
 import { deudasService, type CreateDeudaDto, type UpdateDeudaDto, type CreatePagoDeudaDto } from '../services/deudasService';
 import { gastosCompartidosService, type CreateGastoCompartidoDto } from '../services/gastosCompartidosService';
+import { plantillasGastoService, type CreatePlantillaGastoDto, type UpdatePlantillaGastoDto, type UsarPlantillaDto } from '../services/plantillasGastoService';
+import { reglasCategoriaService, type CreateReglaCategoriaDto, type UpdateReglaCategoriaDto } from '../services/reglasCategoriaService';
 
 // ============ QUERY KEYS ============
 export const queryKeys = {
@@ -52,6 +54,8 @@ export const queryKeys = {
     deudaProyeccion: (deudaId: number, pagoMensual?: number) => ['deudaProyeccion', deudaId, pagoMensual] as const,
     gastosCompartidos: ['gastosCompartidos'] as const,
     resumenSplit: ['resumenSplit'] as const,
+    plantillas: ['plantillas'] as const,
+    reglasCategoria: ['reglasCategoria'] as const,
 };
 
 // ============ DASHBOARD ============
@@ -789,6 +793,96 @@ export function useLiquidarParticipante() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.gastosCompartidos });
             queryClient.invalidateQueries({ queryKey: queryKeys.resumenSplit });
+        },
+    });
+}
+
+// ============ PLANTILLAS DE GASTO ============
+export function usePlantillas() {
+    return useQuery({
+        queryKey: queryKeys.plantillas,
+        queryFn: () => plantillasGastoService.getAll(),
+    });
+}
+
+export function useCreatePlantilla() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreatePlantillaGastoDto) => plantillasGastoService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillas });
+        },
+    });
+}
+
+export function useUpdatePlantilla() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UpdatePlantillaGastoDto }) => plantillasGastoService.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillas });
+        },
+    });
+}
+
+export function useDeletePlantilla() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => plantillasGastoService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillas });
+        },
+    });
+}
+
+export function useUsarPlantilla() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UsarPlantillaDto }) => plantillasGastoService.usar(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+        },
+    });
+}
+
+// ============ REGLAS DE CATEGORIZACIÓN ============
+export function useReglasCategoria() {
+    return useQuery({
+        queryKey: queryKeys.reglasCategoria,
+        queryFn: () => reglasCategoriaService.getAll(),
+    });
+}
+
+export function useCreateReglaCategoria() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreateReglaCategoriaDto) => reglasCategoriaService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.reglasCategoria });
+        },
+    });
+}
+
+export function useUpdateReglaCategoria() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UpdateReglaCategoriaDto }) => reglasCategoriaService.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.reglasCategoria });
+        },
+    });
+}
+
+export function useDeleteReglaCategoria() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => reglasCategoriaService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.reglasCategoria });
         },
     });
 }

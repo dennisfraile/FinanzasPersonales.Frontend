@@ -4,7 +4,8 @@ import { useTheme } from '../context/ThemeContext';
 import {
     LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut,
     Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
-    ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users
+    ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users,
+    Zap, Upload, Copy
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { NotificationBell } from './NotificationBell';
@@ -98,6 +99,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 { path: '/calendario', icon: Calendar, label: 'Calendario' },
                 { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
                 { path: '/reportes', icon: BarChart3, label: 'Reportes' },
+            ],
+        },
+        {
+            key: 'herramientas',
+            label: 'Herramientas',
+            groupIcon: Zap,
+            defaultOpen: false,
+            items: [
+                { path: '/plantillas', icon: Copy, label: 'Plantillas' },
+                { path: '/reglas-categoria', icon: Zap, label: 'Auto-categorización' },
+                { path: '/importar-csv', icon: Upload, label: 'Importar CSV' },
             ],
         },
         {

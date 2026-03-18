@@ -22,6 +22,9 @@ import { IngresosRecurrentesPage } from './pages/IngresosRecurrentesPage';
 import { TagsPage } from './pages/TagsPage';
 import { DeudasPage } from './pages/DeudasPage';
 import { GastosCompartidosPage } from './pages/GastosCompartidosPage';
+import { PlantillasGastoPage } from './pages/PlantillasGastoPage';
+import { ReglasCategoriaPage } from './pages/ReglasCategoriaPage';
+import { ImportacionCsvPage } from './pages/ImportacionCsvPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -212,6 +215,30 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><TagsPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/plantillas"
+                element={
+                  <ProtectedRoute>
+                    <Layout><PlantillasGastoPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reglas-categoria"
+                element={
+                  <ProtectedRoute>
+                    <Layout><ReglasCategoriaPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/importar-csv"
+                element={
+                  <ProtectedRoute>
+                    <Layout><ImportacionCsvPage /></Layout>
                   </ProtectedRoute>
                 }
               />
