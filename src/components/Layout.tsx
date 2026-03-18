@@ -75,6 +75,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             items: [
                 { path: '/metas', icon: Target, label: 'Metas' },
                 { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
+                { path: '/deudas', icon: TrendingDown, label: 'Deudas' },
             ],
         },
         {

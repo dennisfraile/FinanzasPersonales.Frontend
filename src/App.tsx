@@ -20,6 +20,7 @@ import { TransferirPage } from './pages/TransferirPage';
 import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
 import { IngresosRecurrentesPage } from './pages/IngresosRecurrentesPage';
 import { TagsPage } from './pages/TagsPage';
+import { DeudasPage } from './pages/DeudasPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -186,6 +187,14 @@ function App() {
                         <CalendarioPage />
                       </Suspense>
                     </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/deudas"
+                element={
+                  <ProtectedRoute>
+                    <Layout><DeudasPage /></Layout>
                   </ProtectedRoute>
                 }
               />

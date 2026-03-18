@@ -18,6 +18,7 @@ import type { TransferenciaCreateDto } from '../services/transferenciasService';
 import { notificacionesService } from '../services/notificacionesService';
 import { cuentaDashboardService, type AsignarSurplusDto } from '../services/cuentaDashboardService';
 import { detallesGastoService, type CreateDetalleGastoDto } from '../services/detallesGastoService';
+import { deudasService, type CreateDeudaDto, type UpdateDeudaDto, type CreatePagoDeudaDto } from '../services/deudasService';
 
 // ============ QUERY KEYS ============
 export const queryKeys = {
@@ -45,6 +46,9 @@ export const queryKeys = {
     cuentaDashboard: (cuentaId: number) => ['cuentaDashboard', cuentaId] as const,
     presupuestoDashboard: (periodo: string) => ['presupuestoDashboard', periodo] as const,
     gastoConDetalles: (gastoId: number) => ['gastoConDetalles', gastoId] as const,
+    deudas: ['deudas'] as const,
+    deudaPagos: (deudaId: number) => ['deudaPagos', deudaId] as const,
+    deudaProyeccion: (deudaId: number, pagoMensual?: number) => ['deudaProyeccion', deudaId, pagoMensual] as const,
 };
 
 // ============ DASHBOARD ============
@@ -662,5 +666,77 @@ export function useDeleteDetalleGasto() {
             queryClient.invalidateQueries({ queryKey: queryKeys.gastoConDetalles(variables.gastoId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
         },
+    });
+}
+
+// ============ DEUDAS ============
+export function useDeudas() {
+    return useQuery({
+        queryKey: queryKeys.deudas,
+        queryFn: () => deudasService.getAll(),
+    });
+}
+
+export function useCreateDeuda() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreateDeudaDto) => deudasService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.deudas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+        },
+    });
+}
+
+export function useUpdateDeuda() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UpdateDeudaDto }) => deudasService.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.deudas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+        },
+    });
+}
+
+export function useDeleteDeuda() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => deudasService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.deudas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+        },
+    });
+}
+
+export function useRegistrarPagoDeuda() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ deudaId, data }: { deudaId: number; data: CreatePagoDeudaDto }) =>
+            deudasService.registrarPago(deudaId, data),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.deudas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.deudaPagos(variables.deudaId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+        },
+    });
+}
+
+export function useDeudaPagos(deudaId: number | null) {
+    return useQuery({
+        queryKey: queryKeys.deudaPagos(deudaId!),
+        queryFn: () => deudasService.getPagos(deudaId!),
+        enabled: !!deudaId,
+    });
+}
+
+export function useDeudaProyeccion(deudaId: number | null, pagoMensual?: number) {
+    return useQuery({
+        queryKey: queryKeys.deudaProyeccion(deudaId!, pagoMensual),
+        queryFn: () => deudasService.getProyeccion(deudaId!, pagoMensual),
+        enabled: !!deudaId,
     });
 }
