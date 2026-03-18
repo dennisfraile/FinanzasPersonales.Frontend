@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { type Deuda, type CreateDeudaDto, type UpdateDeudaDto, type PagoDeuda, type ProyeccionPago } from '../services/deudasService';
 import { deudasService } from '../services/deudasService';
-import { Trash2, Plus, Edit2, Search, DollarSign, TrendingDown, Eye, ChevronDown, ChevronUp, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, DollarSign, TrendingDown, Eye, CheckCircle2, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';

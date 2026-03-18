@@ -587,7 +587,6 @@ interface CardProps {
 
 const GastoCompartidoCard = ({ gasto, onDelete, onDetail, onLiquidar }: CardProps) => {
     const todoLiquidado = gasto.participantes.every(p => p.liquidado);
-    const recuperadoPct = gasto.montoTotal > 0 ? ((gasto.montoRecuperado / gasto.montoPendiente + gasto.montoRecuperado) * 100) : 0;
     const totalAsignado = gasto.participantes.reduce((s, p) => s + p.montoAsignado, 0);
     const pctRecuperado = totalAsignado > 0 ? (gasto.montoRecuperado / totalAsignado) * 100 : 0;
 

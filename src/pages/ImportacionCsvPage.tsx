@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { type CsvPreviewResponse, type CsvImportRequest, type CsvPreviewRow, type CsvImportResult, importacionCsvService } from '../services/importacionCsvService';
-import { Upload, FileText, CheckCircle2, AlertTriangle, ArrowRight, ArrowLeft, X } from 'lucide-react';
+import { Upload, CheckCircle2, AlertTriangle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { useCategorias } from '../hooks/useQueryHooks';
