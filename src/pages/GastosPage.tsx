@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { type Gasto, type CreateGastoDto } from '../services/gastosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, Search, ShoppingCart } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
@@ -182,6 +182,29 @@ export const GastosPage = () => {
 
     const isMutating = createGastoMutation.isPending || updateGastoMutation.isPending;
 
+    const handleExportCSV = () => {
+        const headers = ['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Cuenta', 'Monto', 'Notas'];
+        const rows = filteredGastos.map(g => [
+            new Date(g.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString(),
+            g.descripcion || '',
+            g.categoriaNombre || '',
+            g.tipo || 'Variable',
+            g.cuentaNombre || '',
+            g.monto.toFixed(2),
+            g.notas || '',
+        ]);
+        const csv = [headers, ...rows]
+            .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gastos_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -193,13 +216,26 @@ export const GastosPage = () => {
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Total: ${total.toFixed(2)}</p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                    >
-                        <Plus size={20} />
-                        Nuevo Gasto
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            onClick={handleExportCSV}
+                            className="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2"
+                            title="Exportar a CSV"
+                        >
+                            <Download size={18} />
+                            <span className="hidden sm:inline">Exportar</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            <span className="hidden sm:inline">Nuevo Gasto</span>
+                            <span className="sm:hidden">Nuevo</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Filtros y búsqueda */}
@@ -345,6 +381,7 @@ export const GastosPage = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tags</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Cuenta</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Monto</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
@@ -353,7 +390,17 @@ export const GastosPage = () => {
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {paginatedGastos.map((gasto) => (
                                         <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <td className="px-6 py-4 dark:text-gray-300">{gasto.descripcion}</td>
+                                            <td className="px-6 py-4 dark:text-gray-300">
+                                                <div>
+                                                    <span>{gasto.descripcion}</span>
+                                                    {gasto.notas && (
+                                                        <p className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                                            <FileText size={11} />
+                                                            <span className="truncate max-w-[160px]">{gasto.notas}</span>
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 {gasto.tagIds && gasto.tagIds.length > 0 ? (
                                                     <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
@@ -369,6 +416,11 @@ export const GastosPage = () => {
                                                     }`}>
                                                     {gasto.tipo || 'Variable'}
                                                 </span>
+                                            </td>
+                                            <td className="px-6 py-4 dark:text-gray-300">
+                                                {gasto.cuentaNombre ? (
+                                                    <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-full">{gasto.cuentaNombre}</span>
+                                                ) : <span className="text-gray-400">-</span>}
                                             </td>
                                             <td className="px-6 py-4 dark:text-gray-300">{new Date(gasto.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</td>
                                             <td className="px-6 py-4">
@@ -423,11 +475,20 @@ export const GastosPage = () => {
                                     <div className="flex justify-between items-start">
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium dark:text-white truncate">{gasto.descripcion}</p>
+                                            {gasto.notas && (
+                                                <p className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                                                    <FileText size={11} className="shrink-0" />
+                                                    <span className="truncate">{gasto.notas}</span>
+                                                </p>
+                                            )}
                                             <div className="flex flex-wrap gap-1 mt-1">
                                                 <span className="text-sm text-gray-500 dark:text-gray-400">{gasto.categoriaNombre || '-'}</span>
                                                 <span className={`px-2 py-0.5 rounded-full text-xs ${gasto.tipo === 'Fijo' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'}`}>
                                                     {gasto.tipo || 'Variable'}
                                                 </span>
+                                                {gasto.cuentaNombre && (
+                                                    <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full">{gasto.cuentaNombre}</span>
+                                                )}
                                                 {gasto.tagIds && gasto.tagIds.length > 0 && (
                                                     <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">
                                                         {gasto.tagIds.length} tag{gasto.tagIds.length !== 1 ? 's' : ''}

@@ -8,6 +8,7 @@ export interface Ingreso {
     descripcion?: string;
     monto: number;
     cuentaId?: number | null;
+    cuentaNombre?: string | null;
     notas?: string;
     tagIds?: number[];
 }

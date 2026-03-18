@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { type Ingreso, type CreateIngresoDto } from '../services/ingresosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, Search } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, Download, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
@@ -177,6 +177,28 @@ export const IngresosPage = () => {
 
     const isMutating = createIngresoMutation.isPending || updateIngresoMutation.isPending;
 
+    const handleExportCSV = () => {
+        const headers = ['Fecha', 'Descripción', 'Categoría', 'Cuenta', 'Monto', 'Notas'];
+        const rows = filteredIngresos.map(i => [
+            new Date(i.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString(),
+            i.descripcion || '',
+            i.categoriaNombre || '',
+            i.cuentaNombre || '',
+            i.monto.toFixed(2),
+            i.notas || '',
+        ]);
+        const csv = [headers, ...rows]
+            .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ingresos_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -188,13 +210,26 @@ export const IngresosPage = () => {
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Total: ${total.toFixed(2)}</p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
-                    >
-                        <Plus size={20} />
-                        Nuevo Ingreso
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            onClick={handleExportCSV}
+                            className="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2"
+                            title="Exportar a CSV"
+                        >
+                            <Download size={18} />
+                            <span className="hidden sm:inline">Exportar</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            <span className="hidden sm:inline">Nuevo Ingreso</span>
+                            <span className="sm:hidden">Nuevo</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Filtros */}
@@ -337,6 +372,7 @@ export const IngresosPage = () => {
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Cuenta</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Fecha</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Monto</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
@@ -345,8 +381,23 @@ export const IngresosPage = () => {
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {paginatedIngresos.map((ingreso) => (
                                     <tr key={ingreso.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4 dark:text-gray-300">{ingreso.descripcion || '-'}</td>
+                                        <td className="px-6 py-4 dark:text-gray-300">
+                                            <div>
+                                                <span>{ingreso.descripcion || '-'}</span>
+                                                {ingreso.notas && (
+                                                    <p className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                                        <FileText size={11} />
+                                                        <span className="truncate max-w-[160px]">{ingreso.notas}</span>
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4 dark:text-gray-300">{ingreso.categoriaNombre || '-'}</td>
+                                        <td className="px-6 py-4 dark:text-gray-300">
+                                            {ingreso.cuentaNombre ? (
+                                                <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-full">{ingreso.cuentaNombre}</span>
+                                            ) : <span className="text-gray-400">-</span>}
+                                        </td>
                                         <td className="px-6 py-4 dark:text-gray-300">{new Date(ingreso.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</td>
                                         <td className="px-6 py-4 font-semibold text-green-600">${ingreso.monto.toFixed(2)}</td>
                                         <td className="px-6 py-4">
@@ -371,7 +422,18 @@ export const IngresosPage = () => {
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium dark:text-white truncate">{ingreso.descripcion || '-'}</p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">{ingreso.categoriaNombre || '-'}</p>
+                                        {ingreso.notas && (
+                                            <p className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                                                <FileText size={11} className="shrink-0" />
+                                                <span className="truncate">{ingreso.notas}</span>
+                                            </p>
+                                        )}
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            <span className="text-sm text-gray-500 dark:text-gray-400">{ingreso.categoriaNombre || '-'}</span>
+                                            {ingreso.cuentaNombre && (
+                                                <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full">{ingreso.cuentaNombre}</span>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="font-bold text-green-600 text-lg ml-4">${ingreso.monto.toFixed(2)}</p>
                                 </div>

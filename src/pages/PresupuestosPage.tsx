@@ -114,6 +114,14 @@ export const PresupuestosPage = () => {
         );
     }, [presupuestos, searchTerm]);
 
+    const alertSummary = useMemo(() => {
+        if (!Array.isArray(presupuestos)) return { danger: [], warning: [] };
+        return {
+            danger: presupuestos.filter(p => p.porcentajeUtilizado >= 100),
+            warning: presupuestos.filter(p => p.porcentajeUtilizado >= 80 && p.porcentajeUtilizado < 100),
+        };
+    }, [presupuestos]);
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -146,6 +154,30 @@ export const PresupuestosPage = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Banner de alertas */}
+                {(alertSummary.danger.length > 0 || alertSummary.warning.length > 0) && (
+                    <div className="mb-6 space-y-2">
+                        {alertSummary.danger.length > 0 && (
+                            <div className="flex items-start gap-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl px-4 py-3">
+                                <AlertTriangle size={18} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                                <div className="text-sm text-red-700 dark:text-red-300">
+                                    <span className="font-semibold">Límite excedido: </span>
+                                    {alertSummary.danger.map(p => p.categoriaNombre).join(', ')}
+                                </div>
+                            </div>
+                        )}
+                        {alertSummary.warning.length > 0 && (
+                            <div className="flex items-start gap-3 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700 rounded-xl px-4 py-3">
+                                <AlertTriangle size={18} className="text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+                                <div className="text-sm text-orange-700 dark:text-orange-300">
+                                    <span className="font-semibold">Cerca del límite: </span>
+                                    {alertSummary.warning.map(p => `${p.categoriaNombre} (${p.porcentajeUtilizado.toFixed(0)}%)`).join(', ')}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Búsqueda */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-6">
@@ -198,10 +230,10 @@ export const PresupuestosPage = () => {
                                         )}
                                     </div>
                                     <div className="flex gap-2">
-                                        <button onClick={() => handleEdit(presupuesto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
+                                        <button type="button" onClick={() => handleEdit(presupuesto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                             <Edit2 size={18} />
                                         </button>
-                                        <button onClick={() => handleDelete(presupuesto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
+                                        <button type="button" onClick={() => handleDelete(presupuesto.id)} className="text-red-600 hover:text-red-800 dark:text-red-400" aria-label="Eliminar">
                                             <Trash2 size={18} />
                                         </button>
                                     </div>
