@@ -1,13 +1,13 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import {
-    LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut,
+    LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, User,
     Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
     ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users,
     Zap, Upload, Copy
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NotificationBell } from './NotificationBell';
 import OfflineIndicator from './OfflineIndicator';
 import { useSignalR } from '../hooks/useSignalR';
@@ -34,9 +34,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
+    const navigate = useNavigate();
     const { startConnection } = useSignalR();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
+    const profileRef = useRef<HTMLDivElement>(null);
+
+    const userInitial = (user?.userName || user?.email || 'U').charAt(0).toUpperCase();
 
     const menuGroups: MenuGroup[] = [
         {
@@ -159,6 +164,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         });
     }, [location.pathname]);
 
+    // Cerrar dropdown de perfil al hacer click fuera
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+                setProfileOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     const toggleGroup = (key: string) => {
@@ -204,19 +220,52 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     <Sun size={20} className="text-gray-300" />
                                 )}
                             </button>
-                            <Link
-                                to="/perfil"
-                                className="text-gray-600 dark:text-gray-300 hidden sm:inline text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                            >
-                                {user?.userName || user?.email}
-                            </Link>
-                            <button
-                                onClick={logout}
-                                className="bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
-                            >
-                                <LogOut size={18} />
-                                <span className="hidden sm:inline">Salir</span>
-                            </button>
+
+                            {/* Profile Dropdown */}
+                            <div className="relative" ref={profileRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setProfileOpen(!profileOpen)}
+                                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    {user?.fotoUrl ? (
+                                        <img src={user.fotoUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                                            {userInitial}
+                                        </div>
+                                    )}
+                                    <span className="hidden sm:inline text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {user?.userName || user?.email}
+                                    </span>
+                                    <ChevronDown size={16} className="text-gray-500 dark:text-gray-400" />
+                                </button>
+
+                                {profileOpen && (
+                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                                        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                            <p className="text-sm font-semibold text-gray-800 dark:text-white">{user?.userName || 'Usuario'}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => { setProfileOpen(false); navigate('/perfil'); }}
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            <User size={16} />
+                                            Mi Perfil
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => { setProfileOpen(false); logout(); }}
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        >
+                                            <LogOut size={16} />
+                                            Cerrar Sesion
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
