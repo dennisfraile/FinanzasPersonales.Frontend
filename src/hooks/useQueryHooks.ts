@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { gastosService, type CreateGastoDto } from '../services/gastosService';
+import { gastosService, type CreateGastoDto, type TransferirSaldoGastoDto } from '../services/gastosService';
 import { ingresosService, type CreateIngresoDto } from '../services/ingresosService';
 import { metasService, type CreateMetaDto } from '../services/metasService';
 import { presupuestosService, type CreatePresupuestoDto } from '../services/presupuestosService';
@@ -112,6 +112,18 @@ export function useDeleteGasto() {
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
             queryClient.invalidateQueries({ queryKey: ['cuentaDashboard'] });
+        },
+    });
+}
+
+export function useTransferirSaldoGasto() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: TransferirSaldoGastoDto) => gastosService.transferirSaldo(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+            queryClient.invalidateQueries({ queryKey: ['gastoConDetalles'] });
         },
     });
 }

@@ -50,4 +50,14 @@ export const gastosService = {
     async delete(id: number): Promise<void> {
         await apiClient.delete(`/Gastos/${id}`);
     },
+
+    async transferirSaldo(data: TransferirSaldoGastoDto): Promise<void> {
+        await apiClient.post('/Gastos/transferir-saldo', data);
+    },
 };
+
+export interface TransferirSaldoGastoDto {
+    gastoOrigenId: number;
+    gastoDestinoId: number;
+    monto: number;
+}

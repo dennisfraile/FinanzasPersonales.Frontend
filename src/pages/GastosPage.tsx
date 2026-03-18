@@ -1,14 +1,14 @@
 import { useState, useMemo } from 'react';
 import { type Gasto, type CreateGastoDto } from '../services/gastosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText, ArrowLeftRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { AdjuntosList } from '../components/AdjuntosList';
 import { TableSkeleton } from '../components/Skeleton';
 import { TagSelector } from '../components/TagSelector';
-import { useGastos, useCreateGasto, useUpdateGasto, useDeleteGasto, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
+import { useGastos, useCreateGasto, useUpdateGasto, useDeleteGasto, useCategorias, useCreateCategoria, useTransferirSaldoGasto } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
 import DetallesGastoPanel from '../components/DetallesGastoPanel';
@@ -25,6 +25,7 @@ export const GastosPage = () => {
     const updateGastoMutation = useUpdateGasto();
     const deleteGastoMutation = useDeleteGasto();
     const createCategoriaMutation = useCreateCategoria();
+    const transferirSaldoMutation = useTransferirSaldoGasto();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
@@ -34,6 +35,8 @@ export const GastosPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
     const [detallesGastoId, setDetallesGastoId] = useState<number | null>(null);
+    const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+    const [transferData, setTransferData] = useState({ gastoOrigenId: 0, gastoDestinoId: 0, monto: 0 });
     // Advanced filters
     const [fechaDesde, setFechaDesde] = useState('');
     const [fechaHasta, setFechaHasta] = useState('');
@@ -205,6 +208,31 @@ export const GastosPage = () => {
         URL.revokeObjectURL(url);
     };
 
+    const handleTransferirSaldo = async () => {
+        if (!transferData.gastoOrigenId || !transferData.gastoDestinoId || transferData.monto <= 0) return;
+        try {
+            await transferirSaldoMutation.mutateAsync(transferData);
+            toast.success(`Saldo de $${transferData.monto.toFixed(2)} transferido exitosamente`);
+            setIsTransferModalOpen(false);
+            setTransferData({ gastoOrigenId: 0, gastoDestinoId: 0, monto: 0 });
+        } catch (error: any) {
+            console.error('Error:', error);
+            toast.error(error?.response?.data || 'Error al transferir saldo');
+        }
+    };
+
+    const gastoOrigenSeleccionado = useMemo(() => {
+        if (!transferData.gastoOrigenId) return null;
+        return (Array.isArray(gastos) ? gastos : []).find((g: Gasto) => g.id === transferData.gastoOrigenId) || null;
+    }, [gastos, transferData.gastoOrigenId]);
+
+    const disponibleOrigen = useMemo(() => {
+        if (!gastoOrigenSeleccionado) return 0;
+        return gastoOrigenSeleccionado.montoDisponible != null
+            ? gastoOrigenSeleccionado.montoDisponible
+            : gastoOrigenSeleccionado.monto;
+    }, [gastoOrigenSeleccionado]);
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -217,6 +245,15 @@ export const GastosPage = () => {
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Total: ${total.toFixed(2)}</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setIsTransferModalOpen(true)}
+                            className="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+                            title="Transferir saldo entre gastos"
+                        >
+                            <ArrowLeftRight size={18} />
+                            <span className="hidden sm:inline">Transferir</span>
+                        </button>
                         <button
                             type="button"
                             onClick={handleExportCSV}
@@ -673,6 +710,101 @@ export const GastosPage = () => {
                         gastoId={detallesGastoId}
                         onClose={() => setDetallesGastoId(null)}
                     />
+                )}
+
+                {/* Modal Transferir Saldo */}
+                {isTransferModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                            <h2 className="text-xl font-bold mb-4 dark:text-white flex items-center gap-2">
+                                <ArrowLeftRight size={20} /> Transferir Saldo entre Gastos
+                            </h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Gasto Origen (de donde se toma)</label>
+                                    <select
+                                        aria-label="Gasto origen"
+                                        value={transferData.gastoOrigenId}
+                                        onChange={(e) => setTransferData({ ...transferData, gastoOrigenId: Number(e.target.value), monto: 0 })}
+                                        className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    >
+                                        <option value={0}>Seleccionar gasto origen...</option>
+                                        {(Array.isArray(gastos) ? gastos : [])
+                                            .filter((g: Gasto) => {
+                                                const disp = g.montoDisponible != null ? g.montoDisponible : g.monto;
+                                                return disp > 0;
+                                            })
+                                            .map((g: Gasto) => {
+                                                const disp = g.montoDisponible != null ? g.montoDisponible : g.monto;
+                                                return (
+                                                    <option key={g.id} value={g.id}>
+                                                        {g.descripcion || g.categoriaNombre || `Gasto #${g.id}`} — ${disp.toFixed(2)} disponible
+                                                    </option>
+                                                );
+                                            })}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Gasto Destino (a donde se envía)</label>
+                                    <select
+                                        aria-label="Gasto destino"
+                                        value={transferData.gastoDestinoId}
+                                        onChange={(e) => setTransferData({ ...transferData, gastoDestinoId: Number(e.target.value) })}
+                                        className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    >
+                                        <option value={0}>Seleccionar gasto destino...</option>
+                                        {(Array.isArray(gastos) ? gastos : [])
+                                            .filter((g: Gasto) => g.id !== transferData.gastoOrigenId)
+                                            .map((g: Gasto) => (
+                                                <option key={g.id} value={g.id}>
+                                                    {g.descripcion || g.categoriaNombre || `Gasto #${g.id}`} — Monto actual: ${g.monto.toFixed(2)}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                                        Monto a transferir
+                                        {gastoOrigenSeleccionado && (
+                                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                                (Disponible: ${disponibleOrigen.toFixed(2)})
+                                            </span>
+                                        )}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        max={disponibleOrigen}
+                                        value={transferData.monto || ''}
+                                        onChange={(e) => setTransferData({ ...transferData, monto: Number(e.target.value) })}
+                                        className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        placeholder="0.00"
+                                    />
+                                    {transferData.monto > disponibleOrigen && disponibleOrigen > 0 && (
+                                        <p className="text-xs text-red-500 mt-1">El monto excede el disponible del gasto origen.</p>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleTransferirSaldo}
+                                        disabled={!transferData.gastoOrigenId || !transferData.gastoDestinoId || transferData.monto <= 0 || transferData.monto > disponibleOrigen}
+                                        className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                                    >
+                                        Transferir
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsTransferModalOpen(false); setTransferData({ gastoOrigenId: 0, gastoDestinoId: 0, monto: 0 }); }}
+                                        className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {/* Quick Create Categoria Modal */}
