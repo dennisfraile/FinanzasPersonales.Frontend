@@ -14,6 +14,9 @@ export interface Presupuesto {
     porcentajeUtilizado: number;
     fechaInicio: string;
     fechaFin: string;
+    comprometido: number;
+    totalProyectado: number;
+    porcentajeProyectado: number;
 }
 
 export interface CreatePresupuestoDto {

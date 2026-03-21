@@ -22,6 +22,8 @@ import { deudasService, type CreateDeudaDto, type UpdateDeudaDto, type CreatePag
 import { gastosCompartidosService, type CreateGastoCompartidoDto } from '../services/gastosCompartidosService';
 import { plantillasGastoService, type CreatePlantillaGastoDto, type UpdatePlantillaGastoDto, type UsarPlantillaDto } from '../services/plantillasGastoService';
 import { reglasCategoriaService, type CreateReglaCategoriaDto, type UpdateReglaCategoriaDto } from '../services/reglasCategoriaService';
+import gastosProgramadosService from '../services/gastosProgramadosService';
+import type { CreateGastoProgramadoDto, UpdateGastoProgramadoDto, PagarGastoProgramadoDto } from '../services/gastosProgramadosService';
 
 // ============ QUERY KEYS ============
 export const queryKeys = {
@@ -56,6 +58,7 @@ export const queryKeys = {
     resumenSplit: ['resumenSplit'] as const,
     plantillas: ['plantillas'] as const,
     reglasCategoria: ['reglasCategoria'] as const,
+    gastosProgramados: ['gastosProgramados'] as const,
 };
 
 // ============ DASHBOARD ============
@@ -895,6 +898,70 @@ export function useDeleteReglaCategoria() {
         mutationFn: (id: number) => reglasCategoriaService.delete(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.reglasCategoria });
+        },
+    });
+}
+
+// ============ GASTOS PROGRAMADOS ============
+export function useGastosProgramados(estado?: string) {
+    return useQuery({
+        queryKey: [...queryKeys.gastosProgramados, estado],
+        queryFn: () => gastosProgramadosService.getAll(estado),
+    });
+}
+
+export function useCreateGastoProgramado() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreateGastoProgramadoDto) => gastosProgramadosService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosProgramados });
+        },
+    });
+}
+
+export function useUpdateGastoProgramado() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UpdateGastoProgramadoDto }) => gastosProgramadosService.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosProgramados });
+        },
+    });
+}
+
+export function useDeleteGastoProgramado() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => gastosProgramadosService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosProgramados });
+        },
+    });
+}
+
+export function usePagarGastoProgramado() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: PagarGastoProgramadoDto }) => gastosProgramadosService.pagar(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosProgramados });
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+            queryClient.invalidateQueries({ queryKey: queryKeys.presupuestos });
+        },
+    });
+}
+
+export function useCancelarGastoProgramado() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => gastosProgramadosService.cancelar(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.gastosProgramados });
+            queryClient.invalidateQueries({ queryKey: queryKeys.presupuestos });
         },
     });
 }

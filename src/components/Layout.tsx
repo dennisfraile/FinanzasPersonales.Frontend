@@ -5,7 +5,7 @@ import {
     LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, User,
     Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
     ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users,
-    Zap, Upload, Copy
+    Zap, Upload, Copy, CalendarClock
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { NotificationBell } from './NotificationBell';
@@ -82,6 +82,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             items: [
                 { path: '/metas', icon: Target, label: 'Metas' },
                 { path: '/presupuestos', icon: FileText, label: 'Presupuestos' },
+                { path: '/gastos-programados', icon: CalendarClock, label: 'Programados' },
                 { path: '/deudas', icon: TrendingDown, label: 'Deudas' },
             ],
         },

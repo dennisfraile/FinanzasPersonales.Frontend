@@ -18,6 +18,7 @@ import { CuentasPage } from './pages/CuentasPage';
 import { CuentaDashboardPage } from './pages/CuentaDashboardPage';
 import { TransferirPage } from './pages/TransferirPage';
 import { GastosRecurrentesPage } from './pages/GastosRecurrentesPage';
+import { GastosProgramadosPage } from './pages/GastosProgramadosPage';
 import { IngresosRecurrentesPage } from './pages/IngresosRecurrentesPage';
 import { TagsPage } from './pages/TagsPage';
 import { DeudasPage } from './pages/DeudasPage';
@@ -171,6 +172,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><GastosRecurrentesPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gastos-programados"
+                element={
+                  <ProtectedRoute>
+                    <Layout><GastosProgramadosPage /></Layout>
                   </ProtectedRoute>
                 }
               />
