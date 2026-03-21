@@ -266,6 +266,32 @@ export const PresupuestosPage = () => {
                                         <span className="font-medium dark:text-white">{presupuesto.periodo}</span>
                                     </div>
                                 </div>
+
+                                {/* Transferencias */}
+                                {presupuesto.transferencias && presupuesto.transferencias.length > 0 && (
+                                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">Transferencias</p>
+                                        <div className="space-y-1">
+                                            {presupuesto.transferencias.map((t) => (
+                                                <div key={t.id} className="flex items-center gap-1.5 text-xs">
+                                                    {t.direccion === 'salida' ? (
+                                                        <>
+                                                            <span className="text-red-500">-${t.monto.toFixed(2)}</span>
+                                                            <span className="text-gray-400 dark:text-gray-500">hacia</span>
+                                                            <span className="font-medium dark:text-gray-300">{t.categoriaDestinoNombre}</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-green-500">+${t.monto.toFixed(2)}</span>
+                                                            <span className="text-gray-400 dark:text-gray-500">desde</span>
+                                                            <span className="font-medium dark:text-gray-300">{t.categoriaOrigenNombre}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         );
                     })}

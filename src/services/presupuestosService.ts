@@ -17,6 +17,16 @@ export interface Presupuesto {
     comprometido: number;
     totalProyectado: number;
     porcentajeProyectado: number;
+    transferencias: TransferenciaGastoResumen[];
+}
+
+export interface TransferenciaGastoResumen {
+    id: number;
+    monto: number;
+    categoriaOrigenNombre: string;
+    categoriaDestinoNombre: string;
+    direccion: 'entrada' | 'salida';
+    fecha: string;
 }
 
 export interface CreatePresupuestoDto {

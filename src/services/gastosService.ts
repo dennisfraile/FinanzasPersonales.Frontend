@@ -14,6 +14,14 @@ export interface Gasto {
     tagIds?: number[];
     cantidadDetalles?: number;
     montoDisponible?: number | null;
+    transferencias?: TransferenciaGastoItem[];
+}
+
+export interface TransferenciaGastoItem {
+    monto: number;
+    direccion: 'entrada' | 'salida';
+    otroGastoDescripcion: string;
+    fecha: string;
 }
 
 export interface CreateGastoDto {

@@ -485,6 +485,19 @@ export const GastosPage = () => {
                                                             );
                                                         })()
                                                     )}
+                                                    {gasto.transferencias && gasto.transferencias.length > 0 && (
+                                                        <div className="mt-1 space-y-0.5">
+                                                            {gasto.transferencias.map((t, i) => (
+                                                                <p key={i} className="text-[10px]">
+                                                                    {t.direccion === 'salida' ? (
+                                                                        <><span className="text-red-500">-${t.monto.toFixed(2)}</span> <span className="text-gray-400">→ {t.otroGastoDescripcion}</span></>
+                                                                    ) : (
+                                                                        <><span className="text-green-500">+${t.monto.toFixed(2)}</span> <span className="text-gray-400">← {t.otroGastoDescripcion}</span></>
+                                                                    )}
+                                                                </p>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -556,6 +569,19 @@ export const GastosPage = () => {
                                                 </div>
                                             );
                                         })()
+                                    )}
+                                    {gasto.transferencias && gasto.transferencias.length > 0 && (
+                                        <div className="mt-1 space-y-0.5">
+                                            {gasto.transferencias.map((t, i) => (
+                                                <p key={i} className="text-[10px]">
+                                                    {t.direccion === 'salida' ? (
+                                                        <><span className="text-red-500">-${t.monto.toFixed(2)}</span> <span className="text-gray-400">→ {t.otroGastoDescripcion}</span></>
+                                                    ) : (
+                                                        <><span className="text-green-500">+${t.monto.toFixed(2)}</span> <span className="text-gray-400">← {t.otroGastoDescripcion}</span></>
+                                                    )}
+                                                </p>
+                                            ))}
+                                        </div>
                                     )}
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(gasto.fecha.split('T')[0] + 'T12:00:00').toLocaleDateString()}</span>
