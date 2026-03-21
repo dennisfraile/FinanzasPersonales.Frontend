@@ -23,6 +23,8 @@ export const sectionHelp: Record<string, SectionHelp> = {
             'Un gasto "Fijo" es algo que pagas siempre (renta, internet). "Variable" es algo que cambia (comida, entretenimiento)',
             'Usa las categorias para organizar tus gastos y ver patrones',
             'Puedes usar los filtros avanzados para buscar gastos por fecha o rango de monto',
+            '"Sin asignar" indica cuanto del gasto aun no tiene sub-compras registradas. Es diferente al "Disponible" del presupuesto, que muestra cuanto queda de tu limite',
+            'Al transferir saldo entre gastos, el historial de movimientos aparece debajo del monto',
         ],
     },
     ingresos: {
@@ -41,6 +43,8 @@ export const sectionHelp: Record<string, SectionHelp> = {
             'Verde = vas bien, Naranja = cuidado (mas del 80%), Rojo = excediste el limite',
             'Empieza con las categorias donde mas gastas',
             'Revisa tus presupuestos cada semana para ajustar tus habitos a tiempo',
+            '"Disponible" aqui significa cuanto te queda de tu limite (ej: $30 - $11.25 = $18.75). Es diferente al "sin asignar" de la tabla de gastos, que indica cuanto del gasto no tiene sub-compras',
+            'Las transferencias entre gastos se muestran al pie de cada tarjeta para que veas como se redistribuyo el dinero',
         ],
     },
     metas: {

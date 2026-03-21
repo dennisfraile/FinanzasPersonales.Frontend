@@ -466,7 +466,7 @@ export const GastosPage = () => {
                                                         <span className="font-semibold text-red-600">${gasto.monto.toFixed(2)}</span>
                                                         {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && gasto.montoDisponible != null && (
                                                             <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
-                                                                {gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible.toFixed(2)} disp.`}
+                                                                {gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible.toFixed(2)} sin asignar`}
                                                             </span>
                                                         )}
                                                     </div>
@@ -550,7 +550,7 @@ export const GastosPage = () => {
                                             <p className="font-bold text-red-600 text-lg">${gasto.monto.toFixed(2)}</p>
                                             {gasto.cantidadDetalles != null && gasto.cantidadDetalles > 0 && gasto.montoDisponible != null && (
                                                 <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${gasto.montoDisponible <= 0 ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'}`}>
-                                                    {gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible.toFixed(2)} disp.`}
+                                                    {gasto.montoDisponible <= 0 ? 'Agotado' : `$${gasto.montoDisponible.toFixed(2)} sin asignar`}
                                                 </span>
                                             )}
                                         </div>
