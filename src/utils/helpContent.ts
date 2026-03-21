@@ -104,6 +104,17 @@ export const sectionHelp: Record<string, SectionHelp> = {
             'Puedes exportar tus datos a Excel o PDF',
         ],
     },
+    gastosProgramados: {
+        title: 'Gastos Programados',
+        description: 'Aqui registras pagos con fecha limite conocida: recibos de luz, agua, gas, renta, suscripciones, etc. El sistema te avisa antes del vencimiento y puede procesar el cobro automaticamente.',
+        tips: [
+            'Usa "Monto variable" para recibos que cambian cada mes (luz, agua, gas)',
+            'Asigna una cuenta para que el sistema descuente el balance automaticamente al pagar',
+            'Los gastos fijos con cuenta se cobran automaticamente en la fecha de vencimiento',
+            'Puedes registrar el pago manualmente con un monto diferente al estimado',
+            'Filtra por estado para ver solo los pendientes, pagados o vencidos',
+        ],
+    },
     deudas: {
         title: 'Control de Deudas',
         description: 'Aqui llevas el registro de tus deudas: tarjetas de credito, prestamos, hipotecas, etc. Puedes registrar pagos y ver cuanto te falta por pagar.',

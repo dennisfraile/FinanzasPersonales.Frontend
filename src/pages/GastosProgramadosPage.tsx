@@ -4,6 +4,8 @@ import type { GastoProgramado, CreateGastoProgramadoDto, PagarGastoProgramadoDto
 import { useCuentas } from '../hooks/useCuentas';
 import { CalendarClock, Plus, Edit2, Trash2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, CreditCard } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import {
     useGastosProgramados, useCreateGastoProgramado, useUpdateGastoProgramado,
     useDeleteGastoProgramado, usePagarGastoProgramado, useCancelarGastoProgramado,
@@ -163,9 +165,12 @@ export const GastosProgramadosPage = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            Gastos Programados
-                        </h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                Gastos Programados
+                            </h1>
+                            <HelpTooltip content={sectionHelp.gastosProgramados} />
+                        </div>
                         <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Recibos, cobros y pagos con fecha limite
                         </p>
