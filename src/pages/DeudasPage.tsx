@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { useDeudas, useCreateDeuda, useUpdateDeuda, useDeleteDeuda, useRegistrarPagoDeuda, useDeudaPagos } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -214,7 +216,10 @@ export const DeudasPage = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Deudas</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Deudas</h1>
+                            <HelpTooltip content={sectionHelp.deudas} />
+                        </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">{filteredDeudas.length} deudas registradas</p>
                     </div>
                     <button

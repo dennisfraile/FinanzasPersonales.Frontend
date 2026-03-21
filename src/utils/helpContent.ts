@@ -104,6 +104,16 @@ export const sectionHelp: Record<string, SectionHelp> = {
             'Puedes exportar tus datos a Excel o PDF',
         ],
     },
+    deudas: {
+        title: 'Control de Deudas',
+        description: 'Aqui llevas el registro de tus deudas: tarjetas de credito, prestamos, hipotecas, etc. Puedes registrar pagos y ver cuanto te falta por pagar.',
+        tips: [
+            'Registra todas tus deudas para tener una vision completa de lo que debes',
+            'Anota la tasa de interes para priorizar: paga primero la deuda con mayor tasa',
+            'Registra cada pago que hagas para ver como baja tu saldo pendiente',
+            'El dia de pago te ayuda a recordar cuando debes hacer tu siguiente abono',
+        ],
+    },
     tags: {
         title: 'Etiquetas (Tags)',
         description: 'Los tags son etiquetas extra que puedes poner a tus gastos e ingresos para organizarlos mejor. Por ejemplo: "vacaciones", "trabajo", "emergencia".',

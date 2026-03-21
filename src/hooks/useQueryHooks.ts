@@ -127,6 +127,8 @@ export function useTransferirSaldoGasto() {
             queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: ['gastoConDetalles'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.presupuestos });
+            queryClient.invalidateQueries({ queryKey: ['presupuestoDashboard'] });
         },
     });
 }
