@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { type ReglaCategoria, type CreateReglaCategoriaDto } from '../services/reglasCategoriaService';
 import { Trash2, Plus, Edit2, Search, Zap, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'react-toastify';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import { useReglasCategoria, useCreateReglaCategoria, useUpdateReglaCategoria, useDeleteReglaCategoria, useCategorias } from '../hooks/useQueryHooks';
 
 const TIPOS_COINCIDENCIA = [
@@ -106,7 +108,7 @@ export const ReglasCategoriaPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Reglas de Auto-categorización</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Reglas de Auto-categorización <HelpTooltip content={sectionHelp.reglasCategoria} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Asigna categorías automáticamente según la descripción</p>
                     </div>
                     <button onClick={() => setIsModalOpen(true)} className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 flex items-center gap-2">

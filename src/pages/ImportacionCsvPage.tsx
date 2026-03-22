@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { type CsvPreviewResponse, type CsvImportRequest, type CsvPreviewRow, type CsvImportResult, importacionCsvService } from '../services/importacionCsvService';
 import { Upload, CheckCircle2, AlertTriangle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { useCategorias } from '../hooks/useQueryHooks';
 import { useQueryClient } from '@tanstack/react-query';
@@ -114,7 +116,7 @@ export const ImportacionCsvPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-5xl mx-auto px-4 py-8">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">Importar CSV</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">Importar CSV <HelpTooltip content={sectionHelp.importacionCsv} /></h1>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">Importa transacciones desde un archivo CSV de tu banco</p>
 
                 {/* Steps indicator */}

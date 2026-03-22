@@ -7,6 +7,8 @@ import type { EventClickArg, DateSelectArg, DatesSetArg, EventInput } from '@ful
 import { calendarioService, type DiaCalendario, type TransaccionSummary } from '../services/calendarioService';
 import { toast } from 'react-toastify';
 import { X } from 'lucide-react';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 export const CalendarioPage = () => {
     const [eventos, setEventos] = useState<EventInput[]>([]);
@@ -93,7 +95,7 @@ export const CalendarioPage = () => {
     return (
         <div className="p-4 md:p-6">
             <div className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Calendario Financiero</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">Calendario Financiero <HelpTooltip content={sectionHelp.calendario} /></h1>
                 <p className="text-gray-600 mt-2">
                     Vista de calendario de tus ingresos y gastos
                 </p>

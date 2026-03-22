@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Plus, Wallet } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useCuentas } from '../hooks/useCuentas';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import { CuentaCard } from '../components/CuentaCard';
 import type { CuentaDto, CuentaCreateDto } from '../services/cuentasService';
 import { toast } from 'react-toastify';
@@ -113,8 +115,8 @@ export const CuentasPage = () => {
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6`}>
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            Mis Cuentas
+                        <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
+                            Mis Cuentas <HelpTooltip content={sectionHelp.cuentas} />
                         </h1>
                         <p className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Gestiona tus cuentas financieras

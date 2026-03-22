@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { type PlantillaGasto, type CreatePlantillaGastoDto } from '../services/plantillasGastoService';
 import { Trash2, Plus, Edit2, Search, Zap, Copy } from 'lucide-react';
 import { toast } from 'react-toastify';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { usePlantillas, useCreatePlantilla, useUpdatePlantilla, useDeletePlantilla, useUsarPlantilla, useCategorias } from '../hooks/useQueryHooks';
 
@@ -109,7 +111,7 @@ export const PlantillasGastoPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Plantillas de Gasto</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Plantillas de Gasto <HelpTooltip content={sectionHelp.plantillas} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Crea gastos frecuentes con un clic</p>
                     </div>
                     <button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2">

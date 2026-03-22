@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { comparacionService, type ComparacionPeriodos } from '../services/comparacionService';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { toast } from 'react-toastify';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 export const ComparacionPage = () => {
     const [fecha1Inicio, setFecha1Inicio] = useState('');
@@ -40,7 +42,7 @@ export const ComparacionPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-6xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">📊 Comparación de Períodos</h1>
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">Comparación de Períodos <HelpTooltip content={sectionHelp.comparacion} /></h1>
 
                 {/* Selectores de Período */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

@@ -5,6 +5,8 @@ import {
 } from 'recharts';
 import { TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, AlertCircle, TrendingUp as TrendIcon, FileDown } from 'lucide-react';
 import { toast } from 'react-toastify';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import apiClient from '../services/api';
 import { useTendencias, useComparativa, useTopCategorias, useGastosTipo, useProyeccion } from '../hooks/useQueryHooks';
 
@@ -101,7 +103,7 @@ export const ReportesPage = () => {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">📊 Reportes Avanzados</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Reportes Avanzados <HelpTooltip content={sectionHelp.reportes} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Análisis profundo de tus finanzas</p>
                     </div>
                     <div className="flex flex-wrap gap-3 items-center">

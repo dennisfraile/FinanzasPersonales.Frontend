@@ -1,5 +1,7 @@
 import { useNotificaciones } from '../hooks/useNotificaciones';
 import { Bell, Check } from 'lucide-react';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 export const NotificacionesPage = () => {
     const { notificaciones, marcarLeida, isLoading } = useNotificaciones();
@@ -52,8 +54,8 @@ export const NotificacionesPage = () => {
         <div className="max-w-4xl mx-auto p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-6">
                 <Bell size={32} className="text-blue-600 dark:text-blue-400" />
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-                    Notificaciones
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    Notificaciones <HelpTooltip content={sectionHelp.notificaciones} />
                 </h1>
             </div>
 

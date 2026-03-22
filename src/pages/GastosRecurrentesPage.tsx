@@ -4,6 +4,8 @@ import type { GastoRecurrente, CreateGastoRecurrenteDto } from '../services/gast
 import { useCuentas } from '../hooks/useCuentas';
 import { Repeat, Plus, Edit2, Trash2, Play } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import {
     useGastosRecurrentes, useCreateGastoRecurrente, useUpdateGastoRecurrente,
     useDeleteGastoRecurrente, useGenerarGastoRecurrente, useGenerarPendientes,
@@ -117,8 +119,8 @@ export const GastosRecurrentesPage = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            🔄 Gastos Recurrentes
+                        <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
+                            Gastos Recurrentes <HelpTooltip content={sectionHelp.gastosRecurrentes} />
                         </h1>
                         <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Gestiona tus gastos automáticos

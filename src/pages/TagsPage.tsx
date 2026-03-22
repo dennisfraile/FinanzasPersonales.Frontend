@@ -3,6 +3,8 @@ import { type Tag, type CreateTagDto } from '../services/tagsService';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 export const TagsPage = () => {
     const { data: tags = [] } = useTags();
@@ -59,7 +61,7 @@ export const TagsPage = () => {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Tags</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Tags <HelpTooltip content={sectionHelp.tags} /></h1>
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"

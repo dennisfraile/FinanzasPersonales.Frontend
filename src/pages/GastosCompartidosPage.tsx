@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { type GastoCompartido, type CreateGastoCompartidoDto, type CreateParticipanteDto, type ParticipanteGasto } from '../services/gastosCompartidosService';
 import { Trash2, Plus, Search, Users, DollarSign, CheckCircle2, Clock, UserPlus, X, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 import { Pagination } from '../components/Pagination';
 import { useCategorias, useGastosCompartidos, useResumenSplit, useCreateGastoCompartido, useDeleteGastoCompartido, useLiquidarParticipante } from '../hooks/useQueryHooks';
 
@@ -150,7 +152,7 @@ export const GastosCompartidosPage = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Gastos Compartidos</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Gastos Compartidos <HelpTooltip content={sectionHelp.gastosCompartidos} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Divide gastos con amigos, familia o roommates</p>
                     </div>
                     <button

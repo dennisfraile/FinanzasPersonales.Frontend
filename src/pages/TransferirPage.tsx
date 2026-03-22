@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import { ArrowLeftRight } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useCreateTransferencia } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 export const TransferirPage = () => {
     const { theme } = useTheme();
@@ -57,8 +59,8 @@ export const TransferirPage = () => {
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-4 sm:p-6`}>
                 <div className="flex items-center gap-3 mb-6">
                     <ArrowLeftRight className="text-blue-600" size={32} />
-                    <h1 className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Transferir entre Cuentas
+                    <h1 className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
+                        Transferir entre Cuentas <HelpTooltip content={sectionHelp.transferencias} />
                     </h1>
                 </div>
 

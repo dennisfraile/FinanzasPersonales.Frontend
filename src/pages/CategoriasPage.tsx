@@ -3,6 +3,8 @@ import { type Categoria, type CreateCategoriaDto } from '../services/categoriasS
 import { Trash2, Plus, Edit2, Search, Tag } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useCategorias, useCreateCategoria, useUpdateCategoria, useDeleteCategoria } from '../hooks/useQueryHooks';
+import HelpTooltip from '../components/HelpTooltip';
+import { sectionHelp } from '../utils/helpContent';
 
 export const CategoriasPage = () => {
     const { data: categorias = [] } = useCategorias();
@@ -83,7 +85,7 @@ export const CategoriasPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Categorías</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Categorías <HelpTooltip content={sectionHelp.categorias} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">{filteredCategorias.length} categorías</p>
                     </div>
                     <button
