@@ -116,7 +116,7 @@ export const CuentasPage = () => {
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
-                            Mis Cuentas <HelpTooltip content={sectionHelp.cuentas} />
+                            Mis cuentas <HelpTooltip content={sectionHelp.cuentas} />
                         </h1>
                         <p className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Gestiona tus cuentas financieras
@@ -131,7 +131,7 @@ export const CuentasPage = () => {
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         <Plus size={20} />
-                        Nueva Cuenta
+                        Nueva cuenta
                     </button>
                 </div>
 
@@ -187,7 +187,7 @@ export const CuentasPage = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto`}>
                         <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                            {editingCuenta ? 'Editar Cuenta' : 'Nueva Cuenta'}
+                            {editingCuenta ? 'Editar cuenta' : 'Nueva cuenta'}
                         </h2>
 
                         <form onSubmit={handleSubmit} className="space-y-4">

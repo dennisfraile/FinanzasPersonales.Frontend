@@ -167,7 +167,7 @@ export const GastosProgramadosPage = () => {
                     <div>
                         <div className="flex items-center gap-2">
                             <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                Gastos Programados
+                                Gastos programados
                             </h1>
                             <HelpTooltip content={sectionHelp.gastosProgramados} />
                         </div>
@@ -351,7 +351,7 @@ export const GastosProgramadosPage = () => {
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
                             <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                {editingId ? 'Editar' : 'Nuevo'} Gasto Programado
+                                {editingId ? 'Editar' : 'Nuevo'} gasto programado
                             </h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -473,7 +473,7 @@ export const GastosProgramadosPage = () => {
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
                             <h2 className={`text-2xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                Registrar Pago
+                                Registrar pago
                             </h2>
                             <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                 {pagandoGasto.descripcion}

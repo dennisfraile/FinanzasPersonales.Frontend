@@ -38,7 +38,7 @@ export const ProfilePage = () => {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-2xl mx-auto px-4 py-8">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Mi Perfil</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Mi perfil</h1>
                     <p className="text-gray-600 dark:text-gray-400 mt-1">Gestiona tu informacion personal</p>
                 </div>
 

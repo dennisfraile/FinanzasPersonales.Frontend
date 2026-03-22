@@ -108,11 +108,11 @@ export const ReglasCategoriaPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Reglas de Auto-categorización <HelpTooltip content={sectionHelp.reglasCategoria} /></h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Reglas de auto-categorización <HelpTooltip content={sectionHelp.reglasCategoria} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Asigna categorías automáticamente según la descripción</p>
                     </div>
                     <button onClick={() => setIsModalOpen(true)} className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 flex items-center gap-2">
-                        <Plus size={20} /> Nueva Regla
+                        <Plus size={20} /> Nueva regla
                     </button>
                 </div>
 
@@ -172,7 +172,7 @@ export const ReglasCategoriaPage = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} Regla</h2>
+                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} regla</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 dark:text-gray-300">Patrón de texto</label>

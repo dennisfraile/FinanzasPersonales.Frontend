@@ -92,8 +92,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             groupIcon: RefreshCw,
             defaultOpen: false,
             items: [
-                { path: '/gastos-recurrentes', icon: Repeat, label: 'Gastos Recurrentes' },
-                { path: '/ingresos-recurrentes', icon: Repeat, label: 'Ingresos Recurrentes' },
+                { path: '/gastos-recurrentes', icon: Repeat, label: 'Gastos recurrentes' },
+                { path: '/ingresos-recurrentes', icon: Repeat, label: 'Ingresos recurrentes' },
             ],
         },
         {
@@ -262,7 +262,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                         >
                                             <User size={16} />
-                                            Mi Perfil
+                                            Mi perfil
                                         </button>
                                         <button
                                             type="button"
@@ -270,7 +270,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                         >
                                             <LogOut size={16} />
-                                            Cerrar Sesion
+                                            Cerrar sesión
                                         </button>
                                     </div>
                                 )}

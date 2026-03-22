@@ -152,7 +152,7 @@ export const GastosCompartidosPage = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Gastos Compartidos <HelpTooltip content={sectionHelp.gastosCompartidos} /></h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Gastos compartidos <HelpTooltip content={sectionHelp.gastosCompartidos} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Divide gastos con amigos, familia o roommates</p>
                     </div>
                     <button
@@ -307,7 +307,7 @@ export const GastosCompartidosPage = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-2xl font-bold mb-4 dark:text-white">Nuevo Gasto Compartido</h2>
+                            <h2 className="text-2xl font-bold mb-4 dark:text-white">Nuevo gasto compartido</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 dark:text-gray-300">Descripción</label>
@@ -546,7 +546,7 @@ export const GastosCompartidosPage = () => {
                 {isLiquidarOpen && selectedParticipante && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
-                            <h2 className="text-xl font-bold mb-2 dark:text-white">Registrar Pago</h2>
+                            <h2 className="text-xl font-bold mb-2 dark:text-white">Registrar pago</h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                                 {selectedParticipante.nombre} debe ${(selectedParticipante.montoAsignado - selectedParticipante.montoPagado).toFixed(2)}
                             </p>

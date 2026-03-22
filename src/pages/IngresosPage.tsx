@@ -226,7 +226,7 @@ export const IngresosPage = () => {
                             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
                         >
                             <Plus size={20} />
-                            <span className="hidden sm:inline">Nuevo Ingreso</span>
+                            <span className="hidden sm:inline">Nuevo ingreso</span>
                             <span className="sm:hidden">Nuevo</span>
                         </button>
                     </div>
@@ -465,7 +465,7 @@ export const IngresosPage = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} Ingreso</h2>
+                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} ingreso</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label htmlFor="ingreso-categoria" className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
@@ -572,7 +572,7 @@ export const IngresosPage = () => {
                     isQuickCatModalOpen && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
-                                <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva Categoría Rápida</h3>
+                                <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva categoría rápida</h3>
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre</label>

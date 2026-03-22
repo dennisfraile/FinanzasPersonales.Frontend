@@ -269,7 +269,7 @@ export const GastosPage = () => {
                             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
                         >
                             <Plus size={20} />
-                            <span className="hidden sm:inline">Nuevo Gasto</span>
+                            <span className="hidden sm:inline">Nuevo gasto</span>
                             <span className="sm:hidden">Nuevo</span>
                         </button>
                     </div>
@@ -614,7 +614,7 @@ export const GastosPage = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} Gasto</h2>
+                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} gasto</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label htmlFor="gasto-descripcion" className="block text-sm font-medium mb-1 dark:text-gray-300">Descripcion (que compraste o pagaste)</label>
@@ -837,7 +837,7 @@ export const GastosPage = () => {
                 {isQuickCatModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
-                            <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva Categoría Rápida</h3>
+                            <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva categoría rápida</h3>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre</label>

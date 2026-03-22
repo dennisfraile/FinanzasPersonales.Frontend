@@ -93,7 +93,7 @@ export const CategoriasPage = () => {
                         className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
                     >
                         <Plus size={20} />
-                        Nueva Categoría
+                        Nueva categoría
                     </button>
                 </div>
 
@@ -186,7 +186,7 @@ export const CategoriasPage = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} Categoría</h2>
+                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} categoría</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label htmlFor="categoria-nombre" className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre</label>

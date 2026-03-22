@@ -111,11 +111,11 @@ export const PlantillasGastoPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Plantillas de Gasto <HelpTooltip content={sectionHelp.plantillas} /></h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">Plantillas de gasto <HelpTooltip content={sectionHelp.plantillas} /></h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">Crea gastos frecuentes con un clic</p>
                     </div>
                     <button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
-                        <Plus size={20} /> Nueva Plantilla
+                        <Plus size={20} /> Nueva plantilla
                     </button>
                 </div>
 
@@ -170,7 +170,7 @@ export const PlantillasGastoPage = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} Plantilla</h2>
+                            <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} plantilla</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 dark:text-gray-300">Nombre</label>
@@ -215,11 +215,11 @@ export const PlantillasGastoPage = () => {
                     </div>
                 )}
 
-                {/* Modal Usar Plantilla */}
+                {/* Modal Usar plantilla */}
                 {isUsarModalOpen && selectedPlantillaId && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
-                            <h2 className="text-xl font-bold mb-4 dark:text-white">Usar Plantilla</h2>
+                            <h2 className="text-xl font-bold mb-4 dark:text-white">Usar plantilla</h2>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha</label>

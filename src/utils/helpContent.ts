@@ -7,7 +7,7 @@ export interface SectionHelp {
 
 export const sectionHelp: Record<string, SectionHelp> = {
     dashboard: {
-        title: 'Tu Panel Principal',
+        title: 'Tu panel principal',
         description: 'Aqui ves un resumen de tus finanzas del mes actual: cuanto ingresaste, cuanto gastaste y tu balance.',
         tips: [
             'El balance es la diferencia entre tus ingresos y gastos del mes. Ej: si ingresaste $1,000 y gastaste $800, tu balance es +$200',
@@ -17,7 +17,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     gastos: {
-        title: 'Registro de Gastos',
+        title: 'Registro de gastos',
         description: 'Aqui llevas el control de todo lo que gastas. Registra cada gasto con su monto, categoria y fecha para tener visibilidad de tu dinero.',
         tips: [
             'Un gasto "Fijo" es algo que pagas siempre (renta, internet). "Variable" es algo que cambia (comida, entretenimiento). Ej: tu renta de $500 es fijo, el almuerzo de hoy es variable',
@@ -28,7 +28,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     ingresos: {
-        title: 'Registro de Ingresos',
+        title: 'Registro de ingresos',
         description: 'Aqui registras todo el dinero que recibes: salario, freelance, ventas, etc. Esto te ayuda a saber cuanto dinero entra cada mes.',
         tips: [
             'Registra todos tus ingresos, no solo el salario. Ej: freelance, renta de propiedad, venta de algo, regalo',
@@ -37,7 +37,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     presupuestos: {
-        title: 'Control de Presupuestos',
+        title: 'Control de presupuestos',
         description: 'Un presupuesto es un limite que te pones para no gastar de mas en una categoria. Por ejemplo: "No gastar mas de $200 en comida esta semana".',
         tips: [
             'Verde = vas bien, Naranja = cuidado (mas del 80%), Rojo = excediste el limite. Ej: si tu presupuesto de comida es $200 y llevas $170, estas en naranja',
@@ -48,7 +48,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     metas: {
-        title: 'Metas de Ahorro',
+        title: 'Metas de ahorro',
         description: 'Una meta es un objetivo financiero que quieres alcanzar. Define cuanto necesitas y ve abonando poco a poco hasta lograrlo.',
         tips: [
             'Ponle un nombre motivador a tu meta. Ej: "Vacaciones en la playa $2,000", "Fondo de emergencia $5,000", "Laptop nueva $800"',
@@ -57,7 +57,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     cuentas: {
-        title: 'Tus Cuentas',
+        title: 'Tus cuentas',
         description: 'Aqui gestionas tus cuentas de dinero: efectivo, banco, tarjeta, ahorro, etc. Cada cuenta lleva su propio balance.',
         tips: [
             'Crea una cuenta por cada lugar donde tengas dinero. Ej: "BAC salario", "Efectivo cartera", "Ahorro emergencia"',
@@ -77,7 +77,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     transferencias: {
-        title: 'Transferencias entre Cuentas',
+        title: 'Transferencias entre cuentas',
         description: 'Mueve dinero entre tus propias cuentas. No es un gasto ni un ingreso, es solo mover dinero de un lugar a otro.',
         tips: [
             'Una transferencia NO afecta tu balance total. Ej: mover $200 de Banco a Ahorro no cambia cuanto dinero tienes en total',
@@ -86,7 +86,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     gastosRecurrentes: {
-        title: 'Gastos Recurrentes',
+        title: 'Gastos recurrentes',
         description: 'Son gastos que se repiten automaticamente cada cierto tiempo. El sistema los genera por ti para que no olvides registrarlos.',
         tips: [
             'Configura tus gastos fijos aqui. Ej: "Renta $500 mensual dia 1", "Internet $40 mensual dia 15", "Netflix $15 mensual dia 5"',
@@ -96,7 +96,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     ingresosRecurrentes: {
-        title: 'Ingresos Recurrentes',
+        title: 'Ingresos recurrentes',
         description: 'Son ingresos que recibes regularmente. El sistema los registra automaticamente para que no tengas que hacerlo manualmente.',
         tips: [
             'Registra tu salario aqui. Ej: "Salario $1,500 quincenal dia 15 y 30", o "Salario $3,000 mensual dia 1"',
@@ -105,7 +105,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     reportes: {
-        title: 'Reportes Financieros',
+        title: 'Reportes financieros',
         description: 'Graficos detallados de tus finanzas: tendencias, comparaciones entre meses y tus categorias principales de gasto.',
         tips: [
             'Usa los reportes para identificar patrones. Ej: si notas que en diciembre siempre gastas el doble, puedes planificar mejor',
@@ -114,7 +114,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     gastosProgramados: {
-        title: 'Gastos Programados',
+        title: 'Gastos programados',
         description: 'Pagos con fecha limite conocida. Ideal para recibos de servicios, suscripciones y cualquier cobro con fecha especifica.',
         tips: [
             'Usa "Monto variable" para recibos que cambian. Ej: la luz puede ser $30 un mes y $50 otro. Pon un estimado y ajusta al pagar',
@@ -125,7 +125,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     deudas: {
-        title: 'Control de Deudas',
+        title: 'Control de deudas',
         description: 'Lleva el registro de tus deudas: tarjetas de credito, prestamos, hipotecas, etc. Registra pagos y ve como baja tu saldo.',
         tips: [
             'Registra todas tus deudas para tener vision completa. Ej: "Tarjeta VISA $2,000", "Prestamo personal $5,000", "Hipoteca $80,000"',
@@ -135,7 +135,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     tags: {
-        title: 'Etiquetas (Tags)',
+        title: 'Etiquetas (tags)',
         description: 'Los tags son etiquetas extra para organizar gastos e ingresos por contexto, evento o proyecto. Cruzan todas las categorias.',
         tips: [
             'Usa tags para agrupar por contexto. Ej: tag "trabajo" para almuerzo de trabajo + pasaje al trabajo + materiales de oficina',
@@ -145,7 +145,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     gastosCompartidos: {
-        title: 'Gastos Compartidos',
+        title: 'Gastos compartidos',
         description: 'Para gastos que divides con otras personas. Registra cuanto pago cada quien y lleva el control de quien debe a quien.',
         tips: [
             'Crea un gasto compartido con los participantes. Ej: "Cena grupal $60" dividida entre 3 personas = $20 cada uno',
@@ -155,7 +155,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     plantillas: {
-        title: 'Plantillas de Gasto',
+        title: 'Plantillas de gasto',
         description: 'Atajos para gastos frecuentes que no son automaticos. Crea una plantilla y registra el gasto con un solo clic.',
         tips: [
             'Crea plantillas para gastos del dia a dia. Ej: "Almuerzo trabajo" (Alimentacion, Variable, cuenta BAC)',
@@ -195,7 +195,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     calendario: {
-        title: 'Calendario Financiero',
+        title: 'Calendario financiero',
         description: 'Vista de calendario que muestra tus gastos e ingresos por dia. Te permite ver de un vistazo cuando entro y salio dinero.',
         tips: [
             'Cada dia muestra el total de gastos (rojo) e ingresos (verde). Ej: el dia 15 puede mostrar +$1,500 (salario) y -$500 (renta)',
@@ -205,7 +205,7 @@ export const sectionHelp: Record<string, SectionHelp> = {
         ],
     },
     comparacion: {
-        title: 'Comparacion de Periodos',
+        title: 'Comparación de períodos',
         description: 'Compara tus finanzas entre dos periodos diferentes. Ve si estas gastando mas o menos que antes y en que categorias cambio.',
         tips: [
             'Compara mes a mes. Ej: "Febrero vs Enero" para ver si bajaste tus gastos de comida',

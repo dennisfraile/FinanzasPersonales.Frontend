@@ -131,7 +131,7 @@ export const IngresosRecurrentesPage = () => {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
-                            Ingresos Recurrentes <HelpTooltip content={sectionHelp.ingresosRecurrentes} />
+                            Ingresos recurrentes <HelpTooltip content={sectionHelp.ingresosRecurrentes} />
                         </h1>
                         <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Gestiona tus ingresos automaticos (salario, rentas, etc.)
@@ -143,7 +143,7 @@ export const IngresosRecurrentesPage = () => {
                             className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                         >
                             <Play size={20} />
-                            Generar Pendientes
+                            Generar pendientes
                         </button>
                         <button
                             onClick={() => setShowModal(true)}
@@ -261,7 +261,7 @@ export const IngresosRecurrentesPage = () => {
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
                             <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                {editingId ? 'Editar' : 'Nuevo'} Ingreso Recurrente
+                                {editingId ? 'Editar' : 'Nuevo'} ingreso recurrente
                             </h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>

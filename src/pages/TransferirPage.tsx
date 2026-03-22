@@ -60,7 +60,7 @@ export const TransferirPage = () => {
                 <div className="flex items-center gap-3 mb-6">
                     <ArrowLeftRight className="text-blue-600" size={32} />
                     <h1 className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
-                        Transferir entre Cuentas <HelpTooltip content={sectionHelp.transferencias} />
+                        Transferir entre cuentas <HelpTooltip content={sectionHelp.transferencias} />
                     </h1>
                 </div>
 
