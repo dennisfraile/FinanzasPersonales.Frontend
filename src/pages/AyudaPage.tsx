@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import {
-    BookOpen, ChevronDown, ChevronRight, Wallet, TrendingDown, FileText, Target,
-    Repeat, CalendarClock, CreditCard, ArrowLeftRight, BarChart3, Zap, Tag,
+    BookOpen, ChevronDown, ChevronRight, FileText, Target,
+    Repeat, CalendarClock, CreditCard, BarChart3, Zap,
     CheckCircle2, ArrowRight, Lightbulb, HelpCircle
 } from 'lucide-react';
 import { sectionHelp, financialGlossary } from '../utils/helpContent';
@@ -273,7 +272,6 @@ const colorMap: Record<string, { bg: string; text: string; border: string; light
 };
 
 export const AyudaPage = () => {
-    const { theme } = useTheme();
     const [expandedWorkflow, setExpandedWorkflow] = useState<string | null>('primeros-pasos');
     const [activeTab, setActiveTab] = useState<'flujos' | 'secciones' | 'glosario'>('flujos');
 
