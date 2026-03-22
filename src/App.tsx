@@ -26,6 +26,7 @@ import { GastosCompartidosPage } from './pages/GastosCompartidosPage';
 import { PlantillasGastoPage } from './pages/PlantillasGastoPage';
 import { ReglasCategoriaPage } from './pages/ReglasCategoriaPage';
 import { ImportacionCsvPage } from './pages/ImportacionCsvPage';
+import { AyudaPage } from './pages/AyudaPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -260,6 +261,15 @@ function App() {
                         <ComparacionPage />
                       </Suspense>
                     </Layout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/ayuda"
+                element={
+                  <ProtectedRoute>
+                    <Layout><AyudaPage /></Layout>
                   </ProtectedRoute>
                 }
               />

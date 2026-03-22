@@ -5,7 +5,7 @@ import {
     LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, User,
     Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
     ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users,
-    Zap, Upload, Copy, CalendarClock
+    Zap, Upload, Copy, CalendarClock, HelpCircle
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { NotificationBell } from './NotificationBell';
@@ -210,6 +210,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                         <div className="flex items-center space-x-2 sm:space-x-4">
                             <NotificationBell />
+                            <button
+                                onClick={() => navigate('/ayuda')}
+                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                aria-label="Ayuda"
+                                title="Centro de Ayuda"
+                            >
+                                <HelpCircle size={20} className="text-gray-600 dark:text-gray-300" />
+                            </button>
                             <button
                                 onClick={toggleTheme}
                                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
