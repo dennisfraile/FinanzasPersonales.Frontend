@@ -34,46 +34,7 @@ export const DashboardPage = () => {
 
     const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <DashboardSkeleton />
-                </div>
-            </div>
-        );
-    }
-
-    if (isError || !metrics) {
-        return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-xl text-red-500 mb-4">Error al cargar el dashboard</p>
-                    <p className="text-gray-500 dark:text-gray-400 mb-4">Verifica que el servidor este funcionando</p>
-                    <button
-                        onClick={() => refetch()}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                        Reintentar
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    const cambioColor = metrics.cambioMesAnterior > 0 ? 'text-red-600' : 'text-green-600';
-    const cambioIcon = metrics.cambioMesAnterior > 0 ? <TrendingUp className="inline" size={20} /> : <TrendingDown className="inline" size={20} />;
-
-    // Sugerencias proactivas
-    const suggestions = getProactiveSuggestions({
-        totalGastos: metrics.totalGastosDelMes,
-        totalIngresos: metrics.totalIngresosDelMes,
-        presupuestosCount: presupuestos.length,
-        metasCount: metas.length,
-        categoriasCount: categorias.length,
-    });
-
-    // Datos del mes anterior para tendencias
+    // ALL useMemo hooks MUST be before any early return (React hooks rule)
     const prevMonth = useMemo(() => {
         const trend = metrics?.tendencia6Meses;
         if (!trend || trend.length < 2) return { ingresos: 0, gastos: 0 };
@@ -81,10 +42,6 @@ export const DashboardPage = () => {
         return { ingresos: prev.ingresos || 0, gastos: prev.gastos || 0 };
     }, [metrics]);
 
-    // Resumen en lenguaje natural
-    const summary = getNaturalLanguageSummary(metrics);
-
-    // Próximos gastos programados (pendientes, ordenados por fecha)
     const proximosProgramados = useMemo(() => {
         return programados
             .filter(gp => gp.estado === 'Pendiente')
@@ -92,7 +49,6 @@ export const DashboardPage = () => {
             .slice(0, 5);
     }, [programados]);
 
-    // Presupuestos en alerta (>80%)
     const presupuestosAlerta = useMemo(() => {
         return presupuestos
             .filter(p => p.porcentajeUtilizado >= 80)
@@ -100,7 +56,6 @@ export const DashboardPage = () => {
             .slice(0, 5);
     }, [presupuestos]);
 
-    // Metas más cercanas a completarse
     const metasCercanas = useMemo(() => {
         return metas
             .filter(m => m.montoTotal > 0 && m.ahorroActual < m.montoTotal)
@@ -109,7 +64,6 @@ export const DashboardPage = () => {
             .slice(0, 5);
     }, [metas]);
 
-    // Deudas próximas a vencer (con día de pago este mes)
     const deudasProximas = useMemo(() => {
         const hoy = new Date();
         return deudas
@@ -124,7 +78,6 @@ export const DashboardPage = () => {
             .slice(0, 5);
     }, [deudas]);
 
-    // Flujo de caja diario (balance acumulado del mes actual)
     const dailyCashflow = useMemo(() => {
         const now = new Date();
         const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -155,6 +108,47 @@ export const DashboardPage = () => {
 
         return dailyData;
     }, [gastos, ingresos]);
+
+    // Early returns AFTER all hooks
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <DashboardSkeleton />
+                </div>
+            </div>
+        );
+    }
+
+    if (isError || !metrics) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-xl text-red-500 mb-4">Error al cargar el dashboard</p>
+                    <p className="text-gray-500 dark:text-gray-400 mb-4">Verifica que el servidor este funcionando</p>
+                    <button
+                        onClick={() => refetch()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const cambioColor = metrics.cambioMesAnterior > 0 ? 'text-red-600' : 'text-green-600';
+    const cambioIcon = metrics.cambioMesAnterior > 0 ? <TrendingUp className="inline" size={20} /> : <TrendingDown className="inline" size={20} />;
+
+    const suggestions = getProactiveSuggestions({
+        totalGastos: metrics.totalGastosDelMes,
+        totalIngresos: metrics.totalIngresosDelMes,
+        presupuestosCount: presupuestos.length,
+        metasCount: metas.length,
+        categoriasCount: categorias.length,
+    });
+
+    const summary = getNaturalLanguageSummary(metrics);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
