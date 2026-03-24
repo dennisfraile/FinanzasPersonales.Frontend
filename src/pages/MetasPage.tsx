@@ -7,6 +7,7 @@ import { useMetas, useCreateMeta, useUpdateMeta, useDeleteMeta, useAbonarMeta } 
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
+import { fireConfetti } from '../components/Animations';
 
 export const MetasPage = () => {
     const { data: metas = [] } = useMetas();
@@ -55,7 +56,15 @@ export const MetasPage = () => {
         if (selectedMetaId && montoAbono > 0) {
             try {
                 await abonarMetaMutation.mutateAsync({ id: selectedMetaId, monto: montoAbono });
-                toast.success(`Abono de $${montoAbono.toFixed(2)} realizado`);
+
+                // Check if the goal is now complete
+                const meta = metas.find(m => m.id === selectedMetaId);
+                if (meta && (meta.ahorroActual + montoAbono) >= meta.montoTotal) {
+                    fireConfetti();
+                    toast.success('Meta completada! Felicidades!');
+                } else {
+                    toast.success(`Abono de $${montoAbono.toFixed(2)} realizado`);
+                }
                 setIsAbonoModalOpen(false);
                 setMontoAbono(0);
                 setSelectedMetaId(null);
