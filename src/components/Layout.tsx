@@ -108,6 +108,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 { path: '/calendario', icon: Calendar, label: 'Calendario' },
                 { path: '/comparacion', icon: BarChart3, label: 'Comparación' },
                 { path: '/reportes', icon: BarChart3, label: 'Reportes' },
+                { path: '/reportes-programados', icon: CalendarClock, label: 'Reportes programados' },
             ],
         },
         {

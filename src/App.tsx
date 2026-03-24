@@ -28,6 +28,8 @@ import { PlantillasIngresoPage } from './pages/PlantillasIngresoPage';
 import { ReglasCategoriaPage } from './pages/ReglasCategoriaPage';
 import { ImportacionCsvPage } from './pages/ImportacionCsvPage';
 import { AyudaPage } from './pages/AyudaPage';
+import { DashboardCompartidoPage } from './pages/DashboardCompartidoPage';
+import { ReportesProgramadosPage } from './pages/ReportesProgramadosPage';
 import { Layout } from './components/Layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -51,6 +53,7 @@ function App() {
           <AuthProvider>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/compartido/:token" element={<DashboardCompartidoPage />} />
 
               <Route
                 path="/dashboard"
@@ -270,6 +273,15 @@ function App() {
                         <ComparacionPage />
                       </Suspense>
                     </Layout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/reportes-programados"
+                element={
+                  <ProtectedRoute>
+                    <Layout><ReportesProgramadosPage /></Layout>
                   </ProtectedRoute>
                 }
               />

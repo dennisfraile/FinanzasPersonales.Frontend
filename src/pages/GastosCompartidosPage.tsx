@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { type GastoCompartido, type CreateGastoCompartidoDto, type CreateParticipanteDto, type ParticipanteGasto } from '../services/gastosCompartidosService';
-import { Trash2, Plus, Search, Users, DollarSign, CheckCircle2, Clock, UserPlus, X, Eye } from 'lucide-react';
+import { Trash2, Plus, Search, Users, DollarSign, CheckCircle2, Clock, UserPlus, X, Eye, Share2, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import HelpTooltip from '../components/HelpTooltip';
 import { sectionHelp } from '../utils/helpContent';
 import { Pagination } from '../components/Pagination';
 import { useCategorias, useGastosCompartidos, useResumenSplit, useCreateGastoCompartido, useDeleteGastoCompartido, useLiquidarParticipante } from '../hooks/useQueryHooks';
+import apiClient from '../services/api';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -32,6 +33,8 @@ export const GastosCompartidosPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [activeTab, setActiveTab] = useState<'gastos' | 'resumen'>('gastos');
+    const [shareToken, setShareToken] = useState('');
+    const [shareModalOpen, setShareModalOpen] = useState(false);
 
     const [formData, setFormData] = useState<CreateGastoCompartidoDto>({
         descripcion: '',
@@ -133,6 +136,47 @@ export const GastosCompartidosPage = () => {
             metodoDivision: 'Equitativo',
             participantes: [{ nombre: '', email: null, montoAsignado: null, porcentaje: null }],
         });
+    };
+
+    const handleShare = async (id: number) => {
+        try {
+            const response = await apiClient.post(`/GastosCompartidos/${id}/compartir`);
+            setShareToken(response.data.token || response.data);
+            setShareModalOpen(true);
+        } catch (error: any) {
+            console.error('Error:', error);
+            toast.error(error?.response?.data || 'Error al generar enlace de compartir');
+        }
+    };
+
+    const shareLink = `${window.location.origin}/compartido/${shareToken}`;
+
+    const handleCopyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(shareLink);
+            toast.success('Enlace copiado al portapapeles');
+        } catch {
+            toast.error('No se pudo copiar el enlace');
+        }
+    };
+
+    const handleWhatsAppShare = () => {
+        const text = encodeURIComponent(`Mira este gasto compartido: ${shareLink}`);
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+    };
+
+    const handleNativeShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Gasto compartido',
+                    text: 'Mira este gasto compartido',
+                    url: shareLink,
+                });
+            } catch {
+                // User cancelled share
+            }
+        }
     };
 
     const openLiquidar = (gasto: GastoCompartido, participante: ParticipanteGasto) => {
@@ -250,6 +294,7 @@ export const GastosCompartidosPage = () => {
                                             onDelete={handleDelete}
                                             onDetail={(g) => { setSelectedGasto(g); setIsDetailOpen(true); }}
                                             onLiquidar={openLiquidar}
+                                            onShare={handleShare}
                                         />
                                     ))}
                                 </div>
@@ -574,6 +619,71 @@ export const GastosCompartidosPage = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Modal Compartir */}
+                {shareModalOpen && shareToken && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                            <div className="flex justify-between items-start mb-4">
+                                <h2 className="text-xl font-bold dark:text-white">Compartir gasto</h2>
+                                <button onClick={() => setShareModalOpen(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 text-xl font-bold">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Enlace para compartir</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={shareLink}
+                                            readOnly
+                                            className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm bg-gray-50"
+                                        />
+                                        <button
+                                            onClick={handleCopyLink}
+                                            className="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-1"
+                                            title="Copiar enlace"
+                                        >
+                                            <Copy size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleWhatsAppShare}
+                                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 text-sm"
+                                    >
+                                        <ExternalLink size={16} />
+                                        WhatsApp
+                                    </button>
+                                    {typeof navigator !== 'undefined' && 'share' in navigator && (
+                                        <button
+                                            onClick={handleNativeShare}
+                                            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
+                                        >
+                                            <Share2 size={16} />
+                                            Compartir
+                                        </button>
+                                    )}
+                                </div>
+
+                                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                                    Este enlace permite ver el detalle del gasto compartido. Puede expirar según la configuración del servidor.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setShareModalOpen(false)}
+                                className="w-full mt-4 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -585,9 +695,10 @@ interface CardProps {
     onDelete: (id: number) => void;
     onDetail: (g: GastoCompartido) => void;
     onLiquidar: (g: GastoCompartido, p: ParticipanteGasto) => void;
+    onShare: (id: number) => void;
 }
 
-const GastoCompartidoCard = ({ gasto, onDelete, onDetail, onLiquidar }: CardProps) => {
+const GastoCompartidoCard = ({ gasto, onDelete, onDetail, onLiquidar, onShare }: CardProps) => {
     const todoLiquidado = gasto.participantes.every(p => p.liquidado);
     const totalAsignado = gasto.participantes.reduce((s, p) => s + p.montoAsignado, 0);
     const pctRecuperado = totalAsignado > 0 ? (gasto.montoRecuperado / totalAsignado) * 100 : 0;
@@ -604,10 +715,13 @@ const GastoCompartidoCard = ({ gasto, onDelete, onDetail, onLiquidar }: CardProp
                     </p>
                 </div>
                 <div className="flex gap-1 ml-2">
-                    <button onClick={() => onDetail(gasto)} className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 p-1" title="Ver detalle">
+                    <button type="button" onClick={() => onDetail(gasto)} className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 p-1" title="Ver detalle">
                         <Eye size={16} />
                     </button>
-                    <button onClick={() => onDelete(gasto.id)} className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 p-1" title="Eliminar">
+                    <button type="button" onClick={() => onShare(gasto.id)} className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 p-1" title="Compartir">
+                        <Share2 size={16} />
+                    </button>
+                    <button type="button" onClick={() => onDelete(gasto.id)} className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 p-1" title="Eliminar">
                         <Trash2 size={16} />
                     </button>
                 </div>
