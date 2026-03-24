@@ -18,6 +18,9 @@ export interface Presupuesto {
     totalProyectado: number;
     porcentajeProyectado: number;
     transferencias: TransferenciaGastoResumen[];
+    permiteRollover: boolean;
+    rollover: number;
+    limiteEfectivo: number;
 }
 
 export interface TransferenciaGastoResumen {
@@ -36,6 +39,7 @@ export interface CreatePresupuestoDto {
     mesAplicable: number;
     anoAplicable: number;
     semanaAplicable?: number;
+    permiteRollover?: boolean;
 }
 
 export interface PresupuestoComparacion {

@@ -6,6 +6,13 @@ export interface Meta {
     montoTotal: number;
     ahorroActual: number;
     montoRestante: number;
+    cuentaId?: number | null;
+    abonoAutomatico: boolean;
+    montoAbono?: number | null;
+    frecuenciaAbono?: string | null;
+    diaAbono?: number | null;
+    proximoAbono?: string | null;
+    ultimoAbono?: string | null;
 }
 
 export interface CreateMetaDto {
@@ -14,6 +21,10 @@ export interface CreateMetaDto {
     ahorroActual: number;
     montoRestante: number;
     cuentaId?: number | null;
+    abonoAutomatico?: boolean;
+    montoAbono?: number | null;
+    frecuenciaAbono?: string | null;
+    diaAbono?: number | null;
 }
 
 export const metasService = {

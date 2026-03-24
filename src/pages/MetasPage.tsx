@@ -85,6 +85,11 @@ export const MetasPage = () => {
             montoTotal: meta.montoTotal,
             ahorroActual: meta.ahorroActual,
             montoRestante: meta.montoRestante,
+            cuentaId: meta.cuentaId,
+            abonoAutomatico: meta.abonoAutomatico,
+            montoAbono: meta.montoAbono,
+            frecuenciaAbono: meta.frecuenciaAbono,
+            diaAbono: meta.diaAbono,
         });
         setIsModalOpen(true);
     };
@@ -209,6 +214,20 @@ export const MetasPage = () => {
                                     </div>
                                 </div>
 
+                                {meta.abonoAutomatico && (
+                                    <div className="mb-3 p-2.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="text-purple-700 dark:text-purple-400 font-medium">Abono automático activo</span>
+                                            <span className="text-purple-600 dark:text-purple-300 font-semibold">${(meta.montoAbono ?? 0).toFixed(2)} / {meta.frecuenciaAbono?.toLowerCase()}</span>
+                                        </div>
+                                        {meta.proximoAbono && (
+                                            <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">
+                                                Próximo abono: {new Date(meta.proximoAbono).toLocaleDateString()}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+
                                 {!completada && (
                                     <button
                                         onClick={() => openAbonoModal(meta.id)}
@@ -269,9 +288,71 @@ export const MetasPage = () => {
                                 <CuentaSelector
                                     value={formData.cuentaId}
                                     onChange={(id) => setFormData({ ...formData, cuentaId: id })}
-                                    label="Cuenta para el Ahorro (Opcional)"
+                                    label="Cuenta para el ahorro (opcional)"
                                     required={false}
                                 />
+
+                                {/* Auto-contribución */}
+                                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-3">
+                                        <div>
+                                            <label className="text-sm font-medium dark:text-gray-300">Abono automático</label>
+                                            <p className="text-xs text-gray-400 mt-0.5">Se descuenta de la cuenta y abona a la meta</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, abonoAutomatico: !formData.abonoAutomatico })}
+                                            aria-label="Activar abono automático"
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.abonoAutomatico ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                        >
+                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.abonoAutomatico ? 'translate-x-6' : 'translate-x-1'}`} />
+                                        </button>
+                                    </div>
+                                    {formData.abonoAutomatico && (
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Monto del abono</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    value={formData.montoAbono || ''}
+                                                    onChange={(e) => setFormData({ ...formData, montoAbono: Number(e.target.value) })}
+                                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                    placeholder="Ej: 50.00"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Frecuencia</label>
+                                                    <select
+                                                        value={formData.frecuenciaAbono || 'Mensual'}
+                                                        onChange={(e) => setFormData({ ...formData, frecuenciaAbono: e.target.value })}
+                                                        aria-label="Frecuencia del abono"
+                                                        className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                    >
+                                                        <option value="Semanal">Semanal</option>
+                                                        <option value="Quincenal">Quincenal</option>
+                                                        <option value="Mensual">Mensual</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Día del abono</label>
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        max="31"
+                                                        value={formData.diaAbono || ''}
+                                                        onChange={(e) => setFormData({ ...formData, diaAbono: Number(e.target.value) })}
+                                                        className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                        placeholder="1-31"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div className="flex gap-2">
                                     <button type="submit" className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">

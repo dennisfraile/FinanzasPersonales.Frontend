@@ -77,6 +77,7 @@ export const PresupuestosPage = () => {
             mesAplicable: presupuesto.mesAplicable,
             anoAplicable: presupuesto.anoAplicable,
             semanaAplicable: presupuesto.semanaAplicable,
+            permiteRollover: presupuesto.permiteRollover,
         });
         setIsModalOpen(true);
     };
@@ -243,7 +244,9 @@ export const PresupuestosPage = () => {
                                 <div className="mb-4">
                                     <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                                         <span>{presupuesto.porcentajeUtilizado.toFixed(1)}% usado</span>
-                                        <span className="font-semibold dark:text-white">${presupuesto.gastadoActual.toFixed(2)} / ${presupuesto.montoLimite.toFixed(2)}</span>
+                                        <span className="font-semibold dark:text-white">
+                                            ${presupuesto.gastadoActual.toFixed(2)} / ${presupuesto.limiteEfectivo?.toFixed(2) || presupuesto.montoLimite.toFixed(2)}
+                                        </span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         <div
@@ -265,6 +268,18 @@ export const PresupuestosPage = () => {
                                         <span className="text-gray-600 dark:text-gray-400">Período:</span>
                                         <span className="font-medium dark:text-white">{presupuesto.periodo}</span>
                                     </div>
+                                    {presupuesto.permiteRollover && presupuesto.rollover > 0 && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-600 dark:text-gray-400">Acumulado anterior:</span>
+                                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">+${presupuesto.rollover.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    {presupuesto.permiteRollover && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-600 dark:text-gray-400">Rollover:</span>
+                                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-medium">Activo</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Transferencias */}
@@ -346,6 +361,20 @@ export const PresupuestosPage = () => {
                                         <option value="Semestral">Semestral</option>
                                         <option value="Anual">Anual</option>
                                     </select>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div>
+                                        <label htmlFor="presupuesto-rollover" className="text-sm font-medium dark:text-gray-300">Acumular sobrante</label>
+                                        <p className="text-xs text-gray-400 mt-0.5">El dinero no gastado se suma al siguiente periodo</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        id="presupuesto-rollover"
+                                        onClick={() => setFormData({ ...formData, permiteRollover: !formData.permiteRollover })}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.permiteRollover ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                    >
+                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.permiteRollover ? 'translate-x-6' : 'translate-x-1'}`} />
+                                    </button>
                                 </div>
                                 {formData.periodo === 'Semanal' && (
                                     <div>
