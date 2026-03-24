@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { type Gasto, type CreateGastoDto } from '../services/gastosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText, ArrowLeftRight } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText, ArrowLeftRight, Copy } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
@@ -112,6 +112,22 @@ export const GastosPage = () => {
             tagIds: gasto.tagIds || [],
         });
         setIsModalOpen(true);
+    };
+
+    const handleDuplicate = (gasto: Gasto) => {
+        setEditingId(null);
+        setFormData({
+            fecha: new Date().toISOString().split('T')[0],
+            categoriaId: gasto.categoriaId,
+            tipo: gasto.tipo || 'Fijo',
+            descripcion: gasto.descripcion ?? '',
+            monto: gasto.monto,
+            cuentaId: gasto.cuentaId ?? null,
+            notas: gasto.notas ?? '',
+            tagIds: gasto.tagIds || [],
+        });
+        setIsModalOpen(true);
+        toast.info('Gasto duplicado. Ajusta los datos y guarda.');
     };
 
     const handleCloseModal = () => {
@@ -505,6 +521,9 @@ export const GastosPage = () => {
                                                     <button onClick={() => setDetallesGastoId(gasto.id)} className="text-green-600 hover:text-green-800 dark:text-green-400" aria-label="Ver compras" title="Registrar compras">
                                                         <ShoppingCart size={18} />
                                                     </button>
+                                                    <button onClick={() => handleDuplicate(gasto)} className="text-purple-600 hover:text-purple-800 dark:text-purple-400" aria-label="Duplicar" title="Duplicar gasto">
+                                                        <Copy size={18} />
+                                                    </button>
                                                     <button onClick={() => handleEdit(gasto)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400" aria-label="Editar">
                                                         <Edit2 size={18} />
                                                     </button>
@@ -588,6 +607,9 @@ export const GastosPage = () => {
                                         <div className="flex gap-3">
                                             <button onClick={() => setDetallesGastoId(gasto.id)} className="text-green-600 dark:text-green-400 p-1" aria-label="Ver compras">
                                                 <ShoppingCart size={18} />
+                                            </button>
+                                            <button onClick={() => handleDuplicate(gasto)} className="text-purple-600 dark:text-purple-400 p-1" aria-label="Duplicar" title="Duplicar gasto">
+                                                <Copy size={18} />
                                             </button>
                                             <button onClick={() => handleEdit(gasto)} className="text-blue-600 dark:text-blue-400 p-1" aria-label="Editar">
                                                 <Edit2 size={18} />

@@ -1,13 +1,14 @@
-import { useDashboardMetrics, useGastos, usePresupuestos, useMetas, useCategorias } from '../hooks/useQueryHooks';
+import { useDashboardMetrics, useGastos, usePresupuestos, useMetas, useCategorias, useGastosProgramados, useDeudas } from '../hooks/useQueryHooks';
 import { useCuentas } from '../hooks/useCuentas';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, Landmark } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, Landmark, CalendarClock, AlertTriangle, Target, CreditCard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import HelpTooltip from '../components/HelpTooltip';
 import GlossaryModal from '../components/GlossaryModal';
 import OnboardingWizard from '../components/OnboardingWizard';
 import SuggestionBanner from '../components/SuggestionBanner';
 import { sectionHelp, getProactiveSuggestions, getNaturalLanguageSummary } from '../utils/helpContent';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export const DashboardPage = () => {
     const { data: metrics, isLoading, isError, refetch } = useDashboardMetrics();
@@ -16,6 +17,9 @@ export const DashboardPage = () => {
     const { data: metas = [] } = useMetas();
     const { data: categorias = [] } = useCategorias();
     const { cuentas } = useCuentas();
+    const { data: programados = [] } = useGastosProgramados();
+    const { data: deudas = [] } = useDeudas();
+    const navigate = useNavigate();
 
     const [onboardingDismissed, setOnboardingDismissed] = useState(
         () => localStorage.getItem('onboarding_dismissed') === 'true'
@@ -65,6 +69,46 @@ export const DashboardPage = () => {
 
     // Resumen en lenguaje natural
     const summary = getNaturalLanguageSummary(metrics);
+
+    // Próximos gastos programados (pendientes, ordenados por fecha)
+    const proximosProgramados = useMemo(() => {
+        return programados
+            .filter(gp => gp.estado === 'Pendiente')
+            .sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime())
+            .slice(0, 5);
+    }, [programados]);
+
+    // Presupuestos en alerta (>80%)
+    const presupuestosAlerta = useMemo(() => {
+        return presupuestos
+            .filter(p => p.porcentajeUtilizado >= 80)
+            .sort((a, b) => b.porcentajeUtilizado - a.porcentajeUtilizado)
+            .slice(0, 5);
+    }, [presupuestos]);
+
+    // Metas más cercanas a completarse
+    const metasCercanas = useMemo(() => {
+        return metas
+            .filter(m => m.montoTotal > 0 && m.ahorroActual < m.montoTotal)
+            .map(m => ({ ...m, porcentaje: (m.ahorroActual / m.montoTotal) * 100 }))
+            .sort((a, b) => b.porcentaje - a.porcentaje)
+            .slice(0, 5);
+    }, [metas]);
+
+    // Deudas próximas a vencer (con día de pago este mes)
+    const deudasProximas = useMemo(() => {
+        const hoy = new Date();
+        return deudas
+            .filter(d => d.activa && d.saldoActual > 0)
+            .sort((a, b) => {
+                const diaA = a.diaDePago || 31;
+                const diaB = b.diaDePago || 31;
+                const diffA = diaA - hoy.getDate();
+                const diffB = diaB - hoy.getDate();
+                return (diffA < 0 ? diffA + 30 : diffA) - (diffB < 0 ? diffB + 30 : diffB);
+            })
+            .slice(0, 5);
+    }, [deudas]);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
@@ -222,6 +266,167 @@ export const DashboardPage = () => {
                             </div>
                         )}
                     </div>
+                </div>
+
+                {/* Quick Info Widgets */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    {/* Próximos gastos programados */}
+                    {proximosProgramados.length > 0 && (
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <CalendarClock size={20} className="text-amber-500" />
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Próximos vencimientos</h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/gastos-programados')}
+                                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    Ver todos
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                {proximosProgramados.map(gp => {
+                                    const dias = gp.diasParaVencimiento;
+                                    const colorDias = dias <= 3 ? 'text-red-600 bg-red-50 dark:bg-red-900/30' : dias <= 7 ? 'text-amber-600 bg-amber-50 dark:bg-amber-900/30' : 'text-green-600 bg-green-50 dark:bg-green-900/30';
+                                    return (
+                                        <div key={gp.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{gp.descripcion}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{gp.categoriaNombre} · {new Date(gp.fechaVencimiento).toLocaleDateString()}</p>
+                                            </div>
+                                            <div className="flex items-center gap-2 ml-3">
+                                                <span className="text-sm font-semibold text-red-600">${gp.monto.toFixed(2)}</span>
+                                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colorDias}`}>
+                                                    {dias <= 0 ? 'Hoy' : dias === 1 ? 'Mañana' : `${dias}d`}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Presupuestos en alerta */}
+                    {presupuestosAlerta.length > 0 && (
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <AlertTriangle size={20} className="text-red-500" />
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Presupuestos en alerta</h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/presupuestos')}
+                                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    Ver todos
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                {presupuestosAlerta.map(p => {
+                                    const pct = Math.min(p.porcentajeUtilizado, 100);
+                                    const color = p.porcentajeUtilizado >= 100 ? 'bg-red-500' : 'bg-amber-500';
+                                    return (
+                                        <div key={p.id} className="py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-white">{p.categoriaNombre}</span>
+                                                <span className={`text-xs font-semibold ${p.porcentajeUtilizado >= 100 ? 'text-red-600' : 'text-amber-600'}`}>
+                                                    {p.porcentajeUtilizado.toFixed(0)}%
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div className={`${color} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
+                                            </div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                ${p.gastadoActual.toFixed(2)} / ${p.montoLimite.toFixed(2)} · {p.periodo}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Metas más cercanas */}
+                    {metasCercanas.length > 0 && (
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <Target size={20} className="text-emerald-500" />
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Metas más cercanas</h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/metas')}
+                                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    Ver todas
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                {metasCercanas.map(m => {
+                                    const pct = Math.min(m.porcentaje, 100);
+                                    return (
+                                        <div key={m.id} className="py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-white">{m.metas}</span>
+                                                <span className="text-xs font-semibold text-emerald-600">{pct.toFixed(0)}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                                            </div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                ${m.ahorroActual.toFixed(2)} / ${m.montoTotal.toFixed(2)} · Falta ${m.montoRestante.toFixed(2)}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Deudas activas */}
+                    {deudasProximas.length > 0 && (
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <CreditCard size={20} className="text-orange-500" />
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Deudas activas</h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/deudas')}
+                                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    Ver todas
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                {deudasProximas.map(d => {
+                                    const pct = Math.min(d.porcentajePagado, 100);
+                                    return (
+                                        <div key={d.id} className="py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-white">{d.nombre}</span>
+                                                <span className="text-xs font-semibold text-orange-600">
+                                                    {d.diaDePago ? `Dia ${d.diaDePago}` : d.tipo}
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                                            </div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                Saldo: ${d.saldoActual.toFixed(2)} · Pagado: {d.porcentajePagado.toFixed(0)}%
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

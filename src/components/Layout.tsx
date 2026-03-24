@@ -5,10 +5,12 @@ import {
     LayoutDashboard, DollarSign, TrendingDown, Target, FileText, Tag, LogOut, User,
     Moon, Sun, Menu, X, BarChart3, Wallet, ArrowLeftRight, Repeat, Calendar,
     ChevronDown, TrendingUp, CreditCard, Lightbulb, RefreshCw, LineChart, Settings, Users,
-    Zap, Upload, Copy, CalendarClock, HelpCircle
+    Zap, Upload, Copy, CalendarClock, HelpCircle, Search
 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { NotificationBell } from './NotificationBell';
+import { GlobalSearch } from './GlobalSearch';
+import PageTransition from './PageTransition';
 import OfflineIndicator from './OfflineIndicator';
 import { useSignalR } from '../hooks/useSignalR';
 
@@ -39,6 +41,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
 
     const userInitial = (user?.userName || user?.email || 'U').charAt(0).toUpperCase();
@@ -176,6 +179,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
+    // Ctrl+K para abrir búsqueda global
+    const handleGlobalKeyDown = useCallback((e: KeyboardEvent) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            setSearchOpen(prev => !prev);
+        }
+    }, []);
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleGlobalKeyDown);
+        return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [handleGlobalKeyDown]);
+
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     const toggleGroup = (key: string) => {
@@ -209,6 +225,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </div>
 
                         <div className="flex items-center space-x-2 sm:space-x-4">
+                            <button
+                                onClick={() => setSearchOpen(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-400 text-sm"
+                                title="Buscar (Ctrl+K)"
+                            >
+                                <Search size={16} />
+                                <span className="hidden md:inline">Buscar...</span>
+                                <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                                    Ctrl+K
+                                </kbd>
+                            </button>
                             <NotificationBell />
                             <button
                                 onClick={() => navigate('/ayuda')}
@@ -364,11 +391,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Main content */}
                 <main className="flex-1 transition-all duration-300">
-                    {children}
+                    <PageTransition key={location.pathname}>
+                        {children}
+                    </PageTransition>
                 </main>
             </div>
 
             <OfflineIndicator />
+            <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
         </div>
     );
 };
