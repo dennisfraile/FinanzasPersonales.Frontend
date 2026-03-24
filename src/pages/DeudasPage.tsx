@@ -7,6 +7,7 @@ import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { useDeudas, useCreateDeuda, useUpdateDeuda, useDeleteDeuda, useRegistrarPagoDeuda, useDeudaPagos } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
+import ExportButton from '../components/ExportButton';
 import { sectionHelp } from '../utils/helpContent';
 
 const ITEMS_PER_PAGE = 9;
@@ -222,13 +223,40 @@ export const DeudasPage = () => {
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">{filteredDeudas.length} deudas registradas</p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
-                    >
-                        <Plus size={20} />
-                        Nueva deuda
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                        <ExportButton
+                            data={filteredDeudas.map(d => ({
+                                nombre: d.nombre,
+                                tipo: d.tipo,
+                                montoOriginal: d.montoOriginal,
+                                saldoActual: d.saldoActual,
+                                totalPagado: d.totalPagado,
+                                porcentajePagado: `${d.porcentajePagado.toFixed(1)}%`,
+                                tasaInteres: `${d.tasaInteres}%`,
+                                diaDePago: d.diaDePago || '-',
+                                activa: d.activa ? 'Sí' : 'No',
+                            }))}
+                            columns={[
+                                { key: 'nombre', label: 'Nombre' },
+                                { key: 'tipo', label: 'Tipo' },
+                                { key: 'montoOriginal', label: 'Monto original' },
+                                { key: 'saldoActual', label: 'Saldo actual' },
+                                { key: 'totalPagado', label: 'Total pagado' },
+                                { key: 'porcentajePagado', label: '% pagado' },
+                                { key: 'tasaInteres', label: 'Tasa interés' },
+                                { key: 'diaDePago', label: 'Día de pago' },
+                                { key: 'activa', label: 'Activa' },
+                            ]}
+                            filename="deudas"
+                        />
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            Nueva deuda
+                        </button>
+                    </div>
                 </div>
 
                 {/* Resumen Cards */}

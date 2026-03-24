@@ -5,6 +5,7 @@ import { useCuentas } from '../hooks/useCuentas';
 import { CalendarClock, Plus, Edit2, Trash2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, CreditCard } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import HelpTooltip from '../components/HelpTooltip';
+import ExportButton from '../components/ExportButton';
 import { sectionHelp } from '../utils/helpContent';
 import {
     useGastosProgramados, useCreateGastoProgramado, useUpdateGastoProgramado,
@@ -182,6 +183,27 @@ export const GastosProgramadosPage = () => {
                         <Plus size={20} />
                         <span>Nuevo</span>
                     </button>
+                    <ExportButton
+                        data={programados.map(gp => ({
+                            descripcion: gp.descripcion,
+                            categoria: gp.categoriaNombre || '',
+                            monto: gp.monto,
+                            estado: gp.estado,
+                            fechaVencimiento: new Date(gp.fechaVencimiento).toLocaleDateString(),
+                            cuenta: gp.cuentaNombre || '-',
+                            variable: gp.esMontoVariable ? 'Sí' : 'No',
+                        }))}
+                        columns={[
+                            { key: 'descripcion', label: 'Descripción' },
+                            { key: 'categoria', label: 'Categoría' },
+                            { key: 'monto', label: 'Monto' },
+                            { key: 'estado', label: 'Estado' },
+                            { key: 'fechaVencimiento', label: 'Vencimiento' },
+                            { key: 'cuenta', label: 'Cuenta' },
+                            { key: 'variable', label: 'Variable' },
+                        ]}
+                        filename="gastos_programados"
+                    />
                 </div>
 
                 {/* Filtros */}

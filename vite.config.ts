@@ -36,19 +36,63 @@ export default defineConfig({
             purpose: 'maskable',
           },
         ],
+        shortcuts: [
+          {
+            name: 'Nuevo gasto',
+            short_name: 'Gasto',
+            url: '/gastos?action=new',
+            icons: [{ src: '/logo.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Dashboard',
+            short_name: 'Dashboard',
+            url: '/dashboard',
+            icons: [{ src: '/logo.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Presupuestos',
+            short_name: 'Presupuestos',
+            url: '/presupuestos',
+            icons: [{ src: '/logo.png', sizes: '192x192' }],
+          },
+        ],
+        categories: ['finance', 'productivity'],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https?:\/\/.*\/api\/(categorias|cuentas|dashboard)/,
+            urlPattern: /^https?:\/\/.*\/api\/(categorias|cuentas|tags)/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'api-static-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 1800, // 30 min - datos que cambian poco
+              },
+            },
+          },
+          {
+            urlPattern: /^https?:\/\/.*\/api\/(dashboard|presupuestos|metas)/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'api-dynamic-cache',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 300, // 5 minutos
+                maxAgeSeconds: 900, // 15 min
               },
+            },
+          },
+          {
+            urlPattern: /^https?:\/\/.*\/api\/(gastos|ingresos|deudas|GastosProgramados)/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-transactions-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 300, // 5 min - datos que cambian seguido
+              },
+              networkTimeoutSeconds: 5,
             },
           },
         ],

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { type Gasto, type CreateGastoDto } from '../services/gastosService';
 import { type Categoria } from '../services/categoriasService';
-import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText, ArrowLeftRight, Copy } from 'lucide-react';
+import { Trash2, Plus, Edit2, Search, ShoppingCart, Download, FileText, ArrowLeftRight, Copy, CheckSquare, Square, XCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Pagination } from '../components/Pagination';
 import { CuentaSelector } from '../components/CuentaSelector';
@@ -53,6 +53,73 @@ export const GastosPage = () => {
         tagIds: [],
     });
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: '', tipo: 'Gasto' });
+
+    // Bulk selection
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [bulkCategoriaId, setBulkCategoriaId] = useState(0);
+    const [showBulkCatModal, setShowBulkCatModal] = useState(false);
+
+    const toggleSelect = (id: number) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === paginatedGastos.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(paginatedGastos.map(g => g.id)));
+        }
+    };
+
+    const clearSelection = () => setSelectedIds(new Set());
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.size === 0) return;
+        if (!window.confirm(`¿Eliminar ${selectedIds.size} gasto(s) seleccionados?`)) return;
+        try {
+            for (const id of selectedIds) {
+                await deleteGastoMutation.mutateAsync(id);
+            }
+            toast.success(`${selectedIds.size} gasto(s) eliminados`);
+            clearSelection();
+        } catch (error) {
+            toast.error('Error al eliminar gastos');
+        }
+    };
+
+    const handleBulkChangeCategory = async () => {
+        if (selectedIds.size === 0 || !bulkCategoriaId) return;
+        try {
+            for (const id of selectedIds) {
+                const gasto = gastos.find(g => g.id === id);
+                if (gasto) {
+                    await updateGastoMutation.mutateAsync({
+                        id,
+                        data: {
+                            fecha: gasto.fecha.split('T')[0],
+                            categoriaId: bulkCategoriaId,
+                            tipo: gasto.tipo || 'Fijo',
+                            descripcion: gasto.descripcion ?? '',
+                            monto: gasto.monto,
+                            cuentaId: gasto.cuentaId ?? null,
+                            tagIds: gasto.tagIds || [],
+                        },
+                    });
+                }
+            }
+            toast.success(`Categoría actualizada en ${selectedIds.size} gasto(s)`);
+            clearSelection();
+            setShowBulkCatModal(false);
+            setBulkCategoriaId(0);
+        } catch (error) {
+            toast.error('Error al cambiar categoría');
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -425,11 +492,43 @@ export const GastosPage = () => {
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                        {/* Bulk action bar */}
+                        {selectedIds.size > 0 && (
+                            <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/30 border-b border-blue-200 dark:border-blue-800">
+                                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">{selectedIds.size} seleccionado(s)</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBulkCatModal(true)}
+                                    className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                >
+                                    Cambiar categoría
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleBulkDelete}
+                                    className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                >
+                                    Eliminar seleccionados
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={clearSelection}
+                                    className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-1"
+                                >
+                                    <XCircle size={14} /> Cancelar
+                                </button>
+                            </div>
+                        )}
                         {/* Desktop table */}
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full">
                                 <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                                     <tr>
+                                        <th className="px-3 py-3 w-10">
+                                            <button type="button" onClick={toggleSelectAll} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-label="Seleccionar todos">
+                                                {selectedIds.size === paginatedGastos.length && paginatedGastos.length > 0 ? <CheckSquare size={18} className="text-blue-600" /> : <Square size={18} />}
+                                            </button>
+                                        </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descripción</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tags</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
@@ -442,7 +541,12 @@ export const GastosPage = () => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {paginatedGastos.map((gasto) => (
-                                        <tr key={gasto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <tr key={gasto.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedIds.has(gasto.id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}>
+                                            <td className="px-3 py-4">
+                                                <button type="button" onClick={() => toggleSelect(gasto.id)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-label="Seleccionar">
+                                                    {selectedIds.has(gasto.id) ? <CheckSquare size={18} className="text-blue-600" /> : <Square size={18} />}
+                                                </button>
+                                            </td>
                                             <td className="px-6 py-4 dark:text-gray-300">
                                                 <div>
                                                     <span>{gasto.descripcion}</span>
@@ -882,6 +986,48 @@ export const GastosPage = () => {
                                     <button
                                         type="button"
                                         onClick={() => { setIsQuickCatModalOpen(false); setNuevaCategoria({ nombre: '', tipo: 'Gasto' }); }}
+                                        className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Bulk Change Category Modal */}
+                {showBulkCatModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
+                            <h3 className="text-lg font-bold mb-4 dark:text-white">Cambiar categoría ({selectedIds.size} gastos)</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">Nueva categoría</label>
+                                    <select
+                                        aria-label="Nueva categoría"
+                                        value={bulkCategoriaId}
+                                        onChange={(e) => setBulkCategoriaId(Number(e.target.value))}
+                                        className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    >
+                                        <option value={0}>Seleccionar...</option>
+                                        {categorias.map(c => (
+                                            <option key={c.id} value={c.id}>{c.nombre}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleBulkChangeCategory}
+                                        disabled={!bulkCategoriaId}
+                                        className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                                    >
+                                        Aplicar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShowBulkCatModal(false); setBulkCategoriaId(0); }}
                                         className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
                                     >
                                         Cancelar
