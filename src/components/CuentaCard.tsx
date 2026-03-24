@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import type { CuentaDto } from '../services/cuentasService';
 import { Wallet, Building2, CreditCard, PiggyBank, TrendingUp, Edit, Trash2, BarChart3 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
+import Sparkline from './Sparkline';
 
 interface CuentaCardProps {
     cuenta: CuentaDto;
@@ -30,6 +32,18 @@ export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete
     const navigate = useNavigate();
     const Icono = iconosPorTipo[cuenta.tipo] || Wallet;
     const color = cuenta.color || coloresPorTipo[cuenta.tipo] || '#6B7280';
+
+    // Generate simple trend data for sparkline (using balance as seed)
+    const trendData = useMemo(() => {
+        const balance = cuenta.balanceActual;
+        const points: number[] = [];
+        let val = balance * 0.7;
+        for (let i = 0; i < 10; i++) {
+            val += (balance * 0.3 * (i / 9)) + (Math.sin(i * 1.5) * balance * 0.05);
+            points.push(val);
+        }
+        return points;
+    }, [cuenta.balanceActual]);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-MX', {
@@ -117,6 +131,14 @@ export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete
                     <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
                         Inicial: {formatCurrency(cuenta.balanceInicial)}
                     </p>
+
+                    <Sparkline
+                        data={trendData}
+                        width={120}
+                        height={28}
+                        color={color}
+                        className="mt-2 opacity-60"
+                    />
                 </div>
             </div>
         </div>

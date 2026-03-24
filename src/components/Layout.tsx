@@ -117,6 +117,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             defaultOpen: false,
             items: [
                 { path: '/plantillas', icon: Copy, label: 'Plantillas' },
+                { path: '/plantillas-ingreso', icon: Copy, label: 'Plantillas ingreso' },
                 { path: '/reglas-categoria', icon: Zap, label: 'Auto-categorización' },
                 { path: '/importar-csv', icon: Upload, label: 'Importar CSV' },
             ],

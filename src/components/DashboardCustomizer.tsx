@@ -16,6 +16,7 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
     { id: 'alertas', label: 'Presupuestos en alerta', visible: true },
     { id: 'metas', label: 'Metas más cercanas', visible: true },
     { id: 'deudas', label: 'Deudas activas', visible: true },
+    { id: 'cashflow', label: 'Flujo de caja diario', visible: true },
 ];
 
 const STORAGE_KEY = 'dashboard_widgets_config';

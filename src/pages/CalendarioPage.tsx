@@ -29,15 +29,23 @@ export const CalendarioPage = () => {
             try {
                 const data = await calendarioService.getCalendario(mesActual, anoActual);
 
+                // Calculate max daily amounts for intensity scaling
+                const maxGasto = Math.max(...data.dias.map(d => d.totalGastos), 0);
+                const maxIngreso = Math.max(...data.dias.map(d => d.totalIngresos), 0);
+
                 const eventosFormateados = data.dias.flatMap(dia => {
                     const events: EventInput[] = [];
 
                     if (dia.totalGastos > 0) {
+                        const intensity = maxGasto > 0
+                            ? Math.max(0.3, Math.min(1, dia.totalGastos / maxGasto))
+                            : 0.5;
                         events.push({
                             title: `$${dia.totalGastos.toFixed(2)}`,
                             start: dia.fecha,
-                            backgroundColor: '#ef4444',
-                            borderColor: '#dc2626',
+                            backgroundColor: `rgba(239, 68, 68, ${intensity})`,
+                            borderColor: `rgba(220, 38, 38, ${intensity})`,
+                            textColor: intensity >= 0.6 ? '#fff' : '#991b1b',
                             extendedProps: {
                                 tipo: 'Gasto',
                                 dia
@@ -46,11 +54,15 @@ export const CalendarioPage = () => {
                     }
 
                     if (dia.totalIngresos > 0) {
+                        const intensity = maxIngreso > 0
+                            ? Math.max(0.3, Math.min(1, dia.totalIngresos / maxIngreso))
+                            : 0.5;
                         events.push({
                             title: `$${dia.totalIngresos.toFixed(2)}`,
                             start: dia.fecha,
-                            backgroundColor: '#10b981',
-                            borderColor: '#059669',
+                            backgroundColor: `rgba(16, 185, 129, ${intensity})`,
+                            borderColor: `rgba(5, 150, 105, ${intensity})`,
+                            textColor: intensity >= 0.6 ? '#fff' : '#065f46',
                             extendedProps: {
                                 tipo: 'Ingreso',
                                 dia

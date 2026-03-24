@@ -1,6 +1,6 @@
-import { useDashboardMetrics, useGastos, usePresupuestos, useMetas, useCategorias, useGastosProgramados, useDeudas } from '../hooks/useQueryHooks';
+import { useDashboardMetrics, useGastos, useIngresos, usePresupuestos, useMetas, useCategorias, useGastosProgramados, useDeudas } from '../hooks/useQueryHooks';
 import { useCuentas } from '../hooks/useCuentas';
-import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, Landmark, CalendarClock, AlertTriangle, Target, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardSkeleton } from '../components/Skeleton';
@@ -17,6 +17,7 @@ import { useState, useMemo } from 'react';
 export const DashboardPage = () => {
     const { data: metrics, isLoading, isError, refetch } = useDashboardMetrics();
     const { data: gastos = [] } = useGastos();
+    const { data: ingresos = [] } = useIngresos();
     const { data: presupuestos = [] } = usePresupuestos();
     const { data: metas = [] } = useMetas();
     const { data: categorias = [] } = useCategorias();
@@ -122,6 +123,38 @@ export const DashboardPage = () => {
             })
             .slice(0, 5);
     }, [deudas]);
+
+    // Flujo de caja diario (balance acumulado del mes actual)
+    const dailyCashflow = useMemo(() => {
+        const now = new Date();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const dailyData: { dia: string; ingresos: number; gastos: number; balance: number }[] = [];
+
+        let runningBalance = 0;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+            const dayIngresos = ingresos
+                .filter(i => i.fecha.startsWith(dateStr))
+                .reduce((sum, i) => sum + i.monto, 0);
+
+            const dayGastos = gastos
+                .filter(g => g.fecha.startsWith(dateStr))
+                .reduce((sum, g) => sum + g.monto, 0);
+
+            runningBalance += dayIngresos - dayGastos;
+
+            dailyData.push({
+                dia: String(d),
+                ingresos: dayIngresos,
+                gastos: dayGastos,
+                balance: runningBalance,
+            });
+        }
+
+        return dailyData;
+    }, [gastos, ingresos]);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
@@ -289,6 +322,31 @@ export const DashboardPage = () => {
                         )}
                     </div>}
                 </div>
+
+                {/* Daily Cashflow Chart */}
+                {isVisible('cashflow') && dailyCashflow.length > 0 && (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mt-6">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Flujo de caja diario</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                            Balance acumulado dia a dia durante el mes actual. Muestra como evoluciona tu dinero.
+                        </p>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <AreaChart data={dailyCashflow}>
+                                <defs>
+                                    <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="dia" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                                <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }} />
+                                <Area type="monotone" dataKey="balance" stroke="#3b82f6" fill="url(#balanceGradient)" strokeWidth={2} name="Balance" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
 
                 {/* Quick Info Widgets */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">

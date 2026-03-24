@@ -24,6 +24,7 @@ import { TagsPage } from './pages/TagsPage';
 import { DeudasPage } from './pages/DeudasPage';
 import { GastosCompartidosPage } from './pages/GastosCompartidosPage';
 import { PlantillasGastoPage } from './pages/PlantillasGastoPage';
+import { PlantillasIngresoPage } from './pages/PlantillasIngresoPage';
 import { ReglasCategoriaPage } from './pages/ReglasCategoriaPage';
 import { ImportacionCsvPage } from './pages/ImportacionCsvPage';
 import { AyudaPage } from './pages/AyudaPage';
@@ -233,6 +234,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout><PlantillasGastoPage /></Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/plantillas-ingreso"
+                element={
+                  <ProtectedRoute>
+                    <Layout><PlantillasIngresoPage /></Layout>
                   </ProtectedRoute>
                 }
               />

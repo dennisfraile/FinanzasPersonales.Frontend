@@ -21,6 +21,7 @@ import { detallesGastoService, type CreateDetalleGastoDto } from '../services/de
 import { deudasService, type CreateDeudaDto, type UpdateDeudaDto, type CreatePagoDeudaDto } from '../services/deudasService';
 import { gastosCompartidosService, type CreateGastoCompartidoDto } from '../services/gastosCompartidosService';
 import { plantillasGastoService, type CreatePlantillaGastoDto, type UpdatePlantillaGastoDto, type UsarPlantillaDto } from '../services/plantillasGastoService';
+import { plantillasIngresoService, type CreatePlantillaIngresoDto, type UpdatePlantillaIngresoDto, type UsarPlantillaIngresoDto } from '../services/plantillasIngresoService';
 import { reglasCategoriaService, type CreateReglaCategoriaDto, type UpdateReglaCategoriaDto } from '../services/reglasCategoriaService';
 import gastosProgramadosService from '../services/gastosProgramadosService';
 import type { CreateGastoProgramadoDto, UpdateGastoProgramadoDto, PagarGastoProgramadoDto } from '../services/gastosProgramadosService';
@@ -57,6 +58,7 @@ export const queryKeys = {
     gastosCompartidos: ['gastosCompartidos'] as const,
     resumenSplit: ['resumenSplit'] as const,
     plantillas: ['plantillas'] as const,
+    plantillasIngreso: ['plantillasIngreso'] as const,
     reglasCategoria: ['reglasCategoria'] as const,
     gastosProgramados: ['gastosProgramados'] as const,
 };
@@ -859,6 +861,58 @@ export function useUsarPlantilla() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.plantillas });
             queryClient.invalidateQueries({ queryKey: queryKeys.gastos });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+            queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });
+        },
+    });
+}
+
+// ============ PLANTILLAS DE INGRESO ============
+export function usePlantillasIngreso() {
+    return useQuery({
+        queryKey: queryKeys.plantillasIngreso,
+        queryFn: () => plantillasIngresoService.getAll(),
+    });
+}
+
+export function useCreatePlantillaIngreso() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: CreatePlantillaIngresoDto) => plantillasIngresoService.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillasIngreso });
+        },
+    });
+}
+
+export function useUpdatePlantillaIngreso() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UpdatePlantillaIngresoDto }) => plantillasIngresoService.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillasIngreso });
+        },
+    });
+}
+
+export function useDeletePlantillaIngreso() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => plantillasIngresoService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillasIngreso });
+        },
+    });
+}
+
+export function useUsarPlantillaIngreso() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number; data: UsarPlantillaIngresoDto }) => plantillasIngresoService.usar(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.plantillasIngreso });
+            queryClient.invalidateQueries({ queryKey: queryKeys.ingresos });
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
             queryClient.invalidateQueries({ queryKey: queryKeys.cuentas });
             queryClient.invalidateQueries({ queryKey: queryKeys.balanceTotal });

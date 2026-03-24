@@ -245,6 +245,7 @@ export interface EmptyStateContent {
     title: string;
     description: string;
     actionLabel: string;
+    steps?: string[];
 }
 
 export const emptyStates: Record<string, EmptyStateContent> = {
@@ -253,42 +254,77 @@ export const emptyStates: Record<string, EmptyStateContent> = {
         title: 'Aun no tienes gastos registrados',
         description: 'Registra tu primer gasto para empezar a llevar el control de tu dinero. Puedes agregar la descripcion, el monto y la categoria.',
         actionLabel: 'Registrar mi primer gasto',
+        steps: [
+            'Crea una cuenta en la seccion de cuentas',
+            'Agrega categorias para organizar tus gastos',
+            'Registra tu primer gasto con el boton de arriba',
+        ],
     },
     ingresos: {
         icon: 'banknote',
         title: 'Aun no tienes ingresos registrados',
         description: 'Registra tu salario u otros ingresos para saber cuanto dinero entra cada mes y poder compararlo con tus gastos.',
         actionLabel: 'Registrar mi primer ingreso',
+        steps: [
+            'Asegurate de tener al menos una cuenta creada',
+            'Crea una categoria de tipo ingreso (ej: Salario)',
+            'Registra tu primer ingreso con el monto y la fecha',
+        ],
     },
     presupuestos: {
         icon: 'piggy-bank',
         title: 'No tienes presupuestos configurados',
         description: 'Un presupuesto te ayuda a no gastar de mas. Define un limite para cada categoria (ej: $3,000 en comida) y el sistema te avisara si te acercas.',
         actionLabel: 'Crear mi primer presupuesto',
+        steps: [
+            'Primero registra algunos gastos para saber cuanto gastas',
+            'Identifica las categorias donde mas gastas',
+            'Crea un presupuesto con un limite para esa categoria',
+        ],
     },
     metas: {
         icon: 'target',
         title: 'Aun no tienes metas de ahorro',
         description: 'Ponte un objetivo financiero: unas vacaciones, un fondo de emergencia o algo que quieras comprar. Define el monto y abona poco a poco.',
         actionLabel: 'Crear mi primera meta',
+        steps: [
+            'Piensa en algo que quieras lograr (ej: fondo de emergencia)',
+            'Define cuanto dinero necesitas y para cuando',
+            'Abona regularmente, aunque sea poco, la constancia es clave',
+        ],
     },
     cuentas: {
         icon: 'wallet',
         title: 'No tienes cuentas registradas',
         description: 'Crea tus cuentas para llevar el control de tu dinero: efectivo, cuenta de banco, tarjeta, ahorro, etc.',
         actionLabel: 'Crear mi primera cuenta',
+        steps: [
+            'Elige el tipo de cuenta (efectivo, banco, tarjeta, ahorro)',
+            'Ponle un nombre descriptivo (ej: BAC salario)',
+            'Ingresa el saldo inicial que tienes actualmente',
+        ],
     },
     categorias: {
         icon: 'tags',
         title: 'No hay categorias creadas',
         description: 'Las categorias te ayudan a organizar tus gastos e ingresos. Crea categorias como: Alimentacion, Transporte, Salario, Freelance, etc.',
         actionLabel: 'Crear mi primera categoria',
+        steps: [
+            'Piensa en tus gastos mas frecuentes (comida, transporte, etc.)',
+            'Crea entre 5 y 10 categorias para empezar',
+            'Puedes agregar subcategorias despues para mas detalle',
+        ],
     },
     tags: {
         icon: 'tag',
         title: 'No tienes etiquetas creadas',
         description: 'Las etiquetas te permiten agrupar transacciones por eventos o proyectos. Ejemplo: "vacaciones-2024", "renovacion-casa".',
         actionLabel: 'Crear mi primera etiqueta',
+        steps: [
+            'Piensa en contextos o proyectos que quieras rastrear',
+            'Crea etiquetas descriptivas (ej: vacaciones-2026, trabajo)',
+            'Asignalas a tus gastos e ingresos al registrarlos',
+        ],
     },
 };
 

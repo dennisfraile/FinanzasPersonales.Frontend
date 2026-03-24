@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { useMetas, useCreateMeta, useUpdateMeta, useDeleteMeta, useAbonarMeta } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
+import ProgressRing from '../components/ProgressRing';
 import EmptyState from '../components/EmptyState';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
 import { fireConfetti } from '../components/Animations';
@@ -190,21 +191,19 @@ export const MetasPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="mb-4">
-                                    <div className="flex justify-between text-sm mb-2">
-                                        <span className={`font-medium ${completada ? 'text-green-600' : progreso >= 50 ? 'text-blue-600' : 'text-orange-600'}`}>
-                                            {progreso.toFixed(1)}%
+                                <div className="flex items-center gap-4 mb-4">
+                                    <ProgressRing progress={progreso} size={64} strokeWidth={5}>
+                                        <span className={`text-xs font-bold ${completada ? 'text-green-600' : 'text-gray-700 dark:text-gray-300'}`}>
+                                            {progreso.toFixed(0)}%
                                         </span>
-                                        <span className={`${completada ? 'text-green-600 font-semibold' : progreso >= 50 ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}>
-                                            {completada ? 'Completada! Felicidades!' : progreso >= 75 ? 'Ya casi lo logras!' : progreso >= 50 ? 'Vas por buen camino' : progreso > 0 ? 'Sigue aportando' : 'Haz tu primer abono'}
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                                        <div
-                                            className={`h-3 rounded-full transition-all ${completada ? 'bg-green-500' : 'bg-purple-600'
-                                                }`}
-                                            style={{ width: `${Math.min(progreso, 100)}%` }}
-                                        />
+                                    </ProgressRing>
+                                    <div className="flex-1">
+                                        <p className={`text-sm font-medium ${completada ? 'text-green-600' : progreso >= 50 ? 'text-blue-600' : 'text-orange-600'}`}>
+                                            {completada ? 'Completada!' : progreso >= 75 ? 'Ya casi lo logras!' : progreso >= 50 ? 'Vas por buen camino' : progreso > 0 ? 'Sigue aportando' : 'Haz tu primer abono'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            ${meta.ahorroActual.toFixed(2)} de ${meta.montoTotal.toFixed(2)}
+                                        </p>
                                     </div>
                                 </div>
 
