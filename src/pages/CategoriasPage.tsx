@@ -4,6 +4,8 @@ import { Trash2, Plus, Edit2, Search, Tag } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useCategorias, useCreateCategoria, useUpdateCategoria, useDeleteCategoria } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
+import { useConfirm } from '../context/ConfirmContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { sectionHelp } from '../utils/helpContent';
 
 export const CategoriasPage = () => {
@@ -11,6 +13,7 @@ export const CategoriasPage = () => {
     const createCategoriaMutation = useCreateCategoria();
     const updateCategoriaMutation = useUpdateCategoria();
     const deleteCategoriaMutation = useDeleteCategoria();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -39,7 +42,7 @@ export const CategoriasPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Estás seguro de eliminar esta categoría?')) {
+        if (await confirm('¿Estás seguro de eliminar esta categoría?')) {
             try {
                 await deleteCategoriaMutation.mutateAsync(id);
                 toast.success('Categoría eliminada');
@@ -67,6 +70,8 @@ export const CategoriasPage = () => {
             tipo: 'Gasto',
         });
     };
+
+    const modalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
 
     const filteredCategorias = useMemo(() => {
         if (!Array.isArray(categorias)) return [];
@@ -185,7 +190,7 @@ export const CategoriasPage = () => {
                 {/* Modal */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={modalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} categoría</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>

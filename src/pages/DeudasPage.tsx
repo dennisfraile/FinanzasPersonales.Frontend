@@ -8,7 +8,9 @@ import { CuentaSelector } from '../components/CuentaSelector';
 import { useDeudas, useCreateDeuda, useUpdateDeuda, useDeleteDeuda, useRegistrarPagoDeuda, useDeudaPagos } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
 import ExportButton from '../components/ExportButton';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -38,6 +40,7 @@ export const DeudasPage = () => {
     const updateMutation = useUpdateDeuda();
     const deleteMutation = useDeleteDeuda();
     const pagoMutation = useRegistrarPagoDeuda();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPagoModalOpen, setIsPagoModalOpen] = useState(false);
@@ -149,7 +152,7 @@ export const DeudasPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Estás seguro de eliminar esta deuda y todos sus pagos?')) {
+        if (await confirm('¿Estás seguro de eliminar esta deuda y todos sus pagos?')) {
             try {
                 await deleteMutation.mutateAsync(id);
                 toast.success('Deuda eliminada');
@@ -210,6 +213,9 @@ export const DeudasPage = () => {
         setSelectedDeudaId(deudaId);
         setIsDetailOpen(true);
     };
+
+    const deudaModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
+    const pagoModalRef = useFocusTrap<HTMLDivElement>(isPagoModalOpen, () => setIsPagoModalOpen(false));
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -367,7 +373,7 @@ export const DeudasPage = () => {
                 {/* Modal Crear/Editar */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div ref={deudaModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} deuda</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -515,7 +521,7 @@ export const DeudasPage = () => {
                 {/* Modal Registrar pago */}
                 {isPagoModalOpen && selectedDeudaId && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                        <div ref={pagoModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">Registrar pago</h2>
                             <div className="space-y-4">
                                 <div>
@@ -684,6 +690,8 @@ const DeudaDetailModal = ({ deudaId, deuda, onClose }: DeudaDetailModalProps) =>
     const [proyeccion, setProyeccion] = useState<ProyeccionPago[]>([]);
     const [loadingProyeccion, setLoadingProyeccion] = useState(false);
 
+    const detailModalRef = useFocusTrap<HTMLDivElement>(true, onClose);
+
     const handleLoadProyeccion = async () => {
         if (pagoMensualCustom <= 0) {
             toast.error('Ingresa un monto de pago mensual');
@@ -704,7 +712,7 @@ const DeudaDetailModal = ({ deudaId, deuda, onClose }: DeudaDetailModalProps) =>
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div ref={detailModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <h2 className="text-2xl font-bold dark:text-white">{deuda.nombre}</h2>

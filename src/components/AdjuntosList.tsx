@@ -4,6 +4,7 @@ import adjuntosService from '../services/adjuntosService';
 import type { Adjunto } from '../services/adjuntosService';
 import { FileUpload } from './FileUpload';
 import { toast } from 'react-toastify';
+import { useConfirm } from '../context/ConfirmContext';
 
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
@@ -24,6 +25,7 @@ export const AdjuntosList: React.FC<AdjuntosListProps> = ({ gastoId, ingresoId }
     const [showUpload, setShowUpload] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [previewFileName, setPreviewFileName] = useState<string>('');
+    const confirm = useConfirm();
 
     useEffect(() => {
         loadAdjuntos();
@@ -74,7 +76,7 @@ export const AdjuntosList: React.FC<AdjuntosListProps> = ({ gastoId, ingresoId }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('¿Eliminar este comprobante?')) return;
+        if (!(await confirm('¿Eliminar este comprobante?'))) return;
         try {
             await adjuntosService.delete(id);
             toast.success('Comprobante eliminado');

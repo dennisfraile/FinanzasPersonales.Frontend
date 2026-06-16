@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { BookOpen, X, Search } from 'lucide-react';
 import { financialGlossary } from '../utils/helpContent';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export default function GlossaryModal() {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
+
+    const glossaryModalRef = useFocusTrap<HTMLDivElement>(isOpen, () => setIsOpen(false));
 
     const filtered = financialGlossary.filter(
         item =>
@@ -25,7 +28,7 @@ export default function GlossaryModal() {
 
             {isOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+                    <div ref={glossaryModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[80vh] flex flex-col">
                         <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
                             <h2 className="text-lg font-bold dark:text-white flex items-center gap-2">
                                 <BookOpen size={20} />

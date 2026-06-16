@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { X } from 'lucide-react';
 import HelpTooltip from '../components/HelpTooltip';
 import { sectionHelp } from '../utils/helpContent';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export const CalendarioPage = () => {
     const [eventos, setEventos] = useState<EventInput[]>([]);
@@ -104,6 +105,8 @@ export const CalendarioPage = () => {
         setAnoActual(fecha.getFullYear());
     };
 
+    const diaModalRef = useFocusTrap<HTMLDivElement>(showModal, () => setShowModal(false));
+
     return (
         <div className="p-4 md:p-6">
             <div className="mb-6">
@@ -143,7 +146,7 @@ export const CalendarioPage = () => {
             {/* Modal de detalles del día */}
             {showModal && selectedDay && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+                    <div ref={diaModalRef} role="dialog" aria-modal="true" className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
                         <div className="p-4 md:p-6 border-b border-gray-200 flex justify-between items-start">
                             <div>
                                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">

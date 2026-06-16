@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { type PlantillaGasto, type CreatePlantillaGastoDto } from '../services/plantillasGastoService';
 import { Trash2, Plus, Edit2, Search, Zap, Copy } from 'lucide-react';
 import { toast } from 'react-toastify';
 import HelpTooltip from '../components/HelpTooltip';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
 import { CuentaSelector } from '../components/CuentaSelector';
 import { usePlantillas, useCreatePlantilla, useUpdatePlantilla, useDeletePlantilla, useUsarPlantilla, useCategorias } from '../hooks/useQueryHooks';
@@ -14,6 +16,7 @@ export const PlantillasGastoPage = () => {
     const updateMutation = useUpdatePlantilla();
     const deleteMutation = useDeletePlantilla();
     const usarMutation = useUsarPlantilla();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUsarModalOpen, setIsUsarModalOpen] = useState(false);
@@ -76,7 +79,7 @@ export const PlantillasGastoPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Eliminar esta plantilla?')) {
+        if (await confirm('¿Eliminar esta plantilla?')) {
             try {
                 await deleteMutation.mutateAsync(id);
                 toast.success('Plantilla eliminada');
@@ -105,6 +108,9 @@ export const PlantillasGastoPage = () => {
         setUsarData({ fecha: new Date().toISOString().split('T')[0], monto: p.monto });
         setIsUsarModalOpen(true);
     };
+
+    const modalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
+    const usarModalRef = useFocusTrap<HTMLDivElement>(isUsarModalOpen, () => setIsUsarModalOpen(false));
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -169,7 +175,7 @@ export const PlantillasGastoPage = () => {
                 {/* Modal Crear/Editar */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={modalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} plantilla</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -218,7 +224,7 @@ export const PlantillasGastoPage = () => {
                 {/* Modal Usar plantilla */}
                 {isUsarModalOpen && selectedPlantillaId && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
+                        <div ref={usarModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
                             <h2 className="text-xl font-bold mb-4 dark:text-white">Usar plantilla</h2>
                             <div className="space-y-4">
                                 <div>

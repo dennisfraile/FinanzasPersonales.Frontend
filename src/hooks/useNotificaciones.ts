@@ -1,14 +1,14 @@
 import { useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useQueryNotificaciones, useNotificacionesNoLeidas, useMarcarNotificacionLeida } from './useQueryHooks';
-import { useSignalR } from './useSignalR';
+import { useSignalRContext } from '../context/SignalRContext';
 
 export const useNotificaciones = () => {
     const queryClient = useQueryClient();
-    const { data: notificaciones = [], isLoading: isLoadingNotif, refetch: refetchNotif } = useQueryNotificaciones(false);
-    const { data: noLeidas = 0, refetch: refetchNoLeidas } = useNotificacionesNoLeidas();
+    const { isConnected, onNotificacion } = useSignalRContext();
+    const { data: notificaciones = [], isLoading: isLoadingNotif, refetch: refetchNotif } = useQueryNotificaciones(false, isConnected);
+    const { data: noLeidas = 0, refetch: refetchNoLeidas } = useNotificacionesNoLeidas(isConnected);
     const marcarLeidaMutation = useMarcarNotificacionLeida();
-    const { startConnection, onNotificacion } = useSignalR();
 
     const isLoading = isLoadingNotif;
 
@@ -24,24 +24,17 @@ export const useNotificaciones = () => {
         await Promise.all([refetchNotif(), refetchNoLeidas()]);
     };
 
-    // Handle incoming SignalR notification by invalidating queries
+    // Una notificación en tiempo real invalida las queries para refrescar el badge/lista.
     const handleNuevaNotificacion = useCallback(() => {
         queryClient.invalidateQueries({ queryKey: ['notificaciones'] });
     }, [queryClient]);
 
     useEffect(() => {
-        // Start SignalR connection
-        startConnection().catch((err) => {
-            console.error('SignalR connection failed, relying on polling fallback:', err);
-        });
-
-        // Listen for real-time notifications
+        // La conexión la gestiona SignalRProvider (única, montada una vez).
+        // Aquí solo nos suscribimos al evento.
         const cleanup = onNotificacion(handleNuevaNotificacion);
-
-        return () => {
-            if (cleanup) cleanup();
-        };
-    }, [startConnection, onNotificacion, handleNuevaNotificacion]);
+        return cleanup;
+    }, [onNotificacion, handleNuevaNotificacion]);
 
     return { notificaciones, noLeidas, isLoading, marcarLeida, refrescar };
 };

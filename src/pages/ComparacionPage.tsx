@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 import HelpTooltip from '../components/HelpTooltip';
 import { sectionHelp } from '../utils/helpContent';
+import { formatCurrency } from '../utils/formatters';
 
 export const ComparacionPage = () => {
     const [fecha1Inicio, setFecha1Inicio] = useState('');
@@ -12,9 +13,6 @@ export const ComparacionPage = () => {
     const [fecha2Fin, setFecha2Fin] = useState('');
     const [comparacion, setComparacion] = useState<ComparacionPeriodos | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-
-    const formatCurrency = (value: number) =>
-        new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(value);
 
     const handleComparar = async () => {
         if (!fecha1Inicio || !fecha1Fin || !fecha2Inicio || !fecha2Fin) {

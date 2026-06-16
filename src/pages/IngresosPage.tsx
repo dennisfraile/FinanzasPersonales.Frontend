@@ -11,9 +11,17 @@ import { TagSelector } from '../components/TagSelector';
 import { useIngresos, useCreateIngreso, useUpdateIngreso, useDeleteIngreso, useCategorias, useCreateCategoria } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
+import { useConfirm } from '../context/ConfirmContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
+import { exportToCsv } from '../utils/csv';
+import { useListFilters } from '../hooks/useListFilters';
+import { AdvancedFiltersPanel } from '../components/AdvancedFiltersPanel';
 
-const ITEMS_PER_PAGE = 10;
+const matchesIngresoSearch = (ingreso: Ingreso, term: string) =>
+    !term ||
+    ingreso.monto.toString().includes(term) ||
+    (ingreso.categoriaNombre ?? '').toLowerCase().includes(term.toLowerCase());
 
 export const IngresosPage = () => {
     const { data: ingresos = [], isLoading } = useIngresos();
@@ -24,20 +32,29 @@ export const IngresosPage = () => {
     const updateIngresoMutation = useUpdateIngreso();
     const deleteIngresoMutation = useDeleteIngreso();
     const createCategoriaMutation = useCreateCategoria();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterCategoria, setFilterCategoria] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showFilters, setShowFilters] = useState(false);
-    // Advanced filters
-    const [fechaDesde, setFechaDesde] = useState('');
-    const [fechaHasta, setFechaHasta] = useState('');
-    const [montoMin, setMontoMin] = useState('');
-    const [montoMax, setMontoMax] = useState('');
-    const [filterTagIds, setFilterTagIds] = useState<number[]>([]);
+
+    const {
+        searchTerm, setSearchTerm,
+        filterCategoria, setFilterCategoria,
+        currentPage, setCurrentPage,
+        showFilters, setShowFilters,
+        fechaDesde, setFechaDesde,
+        fechaHasta, setFechaHasta,
+        montoMin, setMontoMin,
+        montoMax, setMontoMax,
+        filterTagIds, setFilterTagIds,
+        clearFilters,
+        filtered: filteredIngresos,
+        paginated: paginatedIngresos,
+        totalPages,
+        total,
+    } = useListFilters(ingresos, matchesIngresoSearch);
+
     const [formData, setFormData] = useState<CreateIngresoDto>({
         fecha: new Date().toISOString().split('T')[0],
         categoriaId: 0,
@@ -82,7 +99,7 @@ export const IngresosPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Estás seguro de eliminar este ingreso?')) {
+        if (await confirm('¿Estás seguro de eliminar este ingreso?')) {
             try {
                 await deleteIngresoMutation.mutateAsync(id);
                 toast.success('Ingreso eliminado');
@@ -120,6 +137,9 @@ export const IngresosPage = () => {
         });
     };
 
+    const formModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
+    const quickCatModalRef = useFocusTrap<HTMLDivElement>(isQuickCatModalOpen, () => { setIsQuickCatModalOpen(false); setNuevaCategoria({ nombre: '', tipo: 'Ingreso' }); });
+
     const handleQuickCreateCategoria = async () => {
         if (!nuevaCategoria.nombre.trim()) {
             toast.error('El nombre de la categoría es requerido');
@@ -137,44 +157,6 @@ export const IngresosPage = () => {
         }
     };
 
-    const clearFilters = () => {
-        setSearchTerm('');
-        setFilterCategoria('');
-        setFechaDesde('');
-        setFechaHasta('');
-        setMontoMin('');
-        setMontoMax('');
-        setFilterTagIds([]);
-        setCurrentPage(1);
-    };
-
-    const filteredIngresos = useMemo(() => {
-        if (!Array.isArray(ingresos)) return [];
-        return ingresos.filter(ingreso => {
-            const matchesSearch = !searchTerm ||
-                ingreso.monto.toString().includes(searchTerm) ||
-                (ingreso.categoriaNombre ?? '').toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategoria = !filterCategoria || ingreso.categoriaId.toString() === filterCategoria;
-
-            // Filtros avanzados
-            const matchesFechaDesde = !fechaDesde || ingreso.fecha >= fechaDesde;
-            const matchesFechaHasta = !fechaHasta || ingreso.fecha <= fechaHasta;
-            const matchesMontoMin = !montoMin || ingreso.monto >= parseFloat(montoMin);
-            const matchesMontoMax = !montoMax || ingreso.monto <= parseFloat(montoMax);
-
-            return matchesSearch && matchesCategoria && matchesFechaDesde && matchesFechaHasta &&
-                matchesMontoMin && matchesMontoMax;
-        });
-    }, [ingresos, searchTerm, filterCategoria, fechaDesde, fechaHasta, montoMin, montoMax]);
-
-    const totalPages = Math.ceil(filteredIngresos.length / ITEMS_PER_PAGE);
-    const paginatedIngresos = useMemo(() => {
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        return filteredIngresos.slice(start, start + ITEMS_PER_PAGE);
-    }, [filteredIngresos, currentPage]);
-
-    const total = filteredIngresos.reduce((sum, i) => sum + i.monto, 0);
-
     const isMutating = createIngresoMutation.isPending || updateIngresoMutation.isPending;
 
     const handleExportCSV = () => {
@@ -187,16 +169,7 @@ export const IngresosPage = () => {
             i.monto.toFixed(2),
             i.notas || '',
         ]);
-        const csv = [headers, ...rows]
-            .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-            .join('\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `ingresos_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
+        exportToCsv('ingresos', headers, rows);
     };
 
     return (
@@ -268,92 +241,23 @@ export const IngresosPage = () => {
 
                 {/* Advanced Filters Panel */}
                 {showFilters && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold dark:text-white">Filtros Avanzados</h3>
-                            <button
-                                onClick={clearFilters}
-                                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                            >
-                                Limpiar Filtros
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label htmlFor="fecha-desde" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Desde</label>
-                                <input
-                                    id="fecha-desde"
-                                    type="date"
-                                    value={fechaDesde}
-                                    onChange={(e) => setFechaDesde(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="fecha-hasta" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Hasta</label>
-                                <input
-                                    id="fecha-hasta"
-                                    type="date"
-                                    value={fechaHasta}
-                                    onChange={(e) => setFechaHasta(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="filter-categoria" className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
-                                <select
-                                    id="filter-categoria"
-                                    value={filterCategoria}
-                                    onChange={(e) => setFilterCategoria(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                >
-                                    <option value="">Todas</option>
-                                    {categorias.map(c => (
-                                        <option key={c.id} value={c.id}>{c.nombre}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="monto-minimo" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Mínimo</label>
-                                <input
-                                    id="monto-minimo"
-                                    type="number"
-                                    step="0.01"
-                                    value={montoMin}
-                                    onChange={(e) => setMontoMin(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="monto-maximo" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Máximo</label>
-                                <input
-                                    id="monto-maximo"
-                                    type="number"
-                                    step="0.01"
-                                    value={montoMax}
-                                    onChange={(e) => setMontoMax(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    placeholder="0.00"
-                                />
-                            </div>
-
-                            {/* Tags Filter */}
-                            <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Filtrar por Tags</label>
-                                <TagSelector
-                                    selectedTagIds={filterTagIds}
-                                    onChange={setFilterTagIds}
-                                />
-                            </div>
-
-                            <div className="flex items-end">
-                                <div className="text-sm dark:text-gray-300">
-                                    <strong>{filteredIngresos.length}</strong> resultados
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <AdvancedFiltersPanel
+                        fechaDesde={fechaDesde}
+                        onFechaDesde={setFechaDesde}
+                        fechaHasta={fechaHasta}
+                        onFechaHasta={setFechaHasta}
+                        filterCategoria={filterCategoria}
+                        onFilterCategoria={setFilterCategoria}
+                        montoMin={montoMin}
+                        onMontoMin={setMontoMin}
+                        montoMax={montoMax}
+                        onMontoMax={setMontoMax}
+                        filterTagIds={filterTagIds}
+                        onFilterTagIds={setFilterTagIds}
+                        categorias={categorias}
+                        resultCount={filteredIngresos.length}
+                        onClear={clearFilters}
+                    />
                 )}
 
                 {isLoading ? (
@@ -464,7 +368,7 @@ export const IngresosPage = () => {
 
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={formModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} ingreso</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -571,7 +475,7 @@ export const IngresosPage = () => {
                 {
                     isQuickCatModalOpen && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
+                            <div ref={quickCatModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
                                 <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva categoría rápida</h3>
                                 <div className="space-y-4">
                                     <div>

@@ -591,20 +591,22 @@ export function useCreateTransferencia() {
 }
 
 // ============ NOTIFICACIONES ============
-export function useQueryNotificaciones(soloNoLeidas: boolean = false) {
+export function useQueryNotificaciones(soloNoLeidas: boolean = false, isConnected: boolean = false) {
     return useQuery({
         queryKey: [...queryKeys.notificaciones, soloNoLeidas],
         queryFn: () => notificacionesService.getNotificaciones(soloNoLeidas),
-        refetchInterval: 30000,
+        // SignalR es la fuente en tiempo real; el polling solo actúa como fallback
+        // cuando el WebSocket no está conectado.
+        refetchInterval: isConnected ? false : 30000,
         refetchIntervalInBackground: false, // No polling cuando la pestaña está inactiva
     });
 }
 
-export function useNotificacionesNoLeidas() {
+export function useNotificacionesNoLeidas(isConnected: boolean = false) {
     return useQuery({
         queryKey: queryKeys.notificacionesNoLeidas,
         queryFn: () => notificacionesService.getNoLeidas(),
-        refetchInterval: 30000,
+        refetchInterval: isConnected ? false : 30000,
         refetchIntervalInBackground: false, // No polling cuando la pestaña está inactiva
     });
 }

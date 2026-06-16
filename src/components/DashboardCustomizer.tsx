@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Settings, X, Eye, EyeOff, GripVertical } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export interface WidgetConfig {
     id: string;
@@ -62,6 +63,8 @@ export const DashboardCustomizer: React.FC<DashboardCustomizerProps> = ({ widget
         onChange(updated);
     };
 
+    const customizerModalRef = useFocusTrap<HTMLDivElement>(isOpen, () => setIsOpen(false));
+
     return (
         <>
             <button
@@ -77,6 +80,9 @@ export const DashboardCustomizer: React.FC<DashboardCustomizerProps> = ({ widget
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setIsOpen(false)}>
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
                     <div
+                        ref={customizerModalRef}
+                        role="dialog"
+                        aria-modal="true"
                         className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-sm overflow-hidden"
                         onClick={e => e.stopPropagation()}
                     >

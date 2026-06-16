@@ -12,9 +12,15 @@ import { useGastos, useCreateGasto, useUpdateGasto, useDeleteGasto, useCategoria
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
 import DetallesGastoPanel from '../components/DetallesGastoPanel';
+import { useConfirm } from '../context/ConfirmContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
+import { exportToCsv } from '../utils/csv';
+import { useListFilters } from '../hooks/useListFilters';
+import { AdvancedFiltersPanel } from '../components/AdvancedFiltersPanel';
 
-const ITEMS_PER_PAGE = 10;
+const matchesGastoSearch = (gasto: Gasto, term: string) =>
+    (gasto.descripcion ?? '').toLowerCase().includes(term.toLowerCase());
 
 export const GastosPage = () => {
     const { data: gastos = [], isLoading } = useGastos();
@@ -26,23 +32,31 @@ export const GastosPage = () => {
     const deleteGastoMutation = useDeleteGasto();
     const createCategoriaMutation = useCreateCategoria();
     const transferirSaldoMutation = useTransferirSaldoGasto();
+    const confirm = useConfirm();
+
+    const {
+        searchTerm, setSearchTerm,
+        filterCategoria, setFilterCategoria,
+        currentPage, setCurrentPage,
+        showFilters, setShowFilters,
+        fechaDesde, setFechaDesde,
+        fechaHasta, setFechaHasta,
+        montoMin, setMontoMin,
+        montoMax, setMontoMax,
+        filterTagIds, setFilterTagIds,
+        clearFilters,
+        filtered: filteredGastos,
+        paginated: paginatedGastos,
+        totalPages,
+        total,
+    } = useListFilters(gastos, matchesGastoSearch);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isQuickCatModalOpen, setIsQuickCatModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterCategoria, setFilterCategoria] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showFilters, setShowFilters] = useState(false);
     const [detallesGastoId, setDetallesGastoId] = useState<number | null>(null);
     const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
     const [transferData, setTransferData] = useState({ gastoOrigenId: 0, gastoDestinoId: 0, monto: 0 });
-    // Advanced filters
-    const [fechaDesde, setFechaDesde] = useState('');
-    const [fechaHasta, setFechaHasta] = useState('');
-    const [montoMin, setMontoMin] = useState('');
-    const [montoMax, setMontoMax] = useState('');
-    const [filterTagIds, setFilterTagIds] = useState<number[]>([]);
     const [formData, setFormData] = useState<CreateGastoDto>({
         fecha: new Date().toISOString().split('T')[0],
         categoriaId: 0,
@@ -80,7 +94,7 @@ export const GastosPage = () => {
 
     const handleBulkDelete = async () => {
         if (selectedIds.size === 0) return;
-        if (!window.confirm(`¿Eliminar ${selectedIds.size} gasto(s) seleccionados?`)) return;
+        if (!(await confirm(`¿Eliminar ${selectedIds.size} gasto(s) seleccionados?`))) return;
         try {
             for (const id of selectedIds) {
                 await deleteGastoMutation.mutateAsync(id);
@@ -155,7 +169,7 @@ export const GastosPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Estás seguro de eliminar este gasto?')) {
+        if (await confirm('¿Estás seguro de eliminar este gasto?')) {
             try {
                 await deleteGastoMutation.mutateAsync(id);
                 toast.success('Gasto eliminado');
@@ -211,6 +225,11 @@ export const GastosPage = () => {
         });
     };
 
+    const formModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
+    const transferModalRef = useFocusTrap<HTMLDivElement>(isTransferModalOpen, () => { setIsTransferModalOpen(false); setTransferData({ gastoOrigenId: 0, gastoDestinoId: 0, monto: 0 }); });
+    const quickCatModalRef = useFocusTrap<HTMLDivElement>(isQuickCatModalOpen, () => { setIsQuickCatModalOpen(false); setNuevaCategoria({ nombre: '', tipo: 'Gasto' }); });
+    const bulkCatModalRef = useFocusTrap<HTMLDivElement>(showBulkCatModal, () => { setShowBulkCatModal(false); setBulkCategoriaId(0); });
+
     const handleQuickCreateCategoria = async () => {
         if (!nuevaCategoria.nombre.trim()) {
             toast.error('El nombre de la categoría es requerido');
@@ -228,44 +247,6 @@ export const GastosPage = () => {
         }
     };
 
-    const clearFilters = () => {
-        setSearchTerm('');
-        setFilterCategoria('');
-        setFechaDesde('');
-        setFechaHasta('');
-        setMontoMin('');
-        setMontoMax('');
-        setFilterTagIds([]);
-        setCurrentPage(1);
-    };
-
-    // Filtrado y búsqueda con filtros avanzados
-    const filteredGastos = useMemo(() => {
-        if (!Array.isArray(gastos)) return [];
-        return gastos.filter(gasto => {
-            const matchesSearch = (gasto.descripcion ?? '').toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategoria = !filterCategoria || gasto.categoriaId.toString() === filterCategoria;
-
-            // Filtros avanzados
-            const matchesFechaDesde = !fechaDesde || gasto.fecha >= fechaDesde;
-            const matchesFechaHasta = !fechaHasta || gasto.fecha <= fechaHasta;
-            const matchesMontoMin = !montoMin || gasto.monto >= parseFloat(montoMin);
-            const matchesMontoMax = !montoMax || gasto.monto <= parseFloat(montoMax);
-
-            return matchesSearch && matchesCategoria && matchesFechaDesde && matchesFechaHasta &&
-                matchesMontoMin && matchesMontoMax;
-        });
-    }, [gastos, searchTerm, filterCategoria, fechaDesde, fechaHasta, montoMin, montoMax]);
-
-    // Paginación
-    const totalPages = Math.ceil(filteredGastos.length / ITEMS_PER_PAGE);
-    const paginatedGastos = useMemo(() => {
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        return filteredGastos.slice(start, start + ITEMS_PER_PAGE);
-    }, [filteredGastos, currentPage]);
-
-    const total = filteredGastos.reduce((sum, g) => sum + g.monto, 0);
-
     const isMutating = createGastoMutation.isPending || updateGastoMutation.isPending;
 
     const handleExportCSV = () => {
@@ -279,16 +260,7 @@ export const GastosPage = () => {
             g.monto.toFixed(2),
             g.notas || '',
         ]);
-        const csv = [headers, ...rows]
-            .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-            .join('\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `gastos_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
+        exportToCsv('gastos', headers, rows);
     };
 
     const handleTransferirSaldo = async () => {
@@ -394,92 +366,23 @@ export const GastosPage = () => {
 
                 {/* Advanced Filters Panel */}
                 {showFilters && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold dark:text-white">Filtros Avanzados</h3>
-                            <button
-                                onClick={clearFilters}
-                                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                            >
-                                Limpiar Filtros
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label htmlFor="fecha-desde" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Desde</label>
-                                <input
-                                    id="fecha-desde"
-                                    type="date"
-                                    value={fechaDesde}
-                                    onChange={(e) => setFechaDesde(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="fecha-hasta" className="block text-sm font-medium mb-1 dark:text-gray-300">Fecha Hasta</label>
-                                <input
-                                    id="fecha-hasta"
-                                    type="date"
-                                    value={fechaHasta}
-                                    onChange={(e) => setFechaHasta(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="filter-categoria" className="block text-sm font-medium mb-1 dark:text-gray-300">Categoría</label>
-                                <select
-                                    id="filter-categoria"
-                                    value={filterCategoria}
-                                    onChange={(e) => setFilterCategoria(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                >
-                                    <option value="">Todas</option>
-                                    {categorias.map(c => (
-                                        <option key={c.id} value={c.id}>{c.nombre}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="monto-minimo" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Mínimo</label>
-                                <input
-                                    id="monto-minimo"
-                                    type="number"
-                                    step="0.01"
-                                    value={montoMin}
-                                    onChange={(e) => setMontoMin(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="monto-maximo" className="block text-sm font-medium mb-1 dark:text-gray-300">Monto Máximo</label>
-                                <input
-                                    id="monto-maximo"
-                                    type="number"
-                                    step="0.01"
-                                    value={montoMax}
-                                    onChange={(e) => setMontoMax(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    placeholder="0.00"
-                                />
-                            </div>
-
-                            {/* Tags Filter */}
-                            <div>
-                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Filtrar por Tags</label>
-                                <TagSelector
-                                    selectedTagIds={filterTagIds}
-                                    onChange={setFilterTagIds}
-                                />
-                            </div>
-
-                            <div className="flex items-end">
-                                <div className="text-sm dark:text-gray-300">
-                                    <strong>{filteredGastos.length}</strong> resultados
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <AdvancedFiltersPanel
+                        fechaDesde={fechaDesde}
+                        onFechaDesde={setFechaDesde}
+                        fechaHasta={fechaHasta}
+                        onFechaHasta={setFechaHasta}
+                        filterCategoria={filterCategoria}
+                        onFilterCategoria={setFilterCategoria}
+                        montoMin={montoMin}
+                        onMontoMin={setMontoMin}
+                        montoMax={montoMax}
+                        onMontoMax={setMontoMax}
+                        filterTagIds={filterTagIds}
+                        onFilterTagIds={setFilterTagIds}
+                        categorias={categorias}
+                        resultCount={filteredGastos.length}
+                        onClear={clearFilters}
+                    />
                 )}
 
                 {isLoading ? (
@@ -739,7 +642,7 @@ export const GastosPage = () => {
 
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={formModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} gasto</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -867,7 +770,7 @@ export const GastosPage = () => {
                 {/* Modal Transferir Saldo */}
                 {isTransferModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                        <div ref={transferModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
                             <h2 className="text-xl font-bold mb-4 dark:text-white flex items-center gap-2">
                                 <ArrowLeftRight size={20} /> Transferir Saldo entre Gastos
                             </h2>
@@ -962,7 +865,7 @@ export const GastosPage = () => {
                 {/* Quick Create Categoria Modal */}
                 {isQuickCatModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
+                        <div ref={quickCatModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
                             <h3 className="text-xl font-bold mb-4 dark:text-white">➕ Nueva categoría rápida</h3>
                             <div className="space-y-4">
                                 <div>
@@ -999,7 +902,7 @@ export const GastosPage = () => {
                 {/* Bulk Change Category Modal */}
                 {showBulkCatModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
+                        <div ref={bulkCatModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
                             <h3 className="text-lg font-bold mb-4 dark:text-white">Cambiar categoría ({selectedIds.size} gastos)</h3>
                             <div className="space-y-4">
                                 <div>

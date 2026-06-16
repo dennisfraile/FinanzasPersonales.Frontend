@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import type { GastoProgramado, CreateGastoProgramadoDto, PagarGastoProgramadoDto } from '../services/gastosProgramadosService';
 import { useCuentas } from '../hooks/useCuentas';
 import { CalendarClock, Plus, Edit2, Trash2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, CreditCard } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import HelpTooltip from '../components/HelpTooltip';
 import ExportButton from '../components/ExportButton';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
 import {
     useGastosProgramados, useCreateGastoProgramado, useUpdateGastoProgramado,
@@ -32,6 +34,7 @@ export const GastosProgramadosPage = () => {
     const deleteMutation = useDeleteGastoProgramado();
     const pagarMutation = usePagarGastoProgramado();
     const cancelarMutation = useCancelarGastoProgramado();
+    const confirm = useConfirm();
 
     const [showModal, setShowModal] = useState(false);
     const [showPagarModal, setShowPagarModal] = useState(false);
@@ -85,7 +88,7 @@ export const GastosProgramadosPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('¿Eliminar este gasto programado?')) return;
+        if (!(await confirm('¿Eliminar este gasto programado?'))) return;
         try {
             await deleteMutation.mutateAsync(id);
             toast.success('Gasto programado eliminado');
@@ -118,7 +121,7 @@ export const GastosProgramadosPage = () => {
     };
 
     const handleCancelar = async (id: number) => {
-        if (!confirm('¿Cancelar este gasto programado?')) return;
+        if (!(await confirm('¿Cancelar este gasto programado?'))) return;
         try {
             await cancelarMutation.mutateAsync(id);
             toast.success('Gasto cancelado');
@@ -140,6 +143,9 @@ export const GastosProgramadosPage = () => {
             notas: null,
         });
     };
+
+    const modalRef = useFocusTrap<HTMLDivElement>(showModal, handleCloseModal);
+    const pagarModalRef = useFocusTrap<HTMLDivElement>(showPagarModal, () => { setShowPagarModal(false); setPagandoGasto(null); });
 
     const getDiasLabel = (dias: number) => {
         if (dias < 0) return `Vencido hace ${Math.abs(dias)} dia(s)`;
@@ -371,7 +377,7 @@ export const GastosProgramadosPage = () => {
                 {/* Modal Crear/Editar */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
+                        <div ref={modalRef} role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
                             <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {editingId ? 'Editar' : 'Nuevo'} gasto programado
                             </h2>
@@ -493,7 +499,7 @@ export const GastosProgramadosPage = () => {
                 {/* Modal Pagar */}
                 {showPagarModal && pagandoGasto && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
+                        <div ref={pagarModalRef} role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
                             <h2 className={`text-2xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 Registrar pago
                             </h2>

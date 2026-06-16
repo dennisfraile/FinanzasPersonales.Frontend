@@ -4,13 +4,16 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export const TagsPage = () => {
     const { data: tags = [] } = useTags();
     const createTagMutation = useCreateTag();
     const updateTagMutation = useUpdateTag();
     const deleteTagMutation = useDeleteTag();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -34,7 +37,7 @@ export const TagsPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Eliminar este tag?')) {
+        if (await confirm('¿Eliminar este tag?')) {
             try {
                 await deleteTagMutation.mutateAsync(id);
                 toast.success('Tag eliminado');
@@ -56,6 +59,8 @@ export const TagsPage = () => {
         setEditingId(null);
         setFormData({ nombre: '', color: '#3b82f6' });
     };
+
+    const tagModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -106,7 +111,7 @@ export const TagsPage = () => {
 
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={tagModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">
                                 {editingId ? 'Editar' : 'Nuevo'} tag
                             </h2>

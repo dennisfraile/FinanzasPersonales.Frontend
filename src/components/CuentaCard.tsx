@@ -4,6 +4,7 @@ import { Wallet, Building2, CreditCard, PiggyBank, TrendingUp, Edit, Trash2, Bar
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import Sparkline from './Sparkline';
+import { formatCurrency as formatMoney } from '../utils/formatters';
 
 interface CuentaCardProps {
     cuenta: CuentaDto;
@@ -45,12 +46,7 @@ export const CuentaCard: React.FC<CuentaCardProps> = ({ cuenta, onEdit, onDelete
         return points;
     }, [cuenta.balanceActual]);
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: cuenta.moneda || 'USD'
-        }).format(amount);
-    };
+    const formatCurrency = (amount: number) => formatMoney(amount, { currency: cuenta.moneda });
 
     return (
         <div
