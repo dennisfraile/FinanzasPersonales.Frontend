@@ -4,10 +4,13 @@ import { useTheme } from '../context/ThemeContext';
 import { useCuentas } from '../hooks/useCuentas';
 import HelpTooltip from '../components/HelpTooltip';
 import { sectionHelp } from '../utils/helpContent';
+import { formatCurrency } from '../utils/formatters';
 import { CuentaCard } from '../components/CuentaCard';
 import type { CuentaDto, CuentaCreateDto } from '../services/cuentasService';
 import { toast } from 'react-toastify';
 import { useCreateCuenta, useUpdateCuenta, useDeleteCuenta } from '../hooks/useQueryHooks';
+import { useConfirm } from '../context/ConfirmContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export const CuentasPage = () => {
     const { theme } = useTheme();
@@ -15,6 +18,7 @@ export const CuentasPage = () => {
     const createCuentaMutation = useCreateCuenta();
     const updateCuentaMutation = useUpdateCuenta();
     const deleteCuentaMutation = useDeleteCuenta();
+    const confirm = useConfirm();
 
     const [showModal, setShowModal] = useState(false);
     const [editingCuenta, setEditingCuenta] = useState<CuentaDto | null>(null);
@@ -69,7 +73,7 @@ export const CuentasPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('¿Estás seguro de eliminar esta cuenta?')) return;
+        if (!(await confirm('¿Estás seguro de eliminar esta cuenta?'))) return;
 
         try {
             await deleteCuentaMutation.mutateAsync(id);
@@ -89,12 +93,13 @@ export const CuentasPage = () => {
         });
     };
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
-    };
+    // formatCurrency centralizado en utils/formatters (en-US/USD)
+
+    const cuentaModalRef = useFocusTrap<HTMLDivElement>(showModal, () => {
+        setShowModal(false);
+        setEditingCuenta(null);
+        resetForm();
+    });
 
     if (isLoading) {
         return (
@@ -185,7 +190,7 @@ export const CuentasPage = () => {
             {/* Modal Crear/Editar */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto`}>
+                    <div ref={cuentaModalRef} role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto`}>
                         <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             {editingCuenta ? 'Editar cuenta' : 'Nueva cuenta'}
                         </h2>

@@ -3,10 +3,12 @@ import { type GastoCompartido, type CreateGastoCompartidoDto, type CreatePartici
 import { Trash2, Plus, Search, Users, DollarSign, CheckCircle2, Clock, UserPlus, X, Eye, Share2, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import HelpTooltip from '../components/HelpTooltip';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
 import { Pagination } from '../components/Pagination';
 import { useCategorias, useGastosCompartidos, useResumenSplit, useCreateGastoCompartido, useDeleteGastoCompartido, useLiquidarParticipante } from '../hooks/useQueryHooks';
 import apiClient from '../services/api';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -23,6 +25,7 @@ export const GastosCompartidosPage = () => {
     const createMutation = useCreateGastoCompartido();
     const deleteMutation = useDeleteGastoCompartido();
     const liquidarMutation = useLiquidarParticipante();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -97,7 +100,7 @@ export const GastosCompartidosPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Eliminar este gasto compartido y todos sus participantes?')) {
+        if (await confirm('¿Eliminar este gasto compartido y todos sus participantes?')) {
             try {
                 await deleteMutation.mutateAsync(id);
                 toast.success('Gasto compartido eliminado');
@@ -189,6 +192,11 @@ export const GastosCompartidosPage = () => {
     const gastoCategorias = useMemo(() => {
         return categorias.filter((c: any) => c.tipo === 'Gasto');
     }, [categorias]);
+
+    const crearModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
+    const detalleModalRef = useFocusTrap<HTMLDivElement>(isDetailOpen, () => { setIsDetailOpen(false); setSelectedGasto(null); });
+    const liquidarModalRef = useFocusTrap<HTMLDivElement>(isLiquidarOpen, () => setIsLiquidarOpen(false));
+    const compartirModalRef = useFocusTrap<HTMLDivElement>(shareModalOpen, () => setShareModalOpen(false));
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -351,7 +359,7 @@ export const GastosCompartidosPage = () => {
                 {/* Modal Crear Gasto Compartido */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div ref={crearModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">Nuevo gasto compartido</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -509,7 +517,7 @@ export const GastosCompartidosPage = () => {
                 {/* Modal Detalle */}
                 {isDetailOpen && selectedGasto && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div ref={detalleModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
                                     <h2 className="text-2xl font-bold dark:text-white">{selectedGasto.descripcion}</h2>
@@ -590,7 +598,7 @@ export const GastosCompartidosPage = () => {
                 {/* Modal Liquidar */}
                 {isLiquidarOpen && selectedParticipante && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
+                        <div ref={liquidarModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-sm">
                             <h2 className="text-xl font-bold mb-2 dark:text-white">Registrar pago</h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                                 {selectedParticipante.nombre} debe ${(selectedParticipante.montoAsignado - selectedParticipante.montoPagado).toFixed(2)}
@@ -623,7 +631,7 @@ export const GastosCompartidosPage = () => {
                 {/* Modal Compartir */}
                 {shareModalOpen && shareToken && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                        <div ref={compartirModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
                             <div className="flex justify-between items-start mb-4">
                                 <h2 className="text-xl font-bold dark:text-white">Compartir gasto</h2>
                                 <button onClick={() => setShareModalOpen(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 text-xl font-bold">

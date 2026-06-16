@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { reportesProgramadosService, type ReporteProgramado, type CreateReporteProgramadoDto } from '../services/reportesProgramadosService';
 import { Plus, Trash2, CalendarClock, Mail, Power, PowerOff, Pencil, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useConfirm } from '../context/ConfirmContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const FRECUENCIAS = [
     { value: 'Semanal', label: 'Semanal' },
@@ -20,6 +22,7 @@ export const ReportesProgramadosPage = () => {
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const confirm = useConfirm();
     const [formData, setFormData] = useState<CreateReporteProgramadoDto>({
         frecuencia: 'Semanal',
         emailDestino: '',
@@ -87,7 +90,7 @@ export const ReportesProgramadosPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm('¿Eliminar este reporte programado?')) return;
+        if (!(await confirm('¿Eliminar este reporte programado?'))) return;
         try {
             await reportesProgramadosService.delete(id);
             toast.success('Reporte eliminado');
@@ -107,6 +110,8 @@ export const ReportesProgramadosPage = () => {
             toast.error('Error al cambiar estado');
         }
     };
+
+    const reporteModalRef = useFocusTrap<HTMLDivElement>(modalOpen, () => setModalOpen(false));
 
     const toggleSeccion = (seccion: string) => {
         setFormData(prev => ({
@@ -233,7 +238,7 @@ export const ReportesProgramadosPage = () => {
                 {/* Modal Create/Edit */}
                 {modalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                        <div ref={reporteModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
                             <h2 className="text-xl font-bold mb-4 dark:text-white">
                                 {editingId ? 'Editar reporte' : 'Nuevo reporte programado'}
                             </h2>

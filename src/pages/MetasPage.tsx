@@ -7,8 +7,10 @@ import { useMetas, useCreateMeta, useUpdateMeta, useDeleteMeta, useAbonarMeta } 
 import HelpTooltip from '../components/HelpTooltip';
 import ProgressRing from '../components/ProgressRing';
 import EmptyState from '../components/EmptyState';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
 import { fireConfetti } from '../components/Animations';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export const MetasPage = () => {
     const { data: metas = [] } = useMetas();
@@ -16,6 +18,7 @@ export const MetasPage = () => {
     const updateMetaMutation = useUpdateMeta();
     const deleteMetaMutation = useDeleteMeta();
     const abonarMetaMutation = useAbonarMeta();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAbonoModalOpen, setIsAbonoModalOpen] = useState(false);
@@ -77,7 +80,7 @@ export const MetasPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Estás seguro de eliminar esta meta?')) {
+        if (await confirm('¿Estás seguro de eliminar esta meta?')) {
             try {
                 await deleteMetaMutation.mutateAsync(id);
                 toast.success('Meta eliminada');
@@ -119,6 +122,9 @@ export const MetasPage = () => {
         setSelectedMetaId(id);
         setIsAbonoModalOpen(true);
     };
+
+    const metaModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
+    const abonoModalRef = useFocusTrap<HTMLDivElement>(isAbonoModalOpen, () => setIsAbonoModalOpen(false));
 
     const getProgreso = (meta: Meta) => {
         return meta.montoTotal > 0 ? (meta.ahorroActual / meta.montoTotal) * 100 : 0;
@@ -253,7 +259,7 @@ export const MetasPage = () => {
                 {/* Modales */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={metaModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} Meta</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
@@ -377,7 +383,7 @@ export const MetasPage = () => {
 
                 {isAbonoModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={abonoModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">💰 Abonar a Meta</h2>
                             <div className="space-y-4">
                                 <div>

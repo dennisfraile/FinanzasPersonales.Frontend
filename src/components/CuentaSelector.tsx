@@ -1,5 +1,6 @@
 import { useQueryCuentas } from '../hooks/useQueryHooks';
 import { useTheme } from '../context/ThemeContext';
+import { formatCurrency as formatMoney } from '../utils/formatters';
 
 interface CuentaSelectorProps {
     value?: number | null;
@@ -17,14 +18,8 @@ export const CuentaSelector: React.FC<CuentaSelectorProps> = ({
     const { theme } = useTheme();
     const { data: cuentas = [], isLoading } = useQueryCuentas();
 
-    const formatCurrency = (amount: number, moneda: string) => {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: moneda || 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
-    };
+    const formatCurrency = (amount: number, moneda: string) =>
+        formatMoney(amount, { currency: moneda, minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
     return (
         <div>

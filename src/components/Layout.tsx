@@ -12,7 +12,6 @@ import { NotificationBell } from './NotificationBell';
 import { GlobalSearch } from './GlobalSearch';
 import PageTransition from './PageTransition';
 import OfflineIndicator from './OfflineIndicator';
-import { useSignalR } from '../hooks/useSignalR';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -37,7 +36,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
-    const { startConnection } = useSignalR();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
@@ -147,15 +145,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(getInitialOpenGroups);
 
-    // Iniciar conexión SignalR cuando el usuario está autenticado
-    useEffect(() => {
-        if (user) {
-            startConnection().catch((err) => {
-                console.error('SignalR connection failed:', err);
-            });
-        }
-    }, [user, startConnection]);
-
     // Cerrar sidebar al cambiar de ruta
     useEffect(() => {
         setSidebarOpen(false);
@@ -204,6 +193,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+            {/* Skip to content: oculto hasta recibir foco con Tab (accesibilidad teclado) */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg"
+            >
+                Saltar al contenido
+            </a>
             {/* Navbar */}
             <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 sticky top-0 z-20 transition-colors">
                 <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -392,7 +388,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </aside>
 
                 {/* Main content */}
-                <main className="flex-1 transition-all duration-300">
+                <main id="main-content" className="flex-1 transition-all duration-300">
                     <PageTransition key={location.pathname}>
                         {children}
                     </PageTransition>
@@ -400,7 +396,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             <OfflineIndicator />
-            <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+            {searchOpen && <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />}
         </div>
     );
 };

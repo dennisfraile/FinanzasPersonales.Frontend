@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import type { GastoRecurrente, CreateGastoRecurrenteDto } from '../services/gastosRecurrentesService';
 import { useCuentas } from '../hooks/useCuentas';
 import { Repeat, Plus, Edit2, Trash2, Play } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import HelpTooltip from '../components/HelpTooltip';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
 import {
     useGastosRecurrentes, useCreateGastoRecurrente, useUpdateGastoRecurrente,
@@ -23,6 +25,7 @@ export const GastosRecurrentesPage = () => {
     const deleteMutation = useDeleteGastoRecurrente();
     const generarMutation = useGenerarGastoRecurrente();
     const generarPendientesMutation = useGenerarPendientes();
+    const confirm = useConfirm();
 
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -69,7 +72,7 @@ export const GastosRecurrentesPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('¿Eliminar este gasto recurrente?')) return;
+        if (!(await confirm('¿Eliminar este gasto recurrente?'))) return;
         try {
             await deleteMutation.mutateAsync(id);
             toast.success('Gasto recurrente eliminado');
@@ -109,6 +112,8 @@ export const GastosRecurrentesPage = () => {
             activo: true
         });
     };
+
+    const modalRef = useFocusTrap<HTMLDivElement>(showModal, handleCloseModal);
 
     if (isLoading) {
         return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
@@ -241,7 +246,7 @@ export const GastosRecurrentesPage = () => {
                 {/* Modal */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
+                        <div ref={modalRef} role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto`}>
                             <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {editingId ? 'Editar' : 'Nuevo'} gasto recurrente
                             </h2>

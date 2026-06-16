@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { X, Plus, Edit2, Trash2, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useGastoConDetalles, useCreateDetalleGasto, useUpdateDetalleGasto, useDeleteDetalleGasto } from '../hooks/useQueryHooks';
+import { useConfirm } from '../context/ConfirmContext';
 import type { DetalleGasto } from '../services/detallesGastoService';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 interface DetallesGastoPanelProps {
     gastoId: number;
@@ -14,6 +16,7 @@ export default function DetallesGastoPanel({ gastoId, onClose }: DetallesGastoPa
     const createMutation = useCreateDetalleGasto();
     const updateMutation = useUpdateDetalleGasto();
     const deleteMutation = useDeleteDetalleGasto();
+    const confirm = useConfirm();
 
     const [showForm, setShowForm] = useState(false);
     const [editingDetalle, setEditingDetalle] = useState<DetalleGasto | null>(null);
@@ -23,6 +26,9 @@ export default function DetallesGastoPanel({ gastoId, onClose }: DetallesGastoPa
         fecha: new Date().toISOString().split('T')[0],
         notas: '',
     });
+
+    const panelModalRef = useFocusTrap<HTMLDivElement>(true, onClose);
+    const loadingModalRef = useFocusTrap<HTMLDivElement>(true, onClose);
 
     const resetForm = () => {
         setFormData({ descripcion: '', monto: 0, fecha: new Date().toISOString().split('T')[0], notas: '' });
@@ -68,7 +74,7 @@ export default function DetallesGastoPanel({ gastoId, onClose }: DetallesGastoPa
     };
 
     const handleDelete = async (detalleId: number) => {
-        if (!window.confirm('¿Eliminar esta compra?')) return;
+        if (!(await confirm('¿Eliminar esta compra?'))) return;
         try {
             await deleteMutation.mutateAsync({ gastoId, detalleId });
             toast.success('Compra eliminada');
@@ -80,7 +86,7 @@ export default function DetallesGastoPanel({ gastoId, onClose }: DetallesGastoPa
     if (isLoading || !gasto) {
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg">
+                <div ref={loadingModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg">
                     <div className="animate-pulse space-y-4">
                         <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
@@ -97,7 +103,7 @@ export default function DetallesGastoPanel({ gastoId, onClose }: DetallesGastoPa
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div ref={panelModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="p-6 border-b dark:border-gray-700">
                     <div className="flex justify-between items-start">

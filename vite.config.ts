@@ -102,12 +102,20 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-charts': ['recharts'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-signalr': ['@microsoft/signalr'],
-          'vendor-calendar': ['@fullcalendar/core', '@fullcalendar/daygrid', '@fullcalendar/react', '@fullcalendar/timegrid'],
+        // Forma de función para garantizar que react-dom y demás vendors se
+        // extraen por completo del entry (la forma de objeto dejaba parte de
+        // react-dom filtrada en index.js, inflándolo).
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(id)) return 'vendor-react';
+          if (id.includes('node_modules/recharts') || /[\\/]node_modules[\\/](d3-|internmap|victory-vendor|decimal\.js-light)/.test(id)) return 'vendor-charts';
+          if (id.includes('node_modules/@tanstack')) return 'vendor-query';
+          if (id.includes('node_modules/@microsoft/signalr')) return 'vendor-signalr';
+          if (id.includes('node_modules/framer-motion')) return 'vendor-motion';
+          if (id.includes('node_modules/@fullcalendar')) return 'vendor-calendar';
+          if (id.includes('node_modules/react-toastify')) return 'vendor-toastify';
+          if (id.includes('node_modules/axios')) return 'vendor-http';
+          if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
         },
       },
     },

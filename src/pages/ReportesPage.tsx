@@ -9,6 +9,7 @@ import HelpTooltip from '../components/HelpTooltip';
 import { sectionHelp } from '../utils/helpContent';
 import apiClient from '../services/api';
 import { useTendencias, useComparativa, useTopCategorias, useGastosTipo, useProyeccion } from '../hooks/useQueryHooks';
+import { formatCurrency } from '../utils/formatters';
 
 export const ReportesPage = () => {
     const [mesesAnalisis, setMesesAnalisis] = useState(6);
@@ -20,13 +21,6 @@ export const ReportesPage = () => {
     const { data: proyeccion } = useProyeccion();
 
     const isLoading = isLoadingTendencias;
-
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(value);
-    };
 
     const formatPercent = (value: number) => {
         return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;

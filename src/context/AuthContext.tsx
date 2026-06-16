@@ -32,22 +32,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
-        const token = authService.getToken();
-        if (token) {
-            loadUserProfile().finally(() => setIsLoading(false));
-        } else {
-            setIsLoading(false);
-        }
+        loadUserProfile().finally(() => setIsLoading(false));
     }, []);
 
     const loginWithGoogle = async (idToken: string) => {
-        const response = await authService.loginWithGoogle(idToken);
-        localStorage.setItem('token', response.token);
+        await authService.loginWithGoogle(idToken);
         await loadUserProfile();
     };
 
-    const logout = () => {
-        authService.logout();
+    const logout = async () => {
+        await authService.logout();
         setUser(null);
     };
 

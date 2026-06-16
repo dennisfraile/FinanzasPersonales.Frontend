@@ -7,7 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { usePresupuestos, useCreatePresupuesto, useUpdatePresupuesto, useDeletePresupuesto, useCategorias } from '../hooks/useQueryHooks';
 import HelpTooltip from '../components/HelpTooltip';
 import EmptyState from '../components/EmptyState';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp, emptyStates } from '../utils/helpContent';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 // Helper para obtener número de semana ISO
 const getISOWeek = (date: Date): number => {
@@ -26,6 +28,7 @@ export const PresupuestosPage = () => {
     const createPresupuestoMutation = useCreatePresupuesto();
     const updatePresupuestoMutation = useUpdatePresupuesto();
     const deletePresupuestoMutation = useDeletePresupuesto();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -57,7 +60,7 @@ export const PresupuestosPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Estás seguro de eliminar este presupuesto?')) {
+        if (await confirm('¿Estás seguro de eliminar este presupuesto?')) {
             try {
                 await deletePresupuestoMutation.mutateAsync(id);
                 toast.success('Presupuesto eliminado');
@@ -93,6 +96,8 @@ export const PresupuestosPage = () => {
             anoAplicable: new Date().getFullYear(),
         });
     };
+
+    const presupuestoModalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
 
     const getAlertLevel = (porcentaje: number) => {
         if (porcentaje >= 100) return 'danger';
@@ -315,7 +320,7 @@ export const PresupuestosPage = () => {
                 {/* Modal crear/editar */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div ref={presupuestoModalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nuevo'} presupuesto</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>

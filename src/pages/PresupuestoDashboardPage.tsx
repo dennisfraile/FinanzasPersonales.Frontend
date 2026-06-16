@@ -2,11 +2,9 @@ import { useState } from 'react';
 import { usePresupuestoDashboard } from '../hooks/useQueryHooks';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { AlertTriangle, CheckCircle2, TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
+import { formatCurrency } from '../utils/formatters';
 
 const PERIODOS = ['Semanal', 'Quincenal', 'Mensual', 'Trimestral', 'Semestral', 'Anual'] as const;
-
-const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
 export const PresupuestoDashboardPage = () => {
     const [periodo, setPeriodo] = useState('Semanal');

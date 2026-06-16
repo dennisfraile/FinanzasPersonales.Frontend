@@ -1,20 +1,13 @@
-import { motion } from 'framer-motion';
-
 interface PageTransitionProps {
     children: React.ReactNode;
 }
 
+// Transición de entrada con CSS puro (clase .page-transition en index.css).
+// Antes usaba framer-motion, pero eso arrastraba ~122 KB al bundle inicial
+// porque Layout monta este componente de forma eager. La animación es la misma:
+// fade + slide-up al montar.
 const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-            {children}
-        </motion.div>
-    );
+    return <div className="page-transition">{children}</div>;
 };
 
 export default PageTransition;

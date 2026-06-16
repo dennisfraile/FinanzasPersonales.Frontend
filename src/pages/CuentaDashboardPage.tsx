@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import type { TransaccionTimeline } from '../services/cuentaDashboardService';
+import { formatCurrency } from '../utils/formatters';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const iconosPorTipo: Record<string, any> = {
     'Efectivo': Wallet,
@@ -18,9 +20,6 @@ const iconosPorTipo: Record<string, any> = {
     'Ahorros': PiggyBank,
     'Inversion': TrendingUp
 };
-
-const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
 const formatDate = (fecha: string) =>
     new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -298,6 +297,7 @@ const SurplusModal = ({ cuentaId, surplus, periodo, onClose }: {
     const [destino, setDestino] = useState<'BalanceInicial' | 'Meta'>('BalanceInicial');
     const [metaId, setMetaId] = useState<number | undefined>();
     const [monto, setMonto] = useState(surplus);
+    const surplusModalRef = useFocusTrap<HTMLDivElement>(true, onClose);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -317,7 +317,7 @@ const SurplusModal = ({ cuentaId, surplus, periodo, onClose }: {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl max-w-md w-full p-6`}>
+            <div ref={surplusModalRef} role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl max-w-md w-full p-6`}>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Asignar Sobrante</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Tienes {formatCurrency(surplus)} de sobrante en {periodo}

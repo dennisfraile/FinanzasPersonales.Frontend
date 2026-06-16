@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { type ReglaCategoria, type CreateReglaCategoriaDto } from '../services/reglasCategoriaService';
 import { Trash2, Plus, Edit2, Search, Zap, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import HelpTooltip from '../components/HelpTooltip';
+import { useConfirm } from '../context/ConfirmContext';
 import { sectionHelp } from '../utils/helpContent';
 import { useReglasCategoria, useCreateReglaCategoria, useUpdateReglaCategoria, useDeleteReglaCategoria, useCategorias } from '../hooks/useQueryHooks';
 
@@ -24,6 +26,7 @@ export const ReglasCategoriaPage = () => {
     const createMutation = useCreateReglaCategoria();
     const updateMutation = useUpdateReglaCategoria();
     const deleteMutation = useDeleteReglaCategoria();
+    const confirm = useConfirm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -85,7 +88,7 @@ export const ReglasCategoriaPage = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('¿Eliminar esta regla?')) {
+        if (await confirm('¿Eliminar esta regla?')) {
             try { await deleteMutation.mutateAsync(id); toast.success('Regla eliminada'); }
             catch { toast.error('Error al eliminar'); }
         }
@@ -102,6 +105,8 @@ export const ReglasCategoriaPage = () => {
         setEditingId(null);
         setFormData({ patron: '', tipoCoincidencia: 'Contiene', categoriaId: 0, tipoTransaccion: 'Gasto', prioridad: 0 });
     };
+
+    const modalRef = useFocusTrap<HTMLDivElement>(isModalOpen, handleCloseModal);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -171,7 +176,7 @@ export const ReglasCategoriaPage = () => {
                 {/* Modal */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                        <div ref={modalRef} role="dialog" aria-modal="true" className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
                             <h2 className="text-2xl font-bold mb-4 dark:text-white">{editingId ? 'Editar' : 'Nueva'} regla</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
